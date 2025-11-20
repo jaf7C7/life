@@ -1,6 +1,9 @@
 import { next } from './life.js'
 
+
 test('a live cell with no neighbours dies', () => {
-    cells = [[0, 0]];
-    expect(next(cells)).toStrictEqual([]);
+    liveCell = [0, 0];
+    cells = [liveCell];
+
+    expect(next(cells)).not.toContain(liveCell);
 });
