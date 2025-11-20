@@ -8,3 +8,4 @@ export VIMINIT="${VIMINIT:+${VIMINIT} | }set et ts=4 sw=0 formatprg=fmt\ -p'//\ 
 export CMT='//'
 
 alias t='npm test'
+alias todo='grep -- "- \[ ]" TODO.md'
