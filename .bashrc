@@ -7,6 +7,6 @@ PS1='\[\e[1;34m\]life\[\e[m\]\$ '
 export VIMINIT="${VIMINIT:+${VIMINIT} | }set expandtab tabstop=4 shiftwidth=0 autoread formatprg=fmt\ -p'//\ '"
 export CMT='//'
 
-alias t='npm test'
+alias t='npm run lint && npm test'
 alias f='npm run format -- --write'
 alias todo='grep -- "- \[ ]" TODO.md'
