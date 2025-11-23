@@ -13,13 +13,14 @@
     "prettier": "^3.6.2"
   },
   "scripts": {
-    "preinstall": "git config core.hooksPath .githooks",
-    "test": "jest",
-    "format": "prettier --tab-width 4 --single-quote '*.js'",
-    "lint": "eslint"
+    "test": "eslint && prettier --write '*.js' && jest"
   },
   "author": "",
   "license": "ISC",
+  "prettier": {
+    "tabWidth": 4,
+    "singleQuote": true
+  },
   "babel": {
     "presets": [
       [
