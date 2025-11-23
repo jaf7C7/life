@@ -1,0 +1,29 @@
+#!/bin/sh
+
+staged_files=$(git diff --staged --name-only)
+unformatted_files=$(npx prettier --list-different .)
+
+for file in $unformatted_files; do
+    # If `staged_files` contains `file` the string will be empty and the
+    # test will succeed.  If the test succeeds the file will be added to the
+    # argument list.
+    test -z "${staged_files##*${file}*}" && set -- "$@" "$file"
+done
+
+# If any of the staged files need formatting then run the formatter on
+# those files and abort the commit.  This is to prevent accidentally
+# committing changes from whole files if only a part was originally in
+# the index (i.e. from `git add --patch`).  This way the user can see
+# files have been reformatted, and diff the new changes with the changes
+# in the index that they were about to commit.
+if test $# -gt 0; then
+    echo "Formatting errors detected, aborting commit..."
+
+    npx prettier --write "$@"
+
+    echo 'Files have been reformatted, review the changes with "git diff"'
+
+    exit 1
+fi
+
+exit 0
