@@ -5,5 +5,5 @@ test('a live cell with no neighbours dies', () => {
     liveCell = [0, 0];
     cells = [liveCell];
 
-    expect(next(cells)).not.toContain(liveCell);
+    expect(next(cells)).not.toContainEqual(liveCell);
 });
