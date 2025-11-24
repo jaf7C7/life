@@ -60,6 +60,7 @@ function killCell(targetCell, cells) {
  */
 export function next(cells) {
     let newCells = [...cells];
+    const counter = [];
 
     for (let cell of newCells) {
         const liveNeighbours = getNeighbours(cell).filter((neighbour) => {
@@ -69,6 +70,18 @@ export function next(cells) {
         if (liveNeighbours.length < 2 || liveNeighbours.length > 3) {
             newCells = killCell(cell, newCells);
         }
+
+        const deadNeighbours = getNeighbours(cell).filter((neighbour) => {
+            return !cellIsAlive(neighbour, newCells);
+        });
+
+        deadNeighbours.forEach((neighbour) => {
+            counter.push(neighbour);
+        });
+    }
+
+    if (counter.filter((e) => cellsAreEqual(e, [0, 0])).length === 3) {
+        newCells.push([0, 0]);
     }
 
     return newCells;
