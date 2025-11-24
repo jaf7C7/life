@@ -8,6 +8,17 @@ test('a live cell with no neighbours dies', () => {
     expect(next(cells)).not.toContainEqual(liveCell);
 });
 
+test('a live cell with no neighbours dies (redux)', () => {
+    const liveCell = [0, 0];
+    const notNeighbours = [
+        [6, 6],
+        [5, 5],
+    ];
+    const cells = [liveCell, ...notNeighbours];
+
+    expect(next(cells)).not.toContainEqual(liveCell);
+});
+
 test('a live cell with two live neighbours survives', () => {
     const liveCell = [0, 0];
     const neighbours = [
