@@ -29,3 +29,15 @@ test('a live cell with two live neighbours survives', () => {
 
     expect(next(cells)).toContainEqual(liveCell);
 });
+
+test('a live cell with three live neighbours survives', () => {
+    const liveCell = [0, 0];
+    const neighbours = [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+    ];
+    const cells = [liveCell, ...neighbours];
+
+    expect(next(cells)).toContainEqual(liveCell);
+});

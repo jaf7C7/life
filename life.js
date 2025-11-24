@@ -66,7 +66,7 @@ export function next(cells) {
             return cellIsAlive(neighbour, newCells);
         });
 
-        if (liveNeighbours.length !== 2) {
+        if (liveNeighbours.length < 2 || liveNeighbours.length > 3) {
             newCells = killCell(cell, newCells);
         }
     }
