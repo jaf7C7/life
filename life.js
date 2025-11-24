@@ -11,9 +11,9 @@ export function next(cells) {
         [1, 0],
         [-1, 0],
     ];
-    const condition = potentialNeighbours.every((potentialNeighbour) =>
+    const liveNeighbours = potentialNeighbours.filter((potentialNeighbour) =>
         cellIsAlive(potentialNeighbour, cells),
     );
 
-    return condition ? cells : [];
+    return liveNeighbours.length == 2 ? cells : [];
 }
