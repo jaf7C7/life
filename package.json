@@ -13,14 +13,22 @@
     "prettier": "^3.6.2"
   },
   "scripts": {
-    "test": "eslint && prettier --write '*.js' && jest"
     "preinstall": "git config core.hooksPath .githooks",
+    "test": "eslint && jest"
   },
   "author": "",
   "license": "ISC",
   "prettier": {
     "tabWidth": 4,
-    "singleQuote": true
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.json",
+        "options": {
+          "tabWidth": 2
+        }
+      }
+    ]
   },
   "babel": {
     "presets": [

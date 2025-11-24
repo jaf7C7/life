@@ -8,5 +8,6 @@ export VIMINIT="${VIMINIT:+${VIMINIT} | }set expandtab tabstop=4 shiftwidth=0 au
 export CMT='//'
 
 alias t='npm run test'
+alias f='npx prettier --write .'
 alias watch='npx onchange "*.js" -- npm run test'
 alias todo='grep -- "- \[ ]" TODO.md'
