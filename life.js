@@ -52,36 +52,26 @@ function getNeighbours(targetCell) {
 }
 
 /**
- * Removes `targetCell` from `cells` and returns the new state of `cells`.
- * @param {Cell} targetCell
- * @param {Array<Cell>} cells
- * @returns {Array<Cell>}
- */
-function killCell(targetCell, cells) {
-    return cells.filter((cell) => !cellsAreEqual(cell, targetCell));
-}
-
-/**
  * Calculates the next state of a given set of cells according to the
  * rules of the game and returns that new state.
  * @param {Array<Cell>} cells
  * @returns {Array<Cell>}
  */
 export function next(cells) {
-    let newCells = [...cells];
+    const newCells = [];
     const potentialResurrectees = [];
 
-    for (const cell of newCells) {
+    for (const cell of cells) {
         const liveNeighbours = getNeighbours(cell).filter((neighbour) => {
-            return cellIsAlive(neighbour, newCells);
+            return cellIsAlive(neighbour, cells);
         });
 
-        if (liveNeighbours.length < 2 || liveNeighbours.length > 3) {
-            newCells = killCell(cell, newCells);
+        if (liveNeighbours.length == 2 || liveNeighbours.length == 3) {
+            newCells.push(cell);
         }
 
         const deadNeighbours = getNeighbours(cell).filter((neighbour) => {
-            return !cellIsAlive(neighbour, newCells);
+            return !cellIsAlive(neighbour, cells);
         });
 
         potentialResurrectees.push(...deadNeighbours);
