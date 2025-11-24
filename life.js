@@ -23,9 +23,9 @@ function getNeighbours(targetCell) {
 }
 
 export function next(cells) {
-    const potentialNeighbours = getNeighbours([0, 0]);
-    const liveNeighbours = potentialNeighbours.filter((potentialNeighbour) =>
-        cellIsAlive(potentialNeighbour, cells),
+    const neighbours = getNeighbours([0, 0]);
+    const liveNeighbours = neighbours.filter((neighbour) =>
+        cellIsAlive(neighbour, cells),
     );
 
     return liveNeighbours.length == 2 ? cells : [];
