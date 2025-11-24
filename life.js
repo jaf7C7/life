@@ -62,7 +62,7 @@ export function next(cells) {
     let newCells = [...cells];
     const potentialResurrectees = [];
 
-    for (let cell of newCells) {
+    for (const cell of newCells) {
         const liveNeighbours = getNeighbours(cell).filter((neighbour) => {
             return cellIsAlive(neighbour, newCells);
         });
