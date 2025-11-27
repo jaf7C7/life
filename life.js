@@ -37,7 +37,7 @@ function cellIsAlive(targetCell, cells) {
  */
 function getNeighbours(targetCell) {
     const [x, y] = targetCell;
-    const neighbours = [
+    return [
         [x + 1, y],
         [x + 1, y + 1],
         [x, y + 1],
@@ -47,8 +47,6 @@ function getNeighbours(targetCell) {
         [x, y - 1],
         [x + 1, y - 1],
     ];
-
-    return neighbours;
 }
 
 /**
