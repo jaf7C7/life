@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals';
-import { next } from './life.js';
+import { next } from '../life.js';
 
 test('a live cell with no neighbours dies', () => {
     const liveCell = [0, 0];
