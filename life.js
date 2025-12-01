@@ -6,15 +6,15 @@
  * @returns {Array.<Cell>}
  */
 function uniquify(cells) {
-    const uniqueCells = [];
+    const result = [];
 
     for (const cell of cells) {
-        if (!contains(cell, uniqueCells)) {
-            uniqueCells.push(cell);
+        if (!contains(cell, result)) {
+            result.push(cell);
         }
     }
 
-    return uniqueCells;
+    return result;
 }
 
 /**
