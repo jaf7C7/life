@@ -9,7 +9,7 @@ function uniquify(cells) {
     const uniqueCells = [];
 
     for (const cell of cells) {
-        if (!cellIsAlive(cell, uniqueCells)) {
+        if (!contains(cell, uniqueCells)) {
             uniqueCells.push(cell);
         }
     }
@@ -33,7 +33,7 @@ export function cellsAreEqual(cellA, cellB) {
  * @param {Array.<Cell>} cells
  * @returns {boolean}
  */
-function cellIsAlive(targetCell, cells) {
+function contains(targetCell, cells) {
     return cells.find((cell) => cellsAreEqual(targetCell, cell)) !== undefined;
 }
 
@@ -69,7 +69,7 @@ function analyseNeighbours(cell, cells) {
     const deadNeighbours = [];
 
     for (const neighbour of getNeighbours(cell)) {
-        if (cellIsAlive(neighbour, cells)) {
+        if (contains(neighbour, cells)) {
             liveNeighbours.push(neighbour);
         } else {
             deadNeighbours.push(neighbour);
