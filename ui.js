@@ -1,4 +1,4 @@
-import { cellsAreEqual } from './life.js';
+import { cellsAreEqual, next } from './life.js';
 
 export function createGrid() {
     return {
@@ -18,7 +18,7 @@ export function createGrid() {
     };
 }
 
-export function createGame() {
+export function createGame(grid) {
     let playing = false;
 
     return {
@@ -32,6 +32,10 @@ export function createGame() {
 
         isPlaying() {
             return playing;
+        },
+
+        tick() {
+            grid.cells = next(grid.cells);
         },
     };
 }

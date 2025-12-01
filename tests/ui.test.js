@@ -46,3 +46,14 @@ test('can stop the playing game', () => {
 
     expect(game.isPlaying()).toBe(false);
 });
+
+test('calculates new state of the game with each tick', () => {
+    const grid = createGrid();
+    // A lone cell without neighbours will die after 1 generation.
+    grid.toggleCell(5, 5);
+    const game = createGame(grid);
+
+    game.tick();
+
+    expect(grid.cells).not.toContainEqual([5, 5]);
+});
