@@ -23,7 +23,7 @@ function uniquify(cells) {
  * @param {Cell} cellB
  * @returns {boolean}
  */
-export function cellsAreEqual(cellA, cellB) {
+export function equals(cellA, cellB) {
     return cellA[0] === cellB[0] && cellA[1] === cellB[1];
 }
 
@@ -34,7 +34,7 @@ export function cellsAreEqual(cellA, cellB) {
  * @returns {boolean}
  */
 function contains(targetCell, cells) {
-    return cells.find((cell) => cellsAreEqual(targetCell, cell)) !== undefined;
+    return cells.find((cell) => equals(targetCell, cell)) !== undefined;
 }
 
 /**
@@ -101,7 +101,7 @@ export function next(cells) {
 
     for (const cell of uniquify(potentialResurrectees)) {
         const occurrences = potentialResurrectees.filter((e) => {
-            return cellsAreEqual(e, cell);
+            return equals(e, cell);
         });
 
         if (occurrences.length === 3) {

@@ -1,4 +1,4 @@
-import { cellsAreEqual, next } from './life.js';
+import { equals, next } from './life.js';
 
 export function createGrid() {
     return {
@@ -6,7 +6,7 @@ export function createGrid() {
         toggleCell(x, y) {
             const targetCell = [x, y];
             const cellIndex = this.cells.findIndex((cell) =>
-                cellsAreEqual(cell, targetCell),
+                equals(cell, targetCell),
             );
 
             if (cellIndex === -1) {
