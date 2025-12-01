@@ -43,7 +43,7 @@ function contains(targetCell, cells) {
  * @param {Cell} targetCell
  * @returns {Array.<Cell>}
  */
-function getNeighbours(targetCell) {
+function neighbours(targetCell) {
     const [x, y] = targetCell;
     return [
         [x + 1, y],
@@ -68,7 +68,7 @@ function analyseNeighbours(cell, cells) {
     const liveNeighbours = [];
     const deadNeighbours = [];
 
-    for (const neighbour of getNeighbours(cell)) {
+    for (const neighbour of neighbours(cell)) {
         if (contains(neighbour, cells)) {
             liveNeighbours.push(neighbour);
         } else {
