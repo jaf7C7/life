@@ -9,7 +9,7 @@ function uniquify(cells) {
     const uniqueCells = [];
 
     for (const cell of cells) {
-        if (uniqueCells.find((c) => cellsAreEqual(cell, c)) === undefined) {
+        if (!cellIsAlive(cell, uniqueCells)) {
             uniqueCells.push(cell);
         }
     }
