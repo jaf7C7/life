@@ -26,6 +26,10 @@ export function createGame() {
             playing = true;
         },
 
+        stop() {
+            playing = false;
+        },
+
         isPlaying() {
             return playing;
         },

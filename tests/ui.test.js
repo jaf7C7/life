@@ -37,3 +37,12 @@ test('can start the game', () => {
 
     expect(game.isPlaying()).toBe(true);
 });
+
+test('can stop the playing game', () => {
+    const game = createGame();
+
+    game.play();
+    game.stop();
+
+    expect(game.isPlaying()).toBe(false);
+});
