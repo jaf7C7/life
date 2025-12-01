@@ -9,19 +9,14 @@ export CMT='//'
 
 alias t='npm run test'
 alias f='npx prettier --write .'
+alias repl='node -i -e "$(sed -E "s/(export|default) //"'
 alias todo='grep -- "- \[ ]" TODO.md'
 
+# Usage: watch '*.js'
+# Quote glob to only match files tracked by git.
 watch() {
+    set -- $(git ls-files "${@:-*.js}")
+    printf '%s\n' "watching files:" "$@"
     npx onchange "$@" -- npm run test
 }
 
-repl() {
-    node -i -e "$(sed -E "s/(export|default) //" "$@")"
-}
-
-# Tab-complete with file names known to git.
-_f() {
-    COMPREPLY=($(git ls-files ${2}*))
-}
-complete -F _f watch
-complete -F _f repl
