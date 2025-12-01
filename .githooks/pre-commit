@@ -1,7 +1,7 @@
 #!/bin/sh
 
 staged_files=$(git diff --staged --name-only)
-unformatted_files=$(npx prettier --list-different .)
+unformatted_files=$(node_modules/.bin/prettier --list-different .)
 
 for file in $unformatted_files; do
     # If `staged_files` contains `file` the string will be empty and the
@@ -19,7 +19,7 @@ done
 if test $# -gt 0; then
     echo "Formatting errors detected, aborting commit..."
 
-    npx prettier --write "$@"
+    node_modules/.bin/prettier --write "$@"
 
     echo 'Files have been reformatted, review the changes with "git diff"'
 
