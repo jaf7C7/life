@@ -86,14 +86,14 @@ function analyseNeighbours(cell, cells) {
  * @returns {Array.<Cell>}
  */
 export function next(cells) {
-    const nextCells = [];
+    const result = [];
     const potentialResurrectees = [];
 
     for (const cell of cells) {
         const [liveNeighbours, deadNeighbours] = analyseNeighbours(cell, cells);
 
         if (liveNeighbours.length === 2 || liveNeighbours.length === 3) {
-            nextCells.push(cell);
+            result.push(cell);
         }
 
         potentialResurrectees.push(...deadNeighbours);
@@ -105,9 +105,9 @@ export function next(cells) {
         });
 
         if (occurrences.length === 3) {
-            nextCells.push(cell);
+            result.push(cell);
         }
     }
 
-    return nextCells;
+    return result;
 }
