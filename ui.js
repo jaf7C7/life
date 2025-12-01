@@ -19,9 +19,15 @@ export function createGrid() {
 }
 
 export function createGame() {
+    let playing = false;
+
     return {
+        play() {
+            playing = true;
+        },
+
         isPlaying() {
-            return false;
+            return playing;
         },
     };
 }

@@ -29,3 +29,11 @@ test('game starts in stopped state', () => {
 
     expect(game.isPlaying()).toBe(false);
 });
+
+test('can start the game', () => {
+    const game = createGame();
+
+    game.play();
+
+    expect(game.isPlaying()).toBe(true);
+});
