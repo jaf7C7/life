@@ -1,14 +1,14 @@
 import { test, expect } from '@jest/globals';
-import { createGame } from '../ui.js';
+import { Game } from '../ui.js';
 
 test('should create a grid of cells', () => {
-    const game = createGame();
+    const game = new Game();
 
     expect(game.cells).toEqual([]);
 });
 
 test('can toggle a dead cell to alive', () => {
-    const game = createGame();
+    const game = new Game();
 
     game.toggleCell(5, 5);
 
@@ -16,7 +16,7 @@ test('can toggle a dead cell to alive', () => {
 });
 
 test('can toggle an alive cell to dead', () => {
-    const game = createGame();
+    const game = new Game();
 
     game.toggleCell(5, 5);
     game.toggleCell(5, 5);
@@ -25,13 +25,13 @@ test('can toggle an alive cell to dead', () => {
 });
 
 test('the game is initially in stopped state', () => {
-    const game = createGame();
+    const game = new Game();
 
     expect(game.isPlaying()).toBe(false);
 });
 
 test('the game loop can be started', () => {
-    const game = createGame();
+    const game = new Game();
 
     game.play();
 
@@ -39,7 +39,7 @@ test('the game loop can be started', () => {
 });
 
 test('the game loop can be stopped', () => {
-    const game = createGame();
+    const game = new Game();
 
     game.play();
     game.stop();
@@ -49,7 +49,7 @@ test('the game loop can be stopped', () => {
 
 test('the game calculates new state of the grid with each tick', () => {
     // A lone cell without neighbours will die after 1 generation.
-    const game = createGame();
+    const game = new Game();
     game.toggleCell(5, 5);
 
     game.tick();
