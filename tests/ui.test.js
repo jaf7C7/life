@@ -2,9 +2,9 @@ import { test, expect } from '@jest/globals';
 import { createGrid, createGame } from '../ui.js';
 
 test('should create a grid of cells', () => {
-    const grid = createGrid();
+    const game = createGame();
 
-    expect(grid.cells).toEqual([]);
+    expect(game.cells).toEqual([]);
 });
 
 test('can toggle a dead cell to alive', () => {

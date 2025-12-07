@@ -19,9 +19,12 @@ export function createGrid() {
 }
 
 export function createGame(grid) {
+    let cells = [];
     let playing = false;
 
     return {
+        cells: cells,
+
         play() {
             playing = true;
         },
