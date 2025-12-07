@@ -1,94 +1,58 @@
 import { test, expect } from '@jest/globals';
-import { next } from '../life.js';
+import { Life } from '../life.js';
 
-test('a live cell with no neighbours dies', () => {
-    const liveCell = [0, 0];
-    const cells = [liveCell];
+test('should create a grid of cells', () => {
+    const life = new Life();
 
-    expect(next(cells)).not.toContainEqual(liveCell);
+    expect(life.cells).toEqual([]);
 });
 
-test('a live cell with no neighbours dies (redux)', () => {
-    const liveCell = [0, 0];
-    const notNeighbours = [
-        [6, 6],
-        [5, 5],
-    ];
-    const cells = [liveCell, ...notNeighbours];
+test('can toggle a dead cell to alive', () => {
+    const life = new Life();
 
-    expect(next(cells)).not.toContainEqual(liveCell);
+    life.toggleCell(5, 5);
+
+    expect(life.cells).toContainEqual([5, 5]);
 });
 
-test('a live cell with two live neighbours survives', () => {
-    const liveCell = [0, 0];
-    const neighbours = [
-        [1, 0],
-        [-1, 0],
-    ];
-    const cells = [liveCell, ...neighbours];
+test('can toggle an alive cell to dead', () => {
+    const life = new Life();
 
-    expect(next(cells)).toContainEqual(liveCell);
+    life.toggleCell(5, 5);
+    life.toggleCell(5, 5);
+
+    expect(life.cells).not.toContainEqual([5, 5]);
 });
 
-test('a live cell with three live neighbours survives', () => {
-    const liveCell = [0, 0];
-    const neighbours = [
-        [1, 0],
-        [-1, 0],
-        [0, 1],
-    ];
-    const cells = [liveCell, ...neighbours];
+test('the game is initially in stopped state', () => {
+    const life = new Life();
 
-    expect(next(cells)).toContainEqual(liveCell);
+    expect(life.isPlaying()).toBe(false);
 });
 
-test('a live cell with more than three live neighbours dies', () => {
-    const liveCell = [0, 0];
-    const neighbours = [
-        [1, 0],
-        [-1, 0],
-        [0, 1],
-        [1, 1],
-    ];
-    const cells = [liveCell, ...neighbours];
+test('the game loop can be started', () => {
+    const life = new Life();
 
-    expect(next(cells)).not.toContainEqual(liveCell);
+    life.play();
+
+    expect(life.isPlaying()).toBe(true);
 });
 
-test('a dead cell with exactly three live neighbours becomes alive', () => {
-    const soonToBeAliveCell = [0, 0];
-    const neighbours = [
-        [1, 0],
-        [-1, 0],
-        [0, 1],
-    ];
-    const cells = [...neighbours];
+test('the game loop can be stopped', () => {
+    const life = new Life();
 
-    expect(next(cells)).toContainEqual(soonToBeAliveCell);
+    life.play();
+    life.stop();
+
+    expect(life.isPlaying()).toBe(false);
 });
 
-test('a dead cell with exactly three live neighbours becomes alive (redux)', () => {
-    const soonToBeAliveCell = [1, 1];
-    const neighbours = [
-        [1, 0],
-        [0, 0],
-        [0, 1],
-    ];
-    const cells = [...neighbours];
+test('the game calculates new state of the grid with each tick', () => {
+    // A lone cell without neighbours will die after 1 generation.
+    const life = new Life();
+    life.toggleCell(5, 5);
 
-    expect(next(cells)).toContainEqual(soonToBeAliveCell);
-});
+    life.tick();
 
-test('the blinker oscillator', () => {
-    // A blinker is the simplest form of oscillator in `life`. It oscillates
-    // infinitely between a row of three cells and a column of three cells.
-    // See: https://conways-game-of-life.fandom.com/wiki/Blinker
-    const blinker = [
-        [-1, 0],
-        [0, 0],
-        [1, 0],
-    ];
-    const cells = [...blinker];
-
-    expect(next(next(cells)).sort()).toEqual(blinker);
+    expect(life.cells).toEqual([]);
 });
