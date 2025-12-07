@@ -8,11 +8,11 @@ test('should create a grid of cells', () => {
 });
 
 test('can toggle a dead cell to alive', () => {
-    const grid = createGrid();
+    const game = createGame();
 
-    grid.toggleCell(5, 5);
+    game.toggleCell(5, 5);
 
-    expect(grid.cells).toContainEqual([5, 5]);
+    expect(game.cells).toContainEqual([5, 5]);
 });
 
 test('can toggle an alive cell to dead', () => {

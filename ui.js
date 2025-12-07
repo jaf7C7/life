@@ -40,5 +40,18 @@ export function createGame(grid) {
         tick() {
             grid.cells = next(grid.cells);
         },
+
+        toggleCell(x, y) {
+            const targetCell = [x, y];
+            const cellIndex = this.cells.findIndex((cell) =>
+                equals(cell, targetCell),
+            );
+
+            if (cellIndex === -1) {
+                this.cells.push([x, y]);
+            } else {
+                this.cells.splice(cellIndex, 1);
+            }
+        },
     };
 }
