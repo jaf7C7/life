@@ -18,7 +18,7 @@ export function createGrid() {
     };
 }
 
-export function createGame(grid) {
+export function createGame() {
     let cells = [];
     let playing = false;
 
@@ -38,7 +38,7 @@ export function createGame(grid) {
         },
 
         tick() {
-            grid.cells = next(grid.cells);
+            this.cells = next(this.cells);
         },
 
         toggleCell(x, y) {

@@ -1,5 +1,5 @@
 import { test, expect } from '@jest/globals';
-import { createGrid, createGame } from '../ui.js';
+import { createGame } from '../ui.js';
 
 test('should create a grid of cells', () => {
     const game = createGame();
@@ -16,12 +16,12 @@ test('can toggle a dead cell to alive', () => {
 });
 
 test('can toggle an alive cell to dead', () => {
-    const grid = createGrid();
+    const game = createGame();
 
-    grid.toggleCell(5, 5);
-    grid.toggleCell(5, 5);
+    game.toggleCell(5, 5);
+    game.toggleCell(5, 5);
 
-    expect(grid.cells).not.toContainEqual([5, 5]);
+    expect(game.cells).not.toContainEqual([5, 5]);
 });
 
 test('the game is initially in stopped state', () => {
@@ -48,12 +48,11 @@ test('the game loop can be stopped', () => {
 });
 
 test('the game calculates new state of the grid with each tick', () => {
-    const grid = createGrid();
     // A lone cell without neighbours will die after 1 generation.
-    grid.toggleCell(5, 5);
-    const game = createGame(grid);
+    const game = createGame();
+    game.toggleCell(5, 5);
 
     game.tick();
 
-    expect(grid.cells).toEqual([]);
+    expect(game.cells).toEqual([]);
 });
