@@ -131,6 +131,8 @@ export class Life {
     /**
      * @typedef {Object} ScheduledTask - A reference to a scheduled async task
      * - a thin wrapper around an interval id as returned by `setInterval`.
+     * @property {function(): void} cancel - Cancels execution of the task -
+     * a thin wrapper around `clearInterval`.
      */
 
     /**
@@ -148,7 +150,7 @@ export class Life {
     play(scheduler) {
         this._playing = true;
         if (scheduler) {
-            scheduler();
+            this._gameLoop = scheduler();
         }
     }
 
@@ -157,6 +159,9 @@ export class Life {
      */
     stop() {
         this._playing = false;
+        if (this._gameLoop) {
+            this._gameLoop.cancel();
+        }
     }
 
     /**

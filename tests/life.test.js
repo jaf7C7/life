@@ -46,11 +46,21 @@ test('the game loop can be started', () => {
 
 test('the game loop can be stopped', () => {
     const life = new Life();
+    let loopCancelled = false;
 
-    life.play();
+    const mockGameLoopScheduler = () => {
+        return {
+            cancel: () => {
+                loopCancelled = true;
+            },
+        };
+    };
+
+    life.play(mockGameLoopScheduler);
     life.stop();
 
     expect(life.isPlaying()).toBe(false);
+    expect(loopCancelled).toBe(true);
 });
 
 test('the game calculates new state of the grid with each tick', () => {
