@@ -1,9 +1,10 @@
-/** @type {Array.<number>} Cell */
+/** @type {[number, number]} Cell */
 
 /**
  * Removes duplicates from an array of cells, returning a new array.
- * @param {Array.<Cell>} cells
- * @returns {Array.<Cell>}
+ *
+ * @param {Cell[]} cells
+ * @returns {Cell[]}
  */
 function uniquify(cells) {
     const result = [];
@@ -19,6 +20,7 @@ function uniquify(cells) {
 
 /**
  * Returns `true` if `cellA` and `cellB` are the same, else `false`.
+ *
  * @param {Cell} cellA
  * @param {Cell} cellB
  * @returns {boolean}
@@ -29,8 +31,9 @@ function equals(cellA, cellB) {
 
 /**
  * Returns `true` if `targetCell` appears in `cells`, else `false`.
+ *
  * @param {Cell} targetCell
- * @param {Array.<Cell>} cells
+ * @param {Cell[]} cells
  * @returns {boolean}
  */
 function contains(targetCell, cells) {
@@ -38,10 +41,10 @@ function contains(targetCell, cells) {
 }
 
 /**
- * Returns the array of 8 cells which immediately surround the target
- * cell.
+ * Returns the array of 8 cells which immediately surround the target cell.
+ *
  * @param {Cell} targetCell
- * @returns {Array.<Cell>}
+ * @returns {Cell[]}
  */
 function neighbours(targetCell) {
     const [x, y] = targetCell;
@@ -60,9 +63,10 @@ function neighbours(targetCell) {
 /**
  * Checks immediate neighbours of a cell and returns an array of live and dead
  * neighbours.
+ *
  * @param {Cell} cell
- * @param {Array.<Cell>} cells
- * @returns {Array.<Array.<Cell>>}
+ * @param {Cell[]} cells
+ * @returns {Cell[][]}
  */
 function analyseNeighbours(cell, cells) {
     const liveNeighbours = [];
@@ -80,10 +84,11 @@ function analyseNeighbours(cell, cells) {
 }
 
 /**
- * Calculates the next state of a given set of cells according to the
- * rules of the game and returns that new state.
- * @param {Array.<Cell>} cells
- * @returns {Array.<Cell>}
+ * Calculates the next state of a given set of cells according to the rules of
+ * the game and returns that new state.
+ *
+ * @param {Cell[]} cells
+ * @returns {Cell[]}
  */
 export function next(cells) {
     const result = [];
@@ -114,12 +119,11 @@ export function next(cells) {
 
 /** @type {Life} Life */
 
-/**
- * Class representing the state of the game.
- */
+/** Class representing the state of the game. */
 export class Life {
     /**
      * Create a new instance of `Life`.
+     *
      * @returns {Life}
      */
     constructor() {
@@ -129,23 +133,28 @@ export class Life {
     }
 
     /**
-     * @typedef {Object} ScheduledTask - A reference to a scheduled async task
-     * - a thin wrapper around an interval id as returned by `setInterval`.
-     * @property {function(): void} cancel - Cancels execution of the task -
-     * a thin wrapper around `clearInterval`.
+     * @typedef {Object} ScheduledTask - A reference to a scheduled async task,
+     *   e.g. a thin wrapper around an interval id as returned by
+     *   `setInterval`.
+     * @property {function(): void} cancel - Cancels execution of the task - a
+     *   thin wrapper around `clearInterval`.
+     * @returns {void}
      */
 
     /**
-     * @callback schedulerFunction - A function which knows how to schedule
-     * a repeated async task - a thin wrapper around `setInterval`.
+     * @callback schedulerFunction - A function which knows how to schedule a
+     *   repeated async task, i.e. a thin wrapper around `setInterval`.
      * @param {function(): void} callback - The function to repeatedly execute.
      * @returns {scheduledTask}
+     * @returns {void}
      */
 
     /**
-     * Changes the state of the game to playing and starts the game loop
-     * by calling the `scheduler` function.
+     * Changes the state of the game to playing and starts the game loop by
+     * calling the `scheduler` function.
+     *
      * @param {schedulerFunction} scheduler
+     * @returns {void}
      */
     play(scheduler) {
         this._playing = true;
@@ -156,6 +165,8 @@ export class Life {
 
     /**
      * Changes the state of the game to not playing.
+     *
+     * @returns {void}
      */
     stop() {
         this._playing = false;
@@ -166,6 +177,7 @@ export class Life {
 
     /**
      * Returns `true` if the game is currently playing, else `false`.
+     *
      * @returns {boolean}
      */
     isPlaying() {
@@ -175,6 +187,8 @@ export class Life {
     /**
      * Calculates the new state of the game after a single time increment and
      * updates the current state.
+     *
+     * @returns {void}
      */
     tick() {
         this.cells = next(this.cells);
@@ -182,8 +196,10 @@ export class Life {
 
     /**
      * Toggles a single cell to life, if it's dead, or to death, if it's alive.
+     *
      * @param {number} x
      * @param {number} y
+     * @returns {void}
      */
     toggleCell(x, y) {
         const targetCell = [x, y];
