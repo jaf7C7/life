@@ -15,3 +15,7 @@
 - [x] play button starts the game
 - [x] stop button stops the game
 - [x] game stops when all cells are dead
+- [ ] Render the state of the game on a webpage
+- [ ] `Play` button calls `life.play()`
+- [ ] `Stop` button calls `life.stop()`
+- [ ] presets for some interesting patterns?
