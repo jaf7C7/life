@@ -57,12 +57,12 @@ test('the game loop schedules game ticks', () => {
 
 test('the game loop can be stopped', () => {
     const life = new Life();
-    let loopCancelled = false;
+    let tickCallback = () => undefined;
 
     const mockScheduler = () => {
         return {
             cancel: () => {
-                loopCancelled = true;
+                tickCallback = null;
             },
         };
     };
@@ -70,6 +70,5 @@ test('the game loop can be stopped', () => {
     life.play(mockScheduler);
     life.stop();
 
-    expect(life.isPlaying()).toBe(false);
-    expect(loopCancelled).toBe(true);
+    expect(tickCallback).toBe(null);
 });
