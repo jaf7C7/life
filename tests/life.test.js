@@ -24,12 +24,6 @@ test('can toggle an alive cell to dead', () => {
     expect(life.cells).not.toContainEqual([5, 5]);
 });
 
-test('the game is initially in stopped state', () => {
-    const life = new Life();
-
-    expect(life.isPlaying()).toBe(false);
-});
-
 test('the game calculates new state of the grid with each tick', () => {
     // A lone cell without neighbours will die after 1 generation.
     const life = new Life();

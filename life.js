@@ -133,7 +133,6 @@ export class Life {
     /** Create a new instance of `Life`. */
     constructor() {
         this.cells = [];
-        this._playing = false;
         this._gameLoop = null;
     }
 
@@ -145,7 +144,6 @@ export class Life {
      * @returns {void}
      */
     play(scheduler) {
-        this._playing = true;
         if (scheduler) {
             this._gameLoop = scheduler(() => {
                 this.tick();
@@ -159,19 +157,9 @@ export class Life {
      * @returns {void}
      */
     stop() {
-        this._playing = false;
         if (this._gameLoop) {
             this._gameLoop.cancel();
         }
-    }
-
-    /**
-     * Returns `true` if the game is currently playing, else `false`.
-     *
-     * @returns {boolean}
-     */
-    isPlaying() {
-        return this._playing;
     }
 
     /**
