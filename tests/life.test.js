@@ -32,16 +32,18 @@ test('the game is initially in stopped state', () => {
 
 test('the game loop can be started', () => {
     const life = new Life();
-    let gameLoop = null;
+    let tickCallback = null;
 
-    const mockGameLoopScheduler = (callback) => {
-        gameLoop = callback;
+    const mockScheduler = (callback) => {
+        tickCallback = callback;
     };
 
-    life.play(mockGameLoopScheduler);
+    life.toggleCell(0, 0); // Lone cell will die.
+    life.play(mockScheduler);
+    tickCallback(); // Manually simulate a game tick.
 
     expect(life.isPlaying()).toBe(true);
-    expect(gameLoop).not.toBe(null);
+    expect(life.cells).toEqual([]);
 });
 
 test('the game loop can be stopped', () => {

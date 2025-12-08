@@ -147,7 +147,11 @@ export class Life {
     play(scheduler) {
         this._playing = true;
         if (scheduler) {
-            this._gameLoop = scheduler();
+            this._gameLoop = scheduler(() => {
+                if (this._playing) {
+                    this.tick();
+                }
+            });
         }
     }
 
