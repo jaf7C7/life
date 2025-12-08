@@ -1,5 +1,4 @@
 /** @type {Array.<number>} Cell */
-/** @type {Life} Life */
 
 /**
  * Removes duplicates from an array of cells, returning a new array.
@@ -113,6 +112,8 @@ export function next(cells) {
     return result;
 }
 
+/** @type {Life} Life */
+
 /**
  * Class representing the state of the game.
  */
@@ -124,10 +125,25 @@ export class Life {
     constructor() {
         this.cells = [];
         this._playing = false;
+        this._gameLoop = null;
     }
 
     /**
-     * Changes the state of the game to playing.
+     * @typedef {Object} ScheduledTask - A reference to a scheduled async task
+     * - a thin wrapper around an interval id as returned by `setInterval`.
+     */
+
+    /**
+     * @callback schedulerFunction - A function which knows how to schedule
+     * a repeated async task - a thin wrapper around `setInterval`.
+     * @param {function(): void} callback - The function to repeatedly execute.
+     * @returns {scheduledTask}
+     */
+
+    /**
+     * Changes the state of the game to playing and starts the game loop
+     * by calling the `scheduler` function.
+     * @param {schedulerFunction} scheduler
      */
     play(scheduler) {
         this._playing = true;
