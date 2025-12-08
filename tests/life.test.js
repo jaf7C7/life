@@ -53,7 +53,21 @@ test('can be started playing', () => {
     // The scheduler returns an object with a `cancel()` method, which is used
     // by the `life` class to cancel the repeated execution of the task. In
     // production this will be a thin wrapper around `clearInterval`.
-    const mockScheduler = () => {};
+    //
+    // The `mockScheduler` in this test is just a placeholder which does
+    // nothing but is the right "shape" that `play()` expects.
+    const mockScheduler = (/* callback */) => {
+        // Schedule `callback` to be executed somehow.
+        // e.g. const id = setInterval(callback, 1000);
+
+        // Return scheduled task object with `cancel` method.
+        return {
+            cancel: () => {
+                // Cancel the execution of scheduled callback.
+                // e.g. clearInterval(id)
+            },
+        };
+    };
 
     life.play(mockScheduler);
 
