@@ -141,7 +141,6 @@ export class Life {
      * calling the `scheduler` function.
      *
      * @param {SchedulerFunction} scheduler
-     * @returns {void}
      */
     play(scheduler) {
         this._gameLoop = scheduler(() => {
@@ -151,11 +150,7 @@ export class Life {
         });
     }
 
-    /**
-     * Changes the state of the game to not playing.
-     *
-     * @returns {void}
-     */
+    /** Changes the state of the game to not playing. */
     stop() {
         if (this._gameLoop) {
             this._gameLoop.cancel();
@@ -175,8 +170,6 @@ export class Life {
     /**
      * Calculates the new state of the game after a single time increment and
      * updates the current state.
-     *
-     * @returns {void}
      */
     tick() {
         this.cells = next(this.cells);
@@ -190,7 +183,6 @@ export class Life {
      *
      * @param {number} x
      * @param {number} y
-     * @returns {void}
      */
     toggleCell(x, y) {
         const targetCell = [x, y];
