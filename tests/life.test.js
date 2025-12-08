@@ -55,22 +55,27 @@ test('the game loop schedules game ticks', () => {
     expect(life.cells).toEqual([]); // Cell has died.
 });
 
-test('the game loop can be stopped', () => {
+test('the game loop does not execute ticks when stopped', () => {
     const life = new Life();
-    let tickCallback = () => undefined; // Placeholder callback.
+    let tickCallback = null;
+    let tickCancelled = false;
 
-    const mockScheduler = () => {
+    const mockScheduler = (callback) => {
+        tickCallback = callback;
         return {
             cancel: () => {
-                tickCallback = null;
+                tickCancelled = true;
             },
         };
     };
 
+    life.toggleCell(0, 0); // Lone cell will die.
     life.play(mockScheduler);
     life.stop();
+    tickCallback(); // Tick should have no effect on stopped game.
 
-    expect(tickCallback).toBe(null); // No ticks scheduled => game stopped.
+    expect(tickCancelled).toBe(true);
+    expect(life.cells).toEqual([[0, 0]]);
 });
 
 test('game stops automatically when all cells are dead', () => {
