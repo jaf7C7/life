@@ -1,4 +1,15 @@
-/** @type {[number, number]} Cell */
+/** @typedef {[number, number]} Cell */
+
+/**
+ * @typedef {Object} ScheduledTask
+ * @property {function(): void} cancel - Cancels execution of the scheduled task
+ */
+
+/**
+ * @callback SchedulerFunction
+ * @param {function(): void} callback - The function to repeatedly execute
+ * @returns {ScheduledTask}
+ */
 
 /**
  * Removes duplicates from an array of cells, returning a new array.
@@ -117,15 +128,9 @@ export function next(cells) {
     return result;
 }
 
-/** @type {Life} Life */
-
 /** Class representing the state of the game. */
 export class Life {
-    /**
-     * Create a new instance of `Life`.
-     *
-     * @returns {Life}
-     */
+    /** Create a new instance of `Life`. */
     constructor() {
         this.cells = [];
         this._playing = false;
@@ -133,27 +138,10 @@ export class Life {
     }
 
     /**
-     * @typedef {Object} ScheduledTask - A reference to a scheduled async task,
-     *   e.g. a thin wrapper around an interval id as returned by
-     *   `setInterval`.
-     * @property {function(): void} cancel - Cancels execution of the task - a
-     *   thin wrapper around `clearInterval`.
-     * @returns {void}
-     */
-
-    /**
-     * @callback schedulerFunction - A function which knows how to schedule a
-     *   repeated async task, i.e. a thin wrapper around `setInterval`.
-     * @param {function(): void} callback - The function to repeatedly execute.
-     * @returns {scheduledTask}
-     * @returns {void}
-     */
-
-    /**
      * Changes the state of the game to playing and starts the game loop by
      * calling the `scheduler` function.
      *
-     * @param {schedulerFunction} scheduler
+     * @param {SchedulerFunction} scheduler
      * @returns {void}
      */
     play(scheduler) {
