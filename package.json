@@ -17,7 +17,9 @@
   },
   "scripts": {
     "preinstall": "git config core.hooksPath .githooks",
-    "test": "eslint && jest"
+    "test": "eslint && jest",
+    "test-ui": "playwright test",
+    "start": "http-server --port 3000 ."
   },
   "author": "",
   "license": "ISC",
