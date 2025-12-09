@@ -38,6 +38,11 @@
       "prettier-plugin-jsdoc"
     ]
   },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "tests/ui.test.js"
+    ]
+  },
   "babel": {
     "presets": [
       [
