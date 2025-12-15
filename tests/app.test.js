@@ -16,26 +16,6 @@ class MockUI {
     }
 }
 
-class MockLife {
-    constructor() {
-        this.stopCalled = false;
-        this.startCalled = false;
-        this.toggledCells = [];
-    }
-
-    stop() {
-        this.stopCalled = true;
-    }
-
-    start() {
-        this.startCalled = true;
-    }
-
-    toggleCell(x, y) {
-        this.toggledCells.push([x, y]);
-    }
-}
-
 test('Renders a grid of cells', () => {
     const ui = new MockUI();
     const life = new Life();
@@ -92,11 +72,11 @@ test('Renders a start button', () => {
 
 test('Clicking the start button starts the game', () => {
     const ui = new MockUI();
-    const life = new MockLife();
+    const life = new Life();
     const cellPixelSize = 20;
 
     createApp(ui, life, cellPixelSize);
     ui.findElement('start').click();
 
-    expect(life.startCalled).toBe(true);
+    expect(life.isPlaying()).toBe(true);
 });
