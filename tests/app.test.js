@@ -24,7 +24,7 @@ test('Renders a grid of cells', () => {
     expect(ui.findElement('grid')).not.toBe(undefined);
 });
 
-test('Clicking on the grid toggles the corresponding cells', () => {
+test('Clicking on the grid toggles the corresponding cell', () => {
     const life = new Life();
     const ui = new MockUI();
     const cellSize = 20; // size in pixels.
