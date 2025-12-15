@@ -32,20 +32,22 @@ class MockLife {
 
 test('Renders a grid of cells', () => {
     const ui = new MockUI();
+    const life = new MockLife();
+    const cellPixelSize = 20;
 
-    createApp(ui);
+    createApp(ui, life, cellPixelSize);
 
     expect(ui.findElement('grid')).not.toBe(undefined);
 });
 
 test('Clicking on the grid toggles the corresponding cell', () => {
-    const life = new MockLife();
     const ui = new MockUI();
-    const cellSize = 20; // size in pixels.
+    const life = new MockLife();
+    const cellPixelSize = 20;
 
-    createApp(ui, life, cellSize);
+    createApp(ui, life, cellPixelSize);
     const grid = ui.findElement('grid');
-    grid.click(45, 65); // pixel co-ords.
+    grid.click(45, 65);
 
     // (45 / 20 = 2.25 -> floor to 2, 65 / 20 = 3.25 -> floor to 3).
     expect(life.toggledCells).toEqual([[2, 3]]);
@@ -53,8 +55,10 @@ test('Clicking on the grid toggles the corresponding cell', () => {
 
 test('Renders a stop button', () => {
     const ui = new MockUI();
+    const life = new MockLife();
+    const cellPixelSize = 20;
 
-    createApp(ui);
+    createApp(ui, life, cellPixelSize);
 
     expect(ui.findElement('stop')).not.toBe(undefined);
 });
@@ -62,8 +66,9 @@ test('Renders a stop button', () => {
 test('Clicking the stop button stops the game', () => {
     const ui = new MockUI();
     const life = new MockLife();
+    const cellPixelSize = 20;
 
-    createApp(ui, life);
+    createApp(ui, life, cellPixelSize);
     ui.findElement('stop').click();
 
     expect(life.stopCalled).toBe(true);
