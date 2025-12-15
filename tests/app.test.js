@@ -39,23 +39,23 @@ test('Clicking on the grid toggles the corresponding cell', () => {
     expect(life.cells).toEqual([[2, 3]]);
 });
 
-test('Renders a start button', () => {
+test('Renders a play button', () => {
     const ui = new MockUI();
     const life = new Life();
     const cellPixelSize = 20;
 
     createApp(ui, life, cellPixelSize);
 
-    expect(ui.findElement('start')).not.toBe(undefined);
+    expect(ui.findElement('play')).not.toBe(undefined);
 });
 
-test('Clicking the start button starts the game', () => {
+test('Clicking the play button starts the game', () => {
     const ui = new MockUI();
     const life = new Life();
     const cellPixelSize = 20;
 
     createApp(ui, life, cellPixelSize);
-    ui.findElement('start').click();
+    ui.findElement('play').click();
 
     expect(life.isPlaying()).toBe(true);
 });
@@ -76,7 +76,7 @@ test('Clicking the stop button stops the game', () => {
     const cellPixelSize = 20;
 
     createApp(ui, life, cellPixelSize);
-    ui.findElement('start').click();
+    ui.findElement('play').click();
     ui.findElement('stop').click();
 
     expect(life.isPlaying()).toBe(false);

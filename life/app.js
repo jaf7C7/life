@@ -15,7 +15,7 @@ export default function createApp(ui, game, cellSize) {
     });
 
     ui.createElement({
-        id: 'start',
+        id: 'play',
         click() {
             // XXX: This will not work in production.
             const dummyScheduledTask = { cancel: () => undefined };
