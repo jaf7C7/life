@@ -132,8 +132,17 @@ export function next(cells) {
 export class Life {
     /** Create a new instance of `Life`. */
     constructor() {
-        this.cells = [];
+        this._cells = [];
         this._gameLoop = null;
+    }
+
+    /**
+     * Getter which returns the array of live cells.
+     *
+     * @returns {Cell[]}
+     */
+    cells() {
+        return this._cells;
     }
 
     /**
@@ -149,7 +158,7 @@ export class Life {
         this._gameLoop = scheduler(() => {
             if (this.isPlaying()) {
                 this.tick();
-                if (this.cells.length === 0) {
+                if (this._cells.length === 0) {
                     this.stop();
                 }
             }
@@ -178,7 +187,7 @@ export class Life {
      * updates the current state.
      */
     tick() {
-        this.cells = next(this.cells);
+        this._cells = next(this._cells);
     }
 
     /**
@@ -189,14 +198,14 @@ export class Life {
      */
     toggleCell(x, y) {
         const targetCell = [x, y];
-        const cellIndex = this.cells.findIndex((cell) =>
+        const cellIndex = this._cells.findIndex((cell) =>
             equals(cell, targetCell),
         );
 
         if (cellIndex === -1) {
-            this.cells.push([x, y]);
+            this._cells.push([x, y]);
         } else {
-            this.cells.splice(cellIndex, 1);
+            this._cells.splice(cellIndex, 1);
         }
     }
 }

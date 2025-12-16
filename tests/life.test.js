@@ -4,7 +4,7 @@ import { Life } from '../life/life.js';
 test('should have an array of live cells', () => {
     const life = new Life();
 
-    expect(life.cells).toEqual([]);
+    expect(life.cells()).toEqual([]);
 });
 
 test('can toggle a dead cell to alive', () => {
@@ -12,7 +12,7 @@ test('can toggle a dead cell to alive', () => {
 
     life.toggleCell(5, 5);
 
-    expect(life.cells).toContainEqual([5, 5]);
+    expect(life.cells()).toContainEqual([5, 5]);
 });
 
 test('can toggle an alive cell to dead', () => {
@@ -21,7 +21,7 @@ test('can toggle an alive cell to dead', () => {
     life.toggleCell(5, 5);
     life.toggleCell(5, 5);
 
-    expect(life.cells).toEqual([]);
+    expect(life.cells()).toEqual([]);
 });
 
 test('calculates new state of the grid with each tick', () => {
@@ -31,7 +31,7 @@ test('calculates new state of the grid with each tick', () => {
 
     life.tick();
 
-    expect(life.cells).toEqual([]);
+    expect(life.cells()).toEqual([]);
 });
 
 test('starts in a stopped state', () => {
@@ -86,7 +86,7 @@ test('schedules game ticks while playing', () => {
     life.play(mockScheduler);
     tickCallback(); // Manually execute a scheduled tick.
 
-    expect(life.cells).toEqual([]); // Cell has died.
+    expect(life.cells()).toEqual([]); // Cell has died.
 });
 
 test('cancels scheduled ticks when stopped', () => {
@@ -125,7 +125,7 @@ test('ticks executed when stopped have no effect', () => {
     life.stop();
     tickCallback(); // Tick should have no effect on stopped game.
 
-    expect(life.cells).toEqual([[0, 0]]); // Cell still alive.
+    expect(life.cells()).toEqual([[0, 0]]); // Cell still alive.
 });
 
 test('stops playing automatically when all cells are dead', () => {
