@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# Wrap message text at 79 chars for a nicer reading experience.
+
+# $1 - path to file containing commit message
+tmp=$(mktemp "$1.XXXX")
+fmt -w79 "$1" >tmp
+mv tmp "$1"
