@@ -1,6 +1,11 @@
 . ~/.bashrc
 
-PS1='\[\e[1;34m\]life\[\e[m\]\$ '
+__git_ps1() {
+    local branch=$(git branch --show-current)
+    printf '%s' "${branch:-$(git rev-parse --short HEAD)}"
+}
+
+PS1='\[\e[1;34m\]life\[\e[m\](\[\e[33m\]$(__git_ps1)\[\e[m\]) \$ '
 
 export VIMINIT="${VIMINIT+$VIMINIT | }set expandtab shiftwidth=4 autoread formatprg=fmt\ -w79\ -p//\\\  equalprg=cmt"
 export CMT='//'
