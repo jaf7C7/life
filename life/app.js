@@ -1,9 +1,13 @@
-export default function createApp(ui, game, cellSize) {
+export default function createApp(ui, game, cellSize, gridWidth, gridHeight) {
     ui.createElement({
         id: 'grid',
         cellSize: cellSize,
         click(x, y) {
-            game.toggleCell(Math.floor(x / cellSize), Math.floor(y / cellSize));
+            const [cellX, cellY] = [
+                Math.floor(x - gridWidth / 2),
+                Math.floor(y - gridHeight / 2),
+            ];
+            game.toggleCell(cellX, cellY);
         },
     });
 

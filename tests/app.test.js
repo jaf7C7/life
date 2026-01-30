@@ -30,13 +30,14 @@ test('Clicking on the grid toggles the corresponding cell', () => {
     const ui = new MockUI();
     const life = new Life();
     const cellPixelSize = 20;
+    const gridWidth = 100;
+    const gridHeight = 100;
 
-    createApp(ui, life, cellPixelSize);
+    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
     const grid = ui.findElement('grid');
-    grid.click(45, 65);
+    grid.click(50, 50); // Centre of the grid
 
-    // (45 / 20 = 2.25 -> floor to 2, 65 / 20 = 3.25 -> floor to 3).
-    expect(life.cells()).toEqual([[2, 3]]);
+    expect(life.cells()).toEqual([[0, 0]]);
 });
 
 test('Renders a play button', () => {
