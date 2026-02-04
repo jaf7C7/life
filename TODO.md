@@ -15,16 +15,7 @@
 - [x] play button starts the game
 - [x] stop button stops the game
 - [x] game stops when all cells are dead
+- [ ] centre of grid is [0, 0]
+- [ ] can click-and-drag to pan the grid left and right
 - [ ] can zoom in/out on the grid: dynamic grid size?
 - [ ] presets for some interesting patterns?
-
-- [ ] `createApp(life)`: draws user interface on a webpage and adds event handlers
-    - [ ] sets page title
-    - [ ] draws a grid with id `grid`
-    - [ ] draws a play button with id `play`
-    - [ ] draws a stop button with id `stop`
-- [ ] `updateGrid(life)`: redraws the grid with the new `life.cells` state
-- [ ] `onGridClick(life)`: clicking the grid calls `life.toggleCell(x, y)`
-    - [ ] `pixelToCoord(x, y)`: translates pixel location to grid co-ordinate
-- [ ] `onPlayClick(life)`: 'play' button calls `life.play()`
-- [ ] `onStopClick(life)`: 'stop' button calls `life.stop()`
