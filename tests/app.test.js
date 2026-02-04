@@ -92,3 +92,18 @@ test('Clicking the stop button stops the game', () => {
 
     expect(life.isPlaying()).toBe(false);
 });
+
+test('Grid can be panned by clicking and dragging', () => {
+    const ui = new MockUI();
+    const life = new Life();
+    const cellPixelSize = 20;
+    const gridWidth = 100;
+    const gridHeight = 100;
+
+    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
+    const grid = ui.findElement('grid');
+    grid.clickAndDrag([50, 50], [30, 50]); // from, to - pixel co-ords
+    grid.click(50, 50); // Centre of grid
+
+    expect(life.cells()).toEqual([[1, 0]]);
+});

@@ -2,12 +2,18 @@ export default function createApp(ui, game, cellSize, gridWidth, gridHeight) {
     ui.createElement({
         id: 'grid',
         cellSize: cellSize,
+        offsetX: 0,
+        offsetY: 0,
         click(x, y) {
             const [cellX, cellY] = [
-                Math.floor(x - gridWidth / 2),
-                Math.floor(y - gridHeight / 2),
+                Math.floor((x - this.offsetX - gridWidth / 2) / cellSize),
+                Math.floor((y - this.offsetY - gridHeight / 2) / cellSize),
             ];
             game.toggleCell(cellX, cellY);
+        },
+        clickAndDrag(from, to) {
+            this.offsetX = to[0] - from[0];
+            this.offsetY = to[1] - from[1];
         },
     });
 
