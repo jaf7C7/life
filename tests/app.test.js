@@ -20,8 +20,10 @@ test('Renders a grid of cells', () => {
     const ui = new MockUI();
     const life = new Life();
     const cellPixelSize = 20;
+    const gridWidth = 100;
+    const gridHeight = 100;
 
-    createApp(ui, life, cellPixelSize);
+    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
 
     expect(ui.findElement('grid')).not.toBe(undefined);
 });
@@ -44,8 +46,10 @@ test('Renders a play button', () => {
     const ui = new MockUI();
     const life = new Life();
     const cellPixelSize = 20;
+    const gridWidth = 100;
+    const gridHeight = 100;
 
-    createApp(ui, life, cellPixelSize);
+    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
 
     expect(ui.findElement('play')).not.toBe(undefined);
 });
@@ -54,8 +58,10 @@ test('Clicking the play button starts the game', () => {
     const ui = new MockUI();
     const life = new Life();
     const cellPixelSize = 20;
+    const gridWidth = 100;
+    const gridHeight = 100;
 
-    createApp(ui, life, cellPixelSize);
+    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
     ui.findElement('play').click();
 
     expect(life.isPlaying()).toBe(true);
@@ -65,8 +71,10 @@ test('Renders a stop button', () => {
     const ui = new MockUI();
     const life = new Life();
     const cellPixelSize = 20;
+    const gridWidth = 100;
+    const gridHeight = 100;
 
-    createApp(ui, life, cellPixelSize);
+    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
 
     expect(ui.findElement('stop')).not.toBe(undefined);
 });
@@ -75,8 +83,10 @@ test('Clicking the stop button stops the game', () => {
     const ui = new MockUI();
     const life = new Life();
     const cellPixelSize = 20;
+    const gridWidth = 100;
+    const gridHeight = 100;
 
-    createApp(ui, life, cellPixelSize);
+    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
     ui.findElement('play').click();
     ui.findElement('stop').click();
 
