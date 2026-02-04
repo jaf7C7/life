@@ -16,6 +16,6 @@
 - [x] stop button stops the game
 - [x] game stops when all cells are dead
 - [x] centre of grid is [0, 0]
-- [ ] can click-and-drag to pan the grid left and right
-- [ ] can zoom in/out on the grid: dynamic grid size?
+- [x] can click-and-drag to pan the grid left and right
+- [ ] **can zoom in/out on the grid: dynamic grid size?**
 - [ ] presets for some interesting patterns?
