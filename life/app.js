@@ -4,6 +4,7 @@ export default function createApp(ui, game, cellSize, gridWidth, gridHeight) {
         cellSize: cellSize,
         offsetX: 0,
         offsetY: 0,
+
         click(x, y) {
             const [cellX, cellY] = [
                 Math.floor((x - this.offsetX - gridWidth / 2) / cellSize),
@@ -11,6 +12,7 @@ export default function createApp(ui, game, cellSize, gridWidth, gridHeight) {
             ];
             game.toggleCell(cellX, cellY);
         },
+
         clickAndDrag(from, to) {
             this.offsetX = to[0] - from[0];
             this.offsetY = to[1] - from[1];
@@ -19,6 +21,7 @@ export default function createApp(ui, game, cellSize, gridWidth, gridHeight) {
 
     ui.createElement({
         id: 'stop',
+
         click() {
             game.stop();
         },
@@ -26,6 +29,7 @@ export default function createApp(ui, game, cellSize, gridWidth, gridHeight) {
 
     ui.createElement({
         id: 'play',
+
         click() {
             // XXX: This will not work in production.
             const dummyScheduledTask = { cancel: () => undefined };

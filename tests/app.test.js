@@ -102,8 +102,10 @@ test('Grid can be panned by clicking and dragging', () => {
 
     createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
     const grid = ui.findElement('grid');
-    grid.clickAndDrag([50, 50], [30, 50]); // from, to - pixel co-ords
+    // Drag the grid one cell left and one cell up, so the centre of the
+    // grid is offset.
+    grid.clickAndDrag([50, 50], [30, 70]); // from, to - pixel co-ords
     grid.click(50, 50); // Centre of grid
 
-    expect(life.cells()).toEqual([[1, 0]]);
+    expect(life.cells()).toEqual([[1, -1]]);
 });
