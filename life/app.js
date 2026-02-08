@@ -1,7 +1,7 @@
 export default function createApp(ui, game, cellSize, gridWidth, gridHeight) {
     ui.createElement({
         id: 'grid',
-        cellSize: cellSize,
+        cellPixelSize: cellSize,
         offsetX: 0,
         offsetY: 0,
 
@@ -16,6 +16,10 @@ export default function createApp(ui, game, cellSize, gridWidth, gridHeight) {
         clickAndDrag(from, to) {
             this.offsetX = to[0] - from[0];
             this.offsetY = to[1] - from[1];
+        },
+
+        pinch(from, to) {
+            this.cellPixelSize *= to[1][0] / from[1][0];
         },
     });
 

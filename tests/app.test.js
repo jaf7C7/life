@@ -109,3 +109,27 @@ test('Grid can be panned by clicking and dragging', () => {
 
     expect(life.cells()).toEqual([[1, -1]]);
 });
+
+test('Grid can be zoomed out with pinch-to-zoom', () => {
+    const ui = new MockUI();
+    const life = new Life();
+    const cellPixelSize = 20;
+    const gridWidth = 100;
+    const gridHeight = 100;
+
+    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
+    const grid = ui.findElement('grid');
+    // [initialTouch(finger1X, finger1Y, finger2X, finger2Y), finalTouch(...)]
+    grid.pinch(
+        [
+            [0, 0],
+            [100, 0],
+        ],
+        [
+            [0, 0],
+            [200, 0],
+        ],
+    ); // Zoom in 2x
+
+    expect(grid.cellPixelSize).toBe(40);
+});
