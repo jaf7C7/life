@@ -121,14 +121,14 @@ test('Grid can be zoomed out with pinch-to-zoom', () => {
 
     createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
     const grid = ui.findElement('grid');
-    // Outward pinch from x = 100 to x = 200 => Increase zoom by 100%
+    // Outward pinch scales both x and y by 2 => increases zoom by 100%
     const startTouches = [
         { x: 0, y: 0 },
-        { x: 100, y: 0 },
+        { x: 3, y: 4 },
     ];
     const endTouches = [
         { x: 0, y: 0 },
-        { x: 200, y: 0 },
+        { x: 6, y: 8 },
     ];
     grid.pinch(startTouches, endTouches);
 

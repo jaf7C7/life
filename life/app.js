@@ -24,7 +24,16 @@ export default function createApp(ui, game, cellSize, gridWidth, gridHeight) {
         },
 
         pinch(startTouches, endTouches) {
-            this.cellPixelSize *= endTouches[1].x / startTouches[1].x;
+            const separation = (touches) => {
+                const dx = touches[1].x - touches[0].x;
+                const dy = touches[1].y - touches[0].y;
+
+                return Math.sqrt(dx ** 2 + dy ** 2);
+            };
+
+            const scale = separation(endTouches) / separation(startTouches);
+
+            this.cellPixelSize *= scale;
         },
     });
 
