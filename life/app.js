@@ -2,28 +2,29 @@ export default function createApp(ui, game, cellSize, gridWidth, gridHeight) {
     ui.createElement({
         id: 'grid',
         cellPixelSize: cellSize,
-        offsetX: 0,
-        offsetY: 0,
+        offset: { x: 0, y: 0 },
 
         click(x, y) {
             const [cellX, cellY] = [
                 Math.floor(
-                    (x - this.offsetX - gridWidth / 2) / this.cellPixelSize,
+                    (x - this.offset.x - gridWidth / 2) / this.cellPixelSize,
                 ),
                 Math.floor(
-                    (y - this.offsetY - gridHeight / 2) / this.cellPixelSize,
+                    (y - this.offset.y - gridHeight / 2) / this.cellPixelSize,
                 ),
             ];
             game.toggleCell(cellX, cellY);
         },
 
-        clickAndDrag(from, to) {
-            this.offsetX = to[0] - from[0];
-            this.offsetY = to[1] - from[1];
+        clickAndDrag(mouseDownPos, mouseUpPos) {
+            this.offset = {
+                x: mouseUpPos.x - mouseDownPos.x,
+                y: mouseUpPos.y - mouseDownPos.y,
+            };
         },
 
-        pinch(from, to) {
-            this.cellPixelSize *= to[1][0] / from[1][0];
+        pinch(startTouches, endTouches) {
+            this.cellPixelSize *= endTouches[1].x / startTouches[1].x;
         },
     });
 

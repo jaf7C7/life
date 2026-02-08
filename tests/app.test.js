@@ -104,7 +104,9 @@ test('Grid can be panned by clicking and dragging', () => {
     const grid = ui.findElement('grid');
     // Drag the grid one cell left and one cell up, so the centre of the
     // grid is offset.
-    grid.clickAndDrag([50, 50], [30, 70]); // from, to - pixel co-ords
+    const mouseDownPos = { x: 50, y: 50 };
+    const mouseUpPos = { x: 30, y: 70 };
+    grid.clickAndDrag(mouseDownPos, mouseUpPos);
     grid.click(50, 50); // Centre of grid
 
     expect(life.cells()).toEqual([[1, -1]]);
@@ -119,17 +121,16 @@ test('Grid can be zoomed out with pinch-to-zoom', () => {
 
     createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
     const grid = ui.findElement('grid');
-    // [initialTouch(finger1X, finger1Y, finger2X, finger2Y), finalTouch(...)]
-    grid.pinch(
-        [
-            [0, 0],
-            [100, 0],
-        ],
-        [
-            [0, 0],
-            [200, 0],
-        ],
-    ); // Zoom in 2x
+    // Outward pinch from x = 100 to x = 200 => Increase zoom by 100%
+    const startTouches = [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+    ];
+    const endTouches = [
+        { x: 0, y: 0 },
+        { x: 200, y: 0 },
+    ];
+    grid.pinch(startTouches, endTouches);
 
     expect(grid.cellPixelSize).toBe(40);
 });
