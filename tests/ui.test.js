@@ -4,6 +4,7 @@ test('displays project title', async ({ page }) => {
     await page.goto('/');
 
     await expect(page).toHaveTitle(/Life/);
+    await expect(page.getByRole('Heading')).toContainText('Life');
 });
 
 test('displays a grid of cells', async ({ page }) => {
