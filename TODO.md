@@ -17,5 +17,6 @@
 - [x] game stops when all cells are dead
 - [x] centre of grid is [0, 0]
 - [x] can click-and-drag to pan the grid left and right
-- [ ] **can zoom in/out on the grid: dynamic grid size?**
+- [x] can zoom in/out on the grid: dynamic grid size?
+- [ ] **styling: are there actually HTML elements on the screen?**
 - [ ] presets for some interesting patterns?
