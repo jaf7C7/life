@@ -7,8 +7,12 @@ export default function createApp(ui, game, cellSize, gridWidth, gridHeight) {
 
         click(x, y) {
             const [cellX, cellY] = [
-                Math.floor((x - this.offsetX - gridWidth / 2) / cellSize),
-                Math.floor((y - this.offsetY - gridHeight / 2) / cellSize),
+                Math.floor(
+                    (x - this.offsetX - gridWidth / 2) / this.cellPixelSize,
+                ),
+                Math.floor(
+                    (y - this.offsetY - gridHeight / 2) / this.cellPixelSize,
+                ),
             ];
             game.toggleCell(cellX, cellY);
         },
