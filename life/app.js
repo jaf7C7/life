@@ -1,4 +1,17 @@
 export default function createApp(ui, game, cellSize, gridWidth, gridHeight) {
+    if (typeof document !== 'undefined') {
+        document.title = 'Life';
+
+        let title = document.createElement('h1');
+        title.setAttribute('data-testid', 'title');
+        title.textContent = 'Life';
+        document.body.appendChild(title);
+
+        let grid = document.createElement('canvas');
+        grid.setAttribute('data-testid', 'grid');
+        document.body.appendChild(grid);
+    }
+
     ui.createElement({
         id: 'grid',
         cellPixelSize: cellSize,
