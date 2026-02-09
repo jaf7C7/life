@@ -7,6 +7,12 @@ class MockUI {
         this._elements = [];
     }
 
+    setTitle() {}
+
+    createHeading() {}
+
+    createGrid() {}
+
     createElement(element) {
         this._elements.push(element);
     }

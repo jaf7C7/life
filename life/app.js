@@ -1,16 +1,15 @@
-export default function createApp(ui, game, cellSize, gridWidth, gridHeight) {
-    if (typeof document !== 'undefined') {
-        document.title = 'Life';
+import UI from './ui.js';
 
-        let title = document.createElement('h1');
-        title.setAttribute('data-testid', 'title');
-        title.textContent = 'Life';
-        document.body.appendChild(title);
-
-        let grid = document.createElement('canvas');
-        grid.setAttribute('data-testid', 'grid');
-        document.body.appendChild(grid);
-    }
+export default function createApp(
+    ui = new UI(),
+    game,
+    cellSize,
+    gridWidth,
+    gridHeight,
+) {
+    ui.setTitle('Life');
+    ui.createHeading('Life');
+    ui.createGrid();
 
     ui.createElement({
         id: 'grid',
