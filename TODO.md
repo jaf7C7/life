@@ -19,5 +19,6 @@
 - [x] can click-and-drag to pan the grid left and right
 - [x] can zoom in/out on the grid: dynamic grid size?
 - [x] styling: are there actually HTML elements on the screen?
-- [ ] **allow for dynamically calculated `gridWidth` and `gridHeight` to decouple styling from behaviour**
+- [ ] **clicks on the grid should activate the correct cell**
+- [ ] grid cell size should remain constant with grid resizing (styling change / screen resize)
 - [ ] presets for some interesting patterns?
