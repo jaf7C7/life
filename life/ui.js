@@ -10,14 +10,10 @@ export default class UI {
         document.body.appendChild(title);
     }
 
-    createGrid() {
+    createGrid(gridWidth, gridHeight, cellSize) {
         let grid = document.createElement('canvas');
         grid.setAttribute('data-testid', 'grid');
         document.body.appendChild(grid);
-
-        const gridHeight = 100;
-        const gridWidth = 100;
-        const cellSize = 20;
 
         grid.setAttribute('height', gridHeight);
         grid.setAttribute('width', gridWidth);
@@ -50,12 +46,6 @@ export default class UI {
             // Get pixel coordinates relative to canvas
             const pixelX = event.clientX - rect.left;
             const pixelY = event.clientY - rect.top;
-
-            // Convert to grid coordinates
-            const [gridX, gridY] = [
-                Math.round((pixelX - gridWidth / 2) / cellSize),
-                Math.round((pixelY - gridHeight / 2) / cellSize) * -1, // positive Y is upwards.
-            ];
 
             // Colour the cell
             ctx.fillStyle = 'rgb(255, 0, 0)';

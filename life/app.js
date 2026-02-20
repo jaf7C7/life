@@ -3,13 +3,13 @@ import UI from './ui.js';
 export default function createApp(
     ui = new UI(),
     game,
-    cellSize,
-    gridWidth,
-    gridHeight,
+    cellSize = 20,
+    gridWidth = 100,
+    gridHeight = 100,
 ) {
     ui.setTitle('Life');
     ui.createHeading('Life');
-    ui.createGrid();
+    ui.createGrid(gridWidth, gridHeight, cellSize);
 
     ui.createElement({
         id: 'grid',
