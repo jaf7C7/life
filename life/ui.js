@@ -4,14 +4,14 @@ export default class UI {
     }
 
     createHeading(textContent) {
-        let title = document.createElement('h1');
+        let title = this.createElement('h1');
         title.setAttribute('data-testid', 'title');
         title.textContent = textContent;
         document.body.appendChild(title);
     }
 
     createGrid(gridWidth, gridHeight, cellSize) {
-        let grid = document.createElement('canvas');
+        let grid = this.createElement('canvas');
         grid.setAttribute('data-testid', 'grid');
         document.body.appendChild(grid);
 
@@ -58,5 +58,7 @@ export default class UI {
         });
     }
 
-    createElement() {}
+    createElement(type) {
+        return document.createElement(type);
+    }
 }
