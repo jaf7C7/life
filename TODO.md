@@ -18,8 +18,6 @@
 - [x] centre of grid is [0, 0]
 - [x] can click-and-drag to pan the grid left and right
 - [x] can zoom in/out on the grid: dynamic grid size?
-- [ ] styling: are there actually HTML elements on the screen?
-- [ ] **move logic out of other `UI.create...` methods into `UI.createElement`**
-- [ ] move logic out of `UI` class and into `createApp` function
-- [ ] remove `gridHeight` and `gridWidth` parameters from `createApp`
+- [x] styling: are there actually HTML elements on the screen?
+- [ ] **allow for dynamically calculated `gridWidth` and `gridHeight` to decouple styling from behaviour**
 - [ ] presets for some interesting patterns?
