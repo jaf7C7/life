@@ -4,19 +4,18 @@ export default class UI {
     }
 
     createHeading(textContent) {
-        let title = this.createElement('h1');
-        title.setAttribute('data-testid', 'title');
-        title.textContent = textContent;
-        document.body.appendChild(title);
+        const attributes = { 'data-testid': 'title' };
+        const properties = { textContent: textContent };
+        this.createElement('h1', attributes, properties);
     }
 
     createGrid(gridWidth, gridHeight, cellSize) {
-        let grid = this.createElement('canvas');
-        grid.setAttribute('data-testid', 'grid');
-        document.body.appendChild(grid);
-
-        grid.setAttribute('height', gridHeight);
-        grid.setAttribute('width', gridWidth);
+        const attributes = {
+            'data-testid': 'grid',
+            height: gridHeight,
+            width: gridWidth,
+        };
+        const grid = this.createElement('canvas', attributes);
 
         const ctx = grid.getContext('2d');
         ctx.strokeStyle = '#000';
@@ -58,7 +57,14 @@ export default class UI {
         });
     }
 
-    createElement(type) {
-        return document.createElement(type);
+    createElement(type, attributes, properties) {
+        const element = document.createElement(type);
+        for (const [key, value] of Object.entries(attributes)) {
+            element.setAttribute(key, value);
+        }
+        Object.assign(element, properties);
+        document.body.appendChild(element);
+
+        return element;
     }
 }
