@@ -19,6 +19,6 @@
 - [x] can click-and-drag to pan the grid left and right
 - [x] can zoom in/out on the grid: dynamic grid size?
 - [x] styling: are there actually HTML elements on the screen?
-- [ ] **clicks on the grid should activate the correct cell**
+- [ ] **clicks on the grid should activate the correct cell (the grid is drawn using a separate co-ordinate system than the click event uses, so you have to convert the click event location co-ords to canvas drawing co-ords)**
 - [ ] grid cell size should remain constant with grid resizing (styling change / screen resize)
 - [ ] presets for some interesting patterns?
