@@ -2,4 +2,7 @@
 #
 # Make sure all tests are passing before pushing.
 
-exec npm test
+set -e
+
+npm run test
+npm run test-ui
