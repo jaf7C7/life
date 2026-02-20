@@ -17,36 +17,41 @@ export default class UI {
         };
         const grid = this.createElement('canvas', attributes);
 
-        const ctx = grid.getContext('2d');
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 1;
+        function drawGrid(grid) {
+            const ctx = grid.getContext('2d');
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1;
 
-        ctx.beginPath();
+            ctx.beginPath();
 
-        // Vertical lines.
-        for (let i = 0; i <= gridWidth; i++) {
-            const x = i * cellSize;
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, gridHeight);
+            // Vertical lines.
+            for (let i = 0; i <= gridWidth; i++) {
+                const x = i * cellSize;
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, gridHeight);
+            }
+
+            // Horizontal lines.
+            for (let j = 0; j <= gridHeight; j++) {
+                const y = j * cellSize;
+                ctx.moveTo(0, y);
+                ctx.lineTo(gridWidth, y);
+            }
+
+            ctx.stroke();
         }
 
-        // Horizontal lines.
-        for (let j = 0; j <= gridHeight; j++) {
-            const y = j * cellSize;
-            ctx.moveTo(0, y);
-            ctx.lineTo(gridWidth, y);
-        }
-
-        ctx.stroke();
+        drawGrid(grid);
 
         grid.addEventListener('click', (event) => {
-            const rect = grid.getBoundingClientRect();
+            const rect = event.target.getBoundingClientRect();
+            const ctx = event.target.getContext('2d');
 
-            // Get pixel coordinates relative to canvas
+            // Get pixel coordinates relative to canvas.
             const pixelX = event.clientX - rect.left;
             const pixelY = event.clientY - rect.top;
 
-            // Colour the cell
+            // Colour the cell.
             ctx.fillStyle = 'rgb(255, 0, 0)';
             ctx.fillRect(
                 Math.floor(pixelX / cellSize) * cellSize,
