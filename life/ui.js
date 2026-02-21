@@ -15,4 +15,6 @@ export default class UI {
         grid.setAttribute('data-testid', 'grid');
         document.body.appendChild(grid);
     }
+
+    createElement() {}
 }
