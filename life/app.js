@@ -1,28 +1,24 @@
 import UI from './ui.js';
 
-export default function createApp(
-    ui = new UI(),
-    game,
-    cellSize,
-    gridWidth,
-    gridHeight,
-) {
+export default function createApp(ui = new UI(), game) {
     ui.setTitle('Life');
     ui.createHeading('Life');
     ui.createGrid();
 
     ui.createElement({
         id: 'grid',
-        cellPixelSize: cellSize,
+        height: 100,
+        width: 100,
+        cellSize: 20,
         offset: { x: 0, y: 0 },
 
         click(x, y) {
             const [cellX, cellY] = [
                 Math.floor(
-                    (x - this.offset.x - gridWidth / 2) / this.cellPixelSize,
+                    (x - this.offset.x - this.width / 2) / this.cellSize,
                 ),
                 Math.floor(
-                    (y - this.offset.y - gridHeight / 2) / this.cellPixelSize,
+                    (y - this.offset.y - this.height / 2) / this.cellSize,
                 ),
             ];
             game.toggleCell(cellX, cellY);
@@ -45,7 +41,7 @@ export default function createApp(
 
             const scale = separation(endTouches) / separation(startTouches);
 
-            this.cellPixelSize *= scale;
+            this.cellSize *= scale;
         },
     });
 

@@ -25,11 +25,8 @@ class MockUI {
 test('Renders a grid of cells', () => {
     const ui = new MockUI();
     const life = new Life();
-    const cellPixelSize = 20;
-    const gridWidth = 100;
-    const gridHeight = 100;
 
-    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
+    createApp(ui, life);
 
     expect(ui.findElement('grid')).not.toBe(undefined);
 });
@@ -37,13 +34,10 @@ test('Renders a grid of cells', () => {
 test('Clicking on the grid toggles the corresponding cell', () => {
     const ui = new MockUI();
     const life = new Life();
-    const cellPixelSize = 20;
-    const gridWidth = 100;
-    const gridHeight = 100;
 
-    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
+    createApp(ui, life);
     const grid = ui.findElement('grid');
-    grid.click(50, 50); // Centre of the grid
+    grid.click(grid.width / 2, grid.height / 2); // Grid centre
 
     expect(life.cells()).toEqual([[0, 0]]);
 });
@@ -51,11 +45,8 @@ test('Clicking on the grid toggles the corresponding cell', () => {
 test('Renders a play button', () => {
     const ui = new MockUI();
     const life = new Life();
-    const cellPixelSize = 20;
-    const gridWidth = 100;
-    const gridHeight = 100;
 
-    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
+    createApp(ui, life);
 
     expect(ui.findElement('play')).not.toBe(undefined);
 });
@@ -63,11 +54,8 @@ test('Renders a play button', () => {
 test('Clicking the play button starts the game', () => {
     const ui = new MockUI();
     const life = new Life();
-    const cellPixelSize = 20;
-    const gridWidth = 100;
-    const gridHeight = 100;
 
-    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
+    createApp(ui, life);
     ui.findElement('play').click();
 
     expect(life.isPlaying()).toBe(true);
@@ -76,11 +64,8 @@ test('Clicking the play button starts the game', () => {
 test('Renders a stop button', () => {
     const ui = new MockUI();
     const life = new Life();
-    const cellPixelSize = 20;
-    const gridWidth = 100;
-    const gridHeight = 100;
 
-    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
+    createApp(ui, life);
 
     expect(ui.findElement('stop')).not.toBe(undefined);
 });
@@ -88,11 +73,8 @@ test('Renders a stop button', () => {
 test('Clicking the stop button stops the game', () => {
     const ui = new MockUI();
     const life = new Life();
-    const cellPixelSize = 20;
-    const gridWidth = 100;
-    const gridHeight = 100;
 
-    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
+    createApp(ui, life);
     ui.findElement('play').click();
     ui.findElement('stop').click();
 
@@ -102,18 +84,18 @@ test('Clicking the stop button stops the game', () => {
 test('Grid can be panned by clicking and dragging', () => {
     const ui = new MockUI();
     const life = new Life();
-    const cellPixelSize = 20;
-    const gridWidth = 100;
-    const gridHeight = 100;
 
-    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
+    createApp(ui, life);
     const grid = ui.findElement('grid');
+
     // Drag the grid one cell left and one cell up, so the centre of the
     // grid is offset.
-    const mouseDownPos = { x: 50, y: 50 };
-    const mouseUpPos = { x: 30, y: 70 };
+    const [x, y] = [grid.width / 2, grid.height / 2];
+    const mouseDownPos = { x, y };
+    const mouseUpPos = { x: x - grid.cellSize, y: y + grid.cellSize };
     grid.clickAndDrag(mouseDownPos, mouseUpPos);
-    grid.click(50, 50); // Centre of grid
+
+    grid.click(x, y);
 
     expect(life.cells()).toEqual([[1, -1]]);
 });
@@ -121,22 +103,19 @@ test('Grid can be panned by clicking and dragging', () => {
 test('Grid can be zoomed out with pinch-to-zoom', () => {
     const ui = new MockUI();
     const life = new Life();
-    const cellPixelSize = 20;
-    const gridWidth = 100;
-    const gridHeight = 100;
 
-    createApp(ui, life, cellPixelSize, gridWidth, gridHeight);
+    createApp(ui, life);
     const grid = ui.findElement('grid');
     // Outward pinch scales both x and y by 2 => increases zoom by 100%
     const startTouches = [
         { x: 0, y: 0 },
-        { x: 3, y: 4 },
+        { x: 30, y: 40 },
     ];
     const endTouches = [
         { x: 0, y: 0 },
-        { x: 6, y: 8 },
+        { x: 60, y: 80 },
     ];
     grid.pinch(startTouches, endTouches);
 
-    expect(grid.cellPixelSize).toBe(40);
+    expect(grid.cellSize).toBe(40);
 });
