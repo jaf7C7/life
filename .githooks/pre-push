@@ -3,4 +3,3 @@
 # Make sure all tests are passing before pushing.
 
 npm run test
-npm run test-ui

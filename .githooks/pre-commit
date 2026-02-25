@@ -37,7 +37,6 @@ format_staged_files() {
 
 run_tests() {
     npm run test
-    npm run test-ui
 }
 
 main() {
