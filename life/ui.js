@@ -14,6 +14,12 @@ export default class UI {
         let grid = document.createElement('canvas');
         grid.setAttribute('data-testid', 'grid');
         document.body.appendChild(grid);
+
+        grid.height = 2000;
+        grid.width = 2000;
+        const ctx = grid.getContext('2d');
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, grid.width, grid.height);
     }
 
     createElement() {}
