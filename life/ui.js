@@ -20,6 +20,12 @@ export default class UI {
         const ctx = grid.getContext('2d');
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, grid.width, grid.height);
+
+        grid.addEventListener('click', () => {
+            const ctx = grid.getContext('2d');
+            ctx.fillStyle = 'red';
+            ctx.fillRect(0, 0, grid.width, grid.height);
+        });
     }
 
     createElement() {}

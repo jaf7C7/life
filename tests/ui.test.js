@@ -13,16 +13,27 @@ test('displays a grid of cells', async ({ page }) => {
     await expect(page.getByTestId('grid')).toBeVisible();
 });
 
-test('the canvas is white', async ({ page }) => {
-    function canvasIsWhite() {
-        const grid = document.querySelector('canvas');
-        const [cx, cy] = [grid.clientWidth / 2, grid.clientHeight / 2];
-        const [r, g, b] = grid.getContext('2d').getImageData(cx, cy, 1, 1).data;
+/**
+ * Returns true if the canvas is the specified RGB value, else false. Requires
+ * `document` to be defined.
+ *
+ * @param {Integer[]} color - A RGB color value
+ * @returns {boolean}
+ */
+function canvasIsColor([r, g, b]) {
+    const grid = document.querySelector('canvas');
+    const [cx, cy] = [grid.clientWidth / 2, grid.clientHeight / 2];
+    const [_r, _g, _b] = grid.getContext('2d').getImageData(cx, cy, 1, 1).data;
+    return _r === r && _g === g && _b === b;
+}
 
-        return r === 255 && g === 255 && b === 255;
-    }
-
+test('a click turns the canvas from white to red', async ({ page }) => {
     await page.goto('/');
+    const grid = await page.getByTestId('grid');
 
-    expect(await page.evaluate(canvasIsWhite)).toBe(true);
+    expect(await page.evaluate(canvasIsColor, [255, 255, 255])).toBe(true);
+
+    await grid.click();
+
+    expect(await page.evaluate(canvasIsColor, [255, 0, 0])).toBe(true);
 });
