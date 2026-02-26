@@ -23,7 +23,10 @@ export default class UI {
 
         grid.addEventListener('click', () => {
             const ctx = grid.getContext('2d');
-            ctx.fillStyle = 'red';
+            const currentColor = ctx.fillStyle;
+            const red = '#ff0000';
+            const white = '#ffffff';
+            ctx.fillStyle = currentColor === red ? white : red;
             ctx.fillRect(0, 0, grid.width, grid.height);
         });
     }

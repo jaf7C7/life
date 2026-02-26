@@ -37,3 +37,15 @@ test('a click turns the canvas from white to red', async ({ page }) => {
 
     expect(await page.evaluate(canvasIsColor, [255, 0, 0])).toBe(true);
 });
+
+test('two clicks leaves the canvas white again', async ({ page }) => {
+    await page.goto('/');
+    const grid = await page.getByTestId('grid');
+
+    expect(await page.evaluate(canvasIsColor, [255, 255, 255])).toBe(true);
+
+    await grid.click();
+    await grid.click();
+
+    expect(await page.evaluate(canvasIsColor, [255, 255, 255])).toBe(true);
+});
