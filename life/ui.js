@@ -17,6 +17,7 @@ export default class UI {
 
         grid.height = 2000;
         grid.width = 2000;
+        grid.cellSize = 20;
         const ctx = grid.getContext('2d');
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, grid.width, grid.height);

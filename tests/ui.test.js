@@ -19,9 +19,12 @@ test('displays a grid of cells', async ({ page }) => {
  *
  * @returns {Integer[]} Color
  */
-function getCanvasColor() {
+function getCellColor([x, y]) {
     const grid = document.querySelector('canvas');
-    const [cx, cy] = [grid.clientWidth / 2, grid.clientHeight / 2];
+    const [cx, cy] = [
+        grid.clientWidth / 2 + x * grid.cellSize,
+        grid.clientHeight / 2 + y * grid.cellSize,
+    ];
     const [r, g, b] = grid.getContext('2d').getImageData(cx, cy, 1, 1).data;
     return [r, g, b];
 }
@@ -32,11 +35,11 @@ test('a click turns the canvas from white to red', async ({ page }) => {
     const white = [255, 255, 255];
     const red = [255, 0, 0];
 
-    expect(await page.evaluate(getCanvasColor)).toEqual(white);
+    expect(await page.evaluate(getCellColor, [0, 0])).toEqual(white);
 
     await grid.click();
 
-    expect(await page.evaluate(getCanvasColor)).toEqual(red);
+    expect(await page.evaluate(getCellColor, [0, 0])).toEqual(red);
 });
 
 test('two clicks leaves the canvas white again', async ({ page }) => {
@@ -44,10 +47,10 @@ test('two clicks leaves the canvas white again', async ({ page }) => {
     const grid = await page.getByTestId('grid');
     const white = [255, 255, 255];
 
-    expect(await page.evaluate(getCanvasColor)).toEqual(white);
+    expect(await page.evaluate(getCellColor, [0, 0])).toEqual(white);
 
     await grid.click();
     await grid.click();
 
-    expect(await page.evaluate(getCanvasColor)).toEqual(white);
+    expect(await page.evaluate(getCellColor, [0, 0])).toEqual(white);
 });
