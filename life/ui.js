@@ -78,8 +78,7 @@ export default class UI {
         grid.addEventListener('click', (e) => {
             const [x, y] = getClickedCellLocation(e);
             const ctx = e.currentTarget.getContext('2d');
-            const currentColor = ctx.fillStyle;
-            ctx.fillStyle = currentColor === RED ? WHITE : RED;
+            ctx.fillStyle = ctx.fillStyle === RED ? WHITE : RED;
             ctx.fillRect(
                 x,
                 y,
