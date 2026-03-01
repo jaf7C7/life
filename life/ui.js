@@ -19,13 +19,16 @@ function getOffset(width, height, cellSize) {
     );
 }
 
-function getClickOffset(offsetX, offsetY, e, effectiveCellSize) {
+function getClickOffset(clickEvent) {
+    const { width, height, cellSize, lineWidth } = clickEvent.currentTarget;
+    const effectiveCellSize = cellSize + lineWidth;
+    const [offsetX, offsetY] = getOffset(width, height, cellSize);
     return [
         offsetX +
-            Math.floor((e.offsetX - offsetX) / effectiveCellSize) *
+            Math.floor((clickEvent.offsetX - offsetX) / effectiveCellSize) *
                 effectiveCellSize,
         offsetY +
-            Math.floor((e.offsetY - offsetY) / effectiveCellSize) *
+            Math.floor((clickEvent.offsetY - offsetY) / effectiveCellSize) *
                 effectiveCellSize,
     ];
 }
@@ -50,22 +53,11 @@ export default class UI {
         this.drawGrid(grid);
 
         grid.addEventListener('click', (e) => {
-            const { width, height, cellSize, lineWidth } = e.currentTarget;
-            const effectiveCellSize = cellSize + lineWidth;
+            const { cellSize } = e.currentTarget;
             const ctx = e.currentTarget.getContext('2d');
             const currentColor = ctx.fillStyle;
             ctx.fillStyle = currentColor === RED ? WHITE : RED;
-            const [offsetX, offsetY] = getOffset(
-                width,
-                height,
-                cellSize + lineWidth,
-            );
-            const [x, y] = getClickOffset(
-                offsetX,
-                offsetY,
-                e,
-                effectiveCellSize,
-            );
+            const [x, y] = getClickOffset(e);
             ctx.fillRect(x, y, cellSize, cellSize);
         });
 
