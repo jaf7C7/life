@@ -19,6 +19,17 @@ function getOffset(width, height, cellSize) {
     );
 }
 
+function getClickOffset(offsetX, offsetY, e, effectiveCellSize) {
+    return [
+        offsetX +
+            Math.floor((e.offsetX - offsetX) / effectiveCellSize) *
+                effectiveCellSize,
+        offsetY +
+            Math.floor((e.offsetY - offsetY) / effectiveCellSize) *
+                effectiveCellSize,
+    ];
+}
+
 export default class UI {
     setTitle(title) {
         document.title = title;
@@ -49,14 +60,12 @@ export default class UI {
                 height,
                 cellSize + lineWidth,
             );
-            const x =
-                offsetX +
-                Math.floor((e.offsetX - offsetX) / effectiveCellSize) *
-                    effectiveCellSize;
-            const y =
-                offsetY +
-                Math.floor((e.offsetY - offsetY) / effectiveCellSize) *
-                    effectiveCellSize;
+            const [x, y] = getClickOffset(
+                offsetX,
+                offsetY,
+                e,
+                effectiveCellSize,
+            );
             ctx.fillRect(x, y, cellSize, cellSize);
         });
 
