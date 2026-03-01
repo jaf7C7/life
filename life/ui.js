@@ -33,7 +33,7 @@ function getOffset(grid) {
     );
 }
 
-function getClickOffset(clickEvent) {
+function getClickedCellLocation(clickEvent) {
     const { cellSize, lineWidth } = clickEvent.currentTarget;
     const effectiveCellSize = cellSize + lineWidth;
     const [offsetX, offsetY] = getOffset(clickEvent.currentTarget);
@@ -68,10 +68,10 @@ export default class UI {
 
         grid.addEventListener('click', (e) => {
             const { cellSize } = e.currentTarget;
+            const [x, y] = getClickedCellLocation(e);
             const ctx = e.currentTarget.getContext('2d');
             const currentColor = ctx.fillStyle;
             ctx.fillStyle = currentColor === RED ? WHITE : RED;
-            const [x, y] = getClickOffset(e);
             ctx.fillRect(x, y, cellSize, cellSize);
         });
 
