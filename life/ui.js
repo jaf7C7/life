@@ -33,17 +33,26 @@ function getOffset(grid) {
     );
 }
 
+/**
+ * Rounds `number` down to the nearest multiple of `baseNumber`.
+ *
+ * @param {Number} baseNumber
+ * @param {Number} number
+ * @returns {Number}
+ */
+function floorToMultiple(baseNumber, number) {
+    return Math.floor(number / baseNumber) * baseNumber;
+}
+
 function getClickedCellLocation(clickEvent) {
     const { cellSize, lineWidth } = clickEvent.currentTarget;
     const effectiveCellSize = cellSize + lineWidth;
     const [offsetX, offsetY] = getOffset(clickEvent.currentTarget);
     return [
         offsetX +
-            Math.floor((clickEvent.offsetX - offsetX) / effectiveCellSize) *
-                effectiveCellSize,
+            floorToMultiple(effectiveCellSize, clickEvent.offsetX - offsetX),
         offsetY +
-            Math.floor((clickEvent.offsetY - offsetY) / effectiveCellSize) *
-                effectiveCellSize,
+            floorToMultiple(effectiveCellSize, clickEvent.offsetY - offsetY),
     ];
 }
 
