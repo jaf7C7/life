@@ -24,12 +24,8 @@ function getOffset(grid) {
     //     Offsets that point up and left by half a cell, so the midpoint
     //     of the cell aligns with the centre of the grid.
     //
-    // `- grid.cellSize`
-    //     Offsets that point further up and left by a whole cell so cells
-    //     are drawn outside the boundary of the grid element, which prevents
-    //     blank spaces being visible if the grid is being resized.
     return [grid.width, grid.height].map(
-        (e) => ((e / 2) % grid.cellSize) - grid.cellSize / 2 - grid.cellSize,
+        (e) => ((e / 2) % grid.cellSize) - grid.cellSize / 2,
     );
 }
 
@@ -99,7 +95,8 @@ export default class UI {
         grid.cellSize = 20;
         grid.lineWidth = 2;
 
-        // Fix drawing resolution equal to display resolution to make calculations simpler.
+        // Fix drawing resolution equal to display resolution to make
+        // calculations simpler.
         grid.width = grid.clientWidth;
         grid.height = grid.clientHeight;
 
@@ -109,11 +106,23 @@ export default class UI {
 
         const [offsetX, offsetY] = getOffset(grid);
         const effectiveCellSize = grid.cellSize + grid.lineWidth;
+
+        // `+ 1` because the offset will cause the edge of the grid to
+        // become visible, so we just paint an extra row and column of
+        // cells to plug the visual gap.
+        const gridCellWidth = grid.width / effectiveCellSize + 1;
+        const gridCellHeight = grid.height / effectiveCellSize + 1;
+
         ctx.fillStyle = WHITE;
 
-        for (let y = offsetY; y < grid.height; y += effectiveCellSize) {
-            for (let x = offsetX; x < grid.width; x += effectiveCellSize) {
-                ctx.fillRect(x, y, grid.cellSize, grid.cellSize);
+        for (let y = 0; y < gridCellHeight; y++) {
+            for (let x = 0; x < gridCellWidth; x++) {
+                ctx.fillRect(
+                    offsetX + x * effectiveCellSize,
+                    offsetY + y * effectiveCellSize,
+                    grid.cellSize,
+                    grid.cellSize,
+                );
             }
         }
     }
