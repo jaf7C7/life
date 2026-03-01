@@ -29,28 +29,30 @@ function getCellColor([x, y]) {
     return [r, g, b];
 }
 
-test('a click turns the canvas from white to red', async ({ page }) => {
+test('clicking a cell turns it from white to red', async ({ page }) => {
     await page.goto('/');
     const grid = await page.getByTestId('grid');
+    const { width, height } = await grid.boundingBox();
     const white = [255, 255, 255];
     const red = [255, 0, 0];
 
     expect(await page.evaluate(getCellColor, [0, 0])).toEqual(white);
 
-    await grid.click();
+    await grid.click({ position: { x: width / 2, y: height / 2 } });
 
     expect(await page.evaluate(getCellColor, [0, 0])).toEqual(red);
 });
 
-test('two clicks leaves the canvas white again', async ({ page }) => {
+test('clicking a cell twice leaves it white again', async ({ page }) => {
     await page.goto('/');
     const grid = await page.getByTestId('grid');
+    const { width, height } = await grid.boundingBox();
     const white = [255, 255, 255];
 
     expect(await page.evaluate(getCellColor, [0, 0])).toEqual(white);
 
-    await grid.click();
-    await grid.click();
+    await grid.click({ position: { x: width / 2, y: height / 2 } });
+    await grid.click({ position: { x: width / 2, y: height / 2 } });
 
     expect(await page.evaluate(getCellColor, [0, 0])).toEqual(white);
 });

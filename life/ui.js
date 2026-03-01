@@ -1,3 +1,7 @@
+const RED = '#ff0000';
+const WHITE = '#ffffff';
+const BLACK = '#000000';
+
 /**
  * Calculates the offset of the grid to ensure that the centre of the middle
  * cell always aligns with the centre of the grid. The offset is such that a
@@ -34,13 +38,26 @@ export default class UI {
 
         this.drawGrid(grid);
 
-        grid.addEventListener('click', () => {
-            const ctx = grid.getContext('2d');
+        grid.addEventListener('click', (e) => {
+            const { width, height, cellSize, lineWidth } = e.currentTarget;
+            const effectiveCellSize = cellSize + lineWidth;
+            const ctx = e.currentTarget.getContext('2d');
             const currentColor = ctx.fillStyle;
-            const red = '#ff0000';
-            const white = '#ffffff';
-            ctx.fillStyle = currentColor === red ? white : red;
-            ctx.fillRect(0, 0, grid.width, grid.height);
+            ctx.fillStyle = currentColor === RED ? WHITE : RED;
+            const [offsetX, offsetY] = getOffset(
+                width,
+                height,
+                cellSize + lineWidth,
+            );
+            const x =
+                offsetX +
+                Math.floor((e.offsetX - offsetX) / effectiveCellSize) *
+                    effectiveCellSize;
+            const y =
+                offsetY +
+                Math.floor((e.offsetY - offsetY) / effectiveCellSize) *
+                    effectiveCellSize;
+            ctx.fillRect(x, y, cellSize, cellSize);
         });
 
         const resizeObserver = new ResizeObserver((entries) => {
@@ -52,16 +69,18 @@ export default class UI {
 
     drawGrid(grid) {
         grid.cellSize = 20;
+        grid.lineWidth = 2;
+
+        // Fix drawing resolution equal to screen resolution to make calculations simpler.
         grid.width = grid.clientWidth;
         grid.height = grid.clientHeight;
-        const ctx = grid.getContext('2d');
 
-        ctx.fillStyle = 'black';
+        const ctx = grid.getContext('2d');
+        ctx.fillStyle = BLACK;
         ctx.fillRect(0, 0, grid.width, grid.height);
 
-        const lineWidth = 2;
-        const effectiveCellSize = grid.cellSize + lineWidth;
-        ctx.fillStyle = 'white';
+        const effectiveCellSize = grid.cellSize + grid.lineWidth;
+        ctx.fillStyle = WHITE;
 
         const [offsetX, offsetY] = getOffset(
             grid.width,
