@@ -5,8 +5,8 @@ const BLACK = '#000000';
 /**
  * Calculates the offset of the grid to ensure that the centre of the middle
  * cell always aligns with the centre of the grid. The offset is such that a
- * margin of 1 cell is drawn outside the boundary of the grid to avoid any blank
- * space showing when resizing the grid element.
+ * margin of approximately 1 cell is drawn outside the boundary of the grid to
+ * avoid any blank space showing when resizing the grid element.
  *
  * @param {Number} width - Width of the grid.
  * @param {Number} height - Height of the grid.
@@ -14,8 +14,22 @@ const BLACK = '#000000';
  * @returns {Number[]} Offset - A tuple of x and y offset values.
  */
 function getOffset(grid) {
+    // The calculation explained:
+    //
+    // `(e / 2) % grid.cellSize`
+    //     Offsets the cells so top left corner of a grid cell aligns with
+    //     the central point of the grid element.
+    //
+    // `- grid.cellSize / 2`
+    //     Offsets that point up and left by half a cell, so the midpoint
+    //     of the cell aligns with the centre of the grid.
+    //
+    // `- grid.cellSize`
+    //     Offsets that point further up and left by a whole cell so cells
+    //     are drawn outside the boundary of the grid element, which prevents
+    //     blank spaces being visible if the grid is being resized.
     return [grid.width, grid.height].map(
-        (e) => ((e / 2) % grid.cellSize) - grid.cellSize * (3 / 2),
+        (e) => ((e / 2) % grid.cellSize) - grid.cellSize / 2 - grid.cellSize,
     );
 }
 
