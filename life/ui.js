@@ -13,16 +13,16 @@ const BLACK = '#000000';
  * @param {Number} cellSize - Effective (including borders) cell size.
  * @returns {Number[]} Offset - A tuple of x and y offset values.
  */
-function getOffset(width, height, cellSize) {
-    return [width, height].map(
-        (e) => ((e / 2) % cellSize) - cellSize * (3 / 2),
+function getOffset(grid) {
+    return [grid.width, grid.height].map(
+        (e) => ((e / 2) % grid.cellSize) - grid.cellSize * (3 / 2),
     );
 }
 
 function getClickOffset(clickEvent) {
-    const { width, height, cellSize, lineWidth } = clickEvent.currentTarget;
+    const { cellSize, lineWidth } = clickEvent.currentTarget;
     const effectiveCellSize = cellSize + lineWidth;
-    const [offsetX, offsetY] = getOffset(width, height, cellSize);
+    const [offsetX, offsetY] = getOffset(clickEvent.currentTarget);
     return [
         offsetX +
             Math.floor((clickEvent.offsetX - offsetX) / effectiveCellSize) *
@@ -83,11 +83,7 @@ export default class UI {
         const effectiveCellSize = grid.cellSize + grid.lineWidth;
         ctx.fillStyle = WHITE;
 
-        const [offsetX, offsetY] = getOffset(
-            grid.width,
-            grid.height,
-            effectiveCellSize,
-        );
+        const [offsetX, offsetY] = getOffset(grid);
 
         for (let y = offsetY; y < grid.height; y += effectiveCellSize) {
             for (let x = offsetX; x < grid.width; x += effectiveCellSize) {
