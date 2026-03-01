@@ -45,9 +45,9 @@ function floorToMultiple(baseNumber, number) {
 }
 
 function getClickedCellLocation(clickEvent) {
-    const { cellSize, lineWidth } = clickEvent.currentTarget;
-    const effectiveCellSize = cellSize + lineWidth;
-    const [offsetX, offsetY] = getOffset(clickEvent.currentTarget);
+    const grid = clickEvent.currentTarget;
+    const effectiveCellSize = grid.cellSize + grid.lineWidth;
+    const [offsetX, offsetY] = getOffset(grid);
     return [
         offsetX +
             floorToMultiple(effectiveCellSize, clickEvent.offsetX - offsetX),
@@ -99,7 +99,7 @@ export default class UI {
         grid.cellSize = 20;
         grid.lineWidth = 2;
 
-        // Fix drawing resolution equal to screen resolution to make calculations simpler.
+        // Fix drawing resolution equal to display resolution to make calculations simpler.
         grid.width = grid.clientWidth;
         grid.height = grid.clientHeight;
 
@@ -107,10 +107,9 @@ export default class UI {
         ctx.fillStyle = BLACK;
         ctx.fillRect(0, 0, grid.width, grid.height);
 
+        const [offsetX, offsetY] = getOffset(grid);
         const effectiveCellSize = grid.cellSize + grid.lineWidth;
         ctx.fillStyle = WHITE;
-
-        const [offsetX, offsetY] = getOffset(grid);
 
         for (let y = offsetY; y < grid.height; y += effectiveCellSize) {
             for (let x = offsetX; x < grid.width; x += effectiveCellSize) {
