@@ -76,12 +76,16 @@ export default class UI {
         this.drawGrid(grid);
 
         grid.addEventListener('click', (e) => {
-            const { cellSize } = e.currentTarget;
             const [x, y] = getClickedCellLocation(e);
             const ctx = e.currentTarget.getContext('2d');
             const currentColor = ctx.fillStyle;
             ctx.fillStyle = currentColor === RED ? WHITE : RED;
-            ctx.fillRect(x, y, cellSize, cellSize);
+            ctx.fillRect(
+                x,
+                y,
+                e.currentTarget.cellSize,
+                e.currentTarget.cellSize,
+            );
         });
 
         const resizeObserver = new ResizeObserver((entries) => {
