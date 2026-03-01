@@ -15,7 +15,7 @@ test('displays a grid of cells', async ({ page }) => {
 
 /**
  * Returns the color of the single pixel at the centre of the canvas as an RGB
- * value.
+ * value. Must be run within the browser context.
  *
  * @returns {Integer[]} Color
  */
