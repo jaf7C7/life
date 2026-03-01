@@ -1,3 +1,20 @@
+/**
+ * Calculates the offset of the grid to ensure that the centre of the middle
+ * cell always aligns with the centre of the grid. The offset is such that a
+ * margin of 1 cell is drawn outside the boundary of the grid to avoid any blank
+ * space showing when resizing the grid element.
+ *
+ * @param {Number} width - Width of the grid.
+ * @param {Number} height - Height of the grid.
+ * @param {Number} cellSize - Effective (including borders) cell size.
+ * @returns {Number[]} Offset - A tuple of x and y offset values.
+ */
+function getOffset(width, height, cellSize) {
+    return [width, height].map(
+        (e) => ((e / 2) % cellSize) - cellSize * (3 / 2),
+    );
+}
+
 export default class UI {
     setTitle(title) {
         document.title = title;
@@ -46,16 +63,11 @@ export default class UI {
         const effectiveCellSize = grid.cellSize + lineWidth;
         ctx.fillStyle = 'white';
 
-        // Offset the grid so the centre of the middle cell always aligns
-        // with the centre of the grid.  The offset is such that a margin
-        // of 1 cell is drawn outside the boundary of the grid to avoid
-        // any blank space showing when resizing the grid element.
-        const offsetX =
-            ((grid.width / 2) % effectiveCellSize) -
-            effectiveCellSize * (3 / 2);
-        const offsetY =
-            ((grid.height / 2) % effectiveCellSize) -
-            effectiveCellSize * (3 / 2);
+        const [offsetX, offsetY] = getOffset(
+            grid.width,
+            grid.height,
+            effectiveCellSize,
+        );
 
         for (let y = offsetY; y < grid.height; y += effectiveCellSize) {
             for (let x = offsetX; x < grid.width; x += effectiveCellSize) {
