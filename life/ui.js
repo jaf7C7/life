@@ -88,7 +88,8 @@ export default class UI {
         });
 
         const resizeObserver = new ResizeObserver((entries) => {
-            this.drawGrid(entries[0].target);
+            const grid = entries[0].target;
+            this.drawGrid(grid);
         });
 
         resizeObserver.observe(grid);
