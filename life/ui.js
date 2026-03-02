@@ -24,8 +24,12 @@ function getOffset(grid) {
     //     Offsets that point up and left by half a cell, so the midpoint
     //     of the cell aligns with the centre of the grid.
     //
+    // `- grid.cellSize`
+    //    Offsets the grid up and left by another whole cell, to avoid
+    //    blank space showing at certain sizes.
+    //
     return [grid.width, grid.height].map(
-        (e) => ((e / 2) % grid.cellSize) - grid.cellSize / 2,
+        (e) => ((e / 2) % grid.cellSize) - grid.cellSize / 2 - grid.cellSize,
     );
 }
 
@@ -107,11 +111,11 @@ export default class UI {
         const [offsetX, offsetY] = getOffset(grid);
         const effectiveCellSize = grid.cellSize + grid.lineWidth;
 
-        // `+ 1` because the offset will cause the edge of the grid to
-        // become visible, so we just paint an extra row and column of
-        // cells to plug the visual gap.
-        const gridCellWidth = grid.width / effectiveCellSize + 1;
-        const gridCellHeight = grid.height / effectiveCellSize + 1;
+        // `+ 2` because the offset will cause the edge of the grid to
+        // become visible, so we just paint an couple of extra rows and
+        // columns to plug the visual gap.
+        const gridCellWidth = grid.width / effectiveCellSize + 2;
+        const gridCellHeight = grid.height / effectiveCellSize + 2;
 
         ctx.fillStyle = WHITE;
 
