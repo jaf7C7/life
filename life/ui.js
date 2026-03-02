@@ -56,6 +56,30 @@ function getClickedCellLocation(clickEvent) {
     ];
 }
 
+/**
+ * Takes an RGB color and converts it to a hexcode.
+ *
+ * @param {Number[]} rgb - An RGB color in the form [r, g, b]
+ * @returns {String} - A hexcode in the form #abcdef
+ */
+function rgb2hex(rgb) {
+    return `#${rgb.map((e) => e.toString(16).padStart(2, '0')).join('')}`;
+}
+
+/**
+ * Returns the color of the pixel at the given point. Co-ordinates are relative
+ * to the top left corner of the canvas element.
+ *
+ * @param {Number} x
+ * @param {Number} y
+ * @returns {String}
+ */
+function colorAtPoint(x, y) {
+    const grid = document.querySelector('canvas');
+    const [r, g, b] = grid.getContext('2d').getImageData(x, y, 1, 1).data;
+    return rgb2hex([r, g, b]);
+}
+
 export default class UI {
     setTitle(title) {
         document.title = title;
@@ -78,7 +102,8 @@ export default class UI {
         grid.addEventListener('click', (e) => {
             const [x, y] = getClickedCellLocation(e);
             const ctx = e.currentTarget.getContext('2d');
-            ctx.fillStyle = ctx.fillStyle === RED ? WHITE : RED;
+            ctx.fillStyle =
+                colorAtPoint(e.offsetX, e.offsetY) === RED ? WHITE : RED;
             ctx.fillRect(
                 x,
                 y,
