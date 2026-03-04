@@ -64,6 +64,23 @@ function getClickedCellOffset(clickEvent) {
 }
 
 /**
+ * A click event handler which toggles the colour of the clicked cell.
+ *
+ * @param {PointerEvent} - The mouse click event.
+ */
+function handleClick(clickEvent) {
+    const grid = clickEvent.currentTarget;
+    const ctx = grid.getContext('2d');
+    ctx.fillStyle =
+        colorAtPoint(clickEvent.offsetX, clickEvent.offsetY) ===
+        CELL_ACTIVE_COLOR
+            ? CELL_INACTIVE_COLOR
+            : CELL_ACTIVE_COLOR;
+    const [x, y] = getClickedCellOffset(clickEvent);
+    ctx.fillRect(x, y, grid.cellSize, grid.cellSize);
+}
+
+/**
  * Takes an RGB color and converts it to a hexcode.
  *
  * @param {Number[]} rgb - An RGB color in the form [r, g, b]
@@ -101,32 +118,13 @@ export default class UI {
 
     /** Creates the game grid and adds the required event listeners. */
     createGrid() {
-        /**
-         * A click event handler which toggles the colour of the clicked cell.
-         *
-         * @param {PointerEvent} - The mouse click event.
-         */
-        function handleClick(clickEvent) {
-            const grid = clickEvent.currentTarget;
-            const ctx = grid.getContext('2d');
-            ctx.fillStyle =
-                colorAtPoint(clickEvent.offsetX, clickEvent.offsetY) ===
-                CELL_ACTIVE_COLOR
-                    ? CELL_INACTIVE_COLOR
-                    : CELL_ACTIVE_COLOR;
-            const [x, y] = getClickedCellOffset(clickEvent);
-            ctx.fillRect(x, y, grid.cellSize, grid.cellSize);
-        }
-
         const handleResize = this._makeResizeHandler();
-
         const grid = this.createElement({
             type: 'canvas',
             'data-testid': 'grid',
             handleClick,
             handleResize,
         });
-
         this._drawGrid(grid);
     }
 
