@@ -118,21 +118,7 @@ export default class UI {
             ctx.fillRect(x, y, grid.cellSize, grid.cellSize);
         }
 
-        /**
-         * Creates a resize event handler for a given UI object.
-         *
-         * @param {UI} ui - The UI object which will be used to redraw the grid.
-         * @returns {Function} - The resize event handler function to be called
-         *   on resize events.
-         */
-        function makeResizeHandler(ui) {
-            return (entries) => {
-                const grid = entries[0].target;
-                return ui.drawGrid(grid);
-            };
-        }
-
-        const handleResize = makeResizeHandler(this);
+        const handleResize = this.makeResizeHandler();
 
         const grid = this.createElement({
             type: 'canvas',
@@ -144,7 +130,23 @@ export default class UI {
         this.drawGrid(grid);
     }
 
-    /** Draws the grid. */
+    /**
+     * Creates a resize event handler for a given UI object.
+     *
+     * @returns {Function} - The resize event handler.
+     */
+    makeResizeHandler() {
+        return (entries) => {
+            const grid = entries[0].target;
+            return this.drawGrid(grid);
+        };
+    }
+
+    /**
+     * Draws the grid.
+     *
+     * @param {HTMLElement} grid
+     */
     drawGrid(grid) {
         grid.cellSize = 20;
         grid.lineWidth = 2;
