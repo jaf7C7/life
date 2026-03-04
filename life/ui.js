@@ -161,11 +161,11 @@ export default class UI {
         const [offsetX, offsetY] = getOffset(grid);
         const effectiveCellSize = grid.cellSize + grid.lineWidth;
 
-        // `+ 2` because the offset will cause the edge of the grid to
-        // become visible, so we just paint an couple of extra rows and
-        // columns to plug the visual gap.
-        const gridCellWidth = grid.width / effectiveCellSize + 2;
-        const gridCellHeight = grid.height / effectiveCellSize + 2;
+        // The offset will cause the edge of the grid to become visible,
+        // so the padding serves to plug the visual gap.
+        const gridPadding = 2;
+        const gridCellWidth = grid.width / effectiveCellSize + gridPadding;
+        const gridCellHeight = grid.height / effectiveCellSize + gridPadding;
 
         ctx.fillStyle = CELL_INACTIVE_COLOR;
 
