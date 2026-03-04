@@ -87,44 +87,64 @@ function colorAtPoint(x, y) {
     return rgb2hex([r, g, b]);
 }
 
+/** Encapsulates all the browser-specific code for rendering the user-interface. */
 export default class UI {
+    /** Sets the document title. */
     setTitle(title) {
         document.title = title;
     }
 
+    /** Creates a level 1 heading. */
     createHeading(textContent) {
-        let title = document.createElement('h1');
-        title.setAttribute('data-testid', 'title');
-        title.textContent = textContent;
-        document.body.appendChild(title);
+        this.createElement({ type: 'h1', 'data-testid': 'title', textContent });
     }
 
+    /** Creates the game grid and adds the required event listeners. */
     createGrid() {
-        let grid = document.createElement('canvas');
-        grid.setAttribute('data-testid', 'grid');
-        document.body.appendChild(grid);
-
-        this.drawGrid(grid);
-
-        grid.addEventListener('click', (e) => {
-            const grid = e.currentTarget;
+        /**
+         * A click event handler which toggles the colour of the clicked cell.
+         *
+         * @param {PointerEvent} - The mouse click event.
+         */
+        function handleClick(clickEvent) {
+            const grid = clickEvent.currentTarget;
             const ctx = grid.getContext('2d');
             ctx.fillStyle =
-                colorAtPoint(e.offsetX, e.offsetY) === CELL_ACTIVE_COLOR
+                colorAtPoint(clickEvent.offsetX, clickEvent.offsetY) ===
+                CELL_ACTIVE_COLOR
                     ? CELL_INACTIVE_COLOR
                     : CELL_ACTIVE_COLOR;
-            const [x, y] = getClickedCellOffset(e);
+            const [x, y] = getClickedCellOffset(clickEvent);
             ctx.fillRect(x, y, grid.cellSize, grid.cellSize);
+        }
+
+        /**
+         * Creates a resize event handler for a given UI object.
+         *
+         * @param {UI} ui - The UI object which will be used to redraw the grid.
+         * @returns {Function} - The resize event handler function to be called
+         *   on resize events.
+         */
+        function makeResizeHandler(ui) {
+            return (entries) => {
+                const grid = entries[0].target;
+                return ui.drawGrid(grid);
+            };
+        }
+
+        const handleResize = makeResizeHandler(this);
+
+        const grid = this.createElement({
+            type: 'canvas',
+            'data-testid': 'grid',
+            handleClick,
+            handleResize,
         });
 
-        const resizeObserver = new ResizeObserver((entries) => {
-            const grid = entries[0].target;
-            this.drawGrid(grid);
-        });
-
-        resizeObserver.observe(grid);
+        this.drawGrid(grid);
     }
 
+    /** Draws the grid. */
     drawGrid(grid) {
         grid.cellSize = 20;
         grid.lineWidth = 2;
@@ -161,5 +181,31 @@ export default class UI {
         }
     }
 
-    createElement() {}
+    /**
+     * Does the actual DOM manipulation work of creating an element and setting
+     * event handlers, attributes and properties.
+     *
+     * @param {Object} element - A specification object for the element to be
+     *   created.
+     * @returns {HTMLElement} - The HTML element as returned by
+     *   `document.createElement`.
+     */
+    createElement(element) {
+        const e = document.createElement(element.type);
+        e.setAttribute('data-testid', element['data-testid']);
+        e.textContent = element.textContent;
+
+        if (element.handleClick) {
+            e.addEventListener('click', element.handleClick);
+        }
+
+        if (element.handleResize) {
+            const resizeObserver = new ResizeObserver(element.handleResize);
+            resizeObserver.observe(e);
+        }
+
+        document.body.appendChild(e);
+
+        return e;
+    }
 }
