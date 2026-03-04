@@ -47,33 +47,13 @@ function floorToMultiple(baseNumber, number) {
  * @param {PointerEvent} clickEvent
  * @returns {Number[]}
  */
-function getClickedCellOffset(clickEvent) {
-    const grid = clickEvent.currentTarget;
+function getClickedCellOffset(grid, offsetX, offsetY) {
     const effectiveCellSize = grid.cellSize + grid.lineWidth;
-    const [offsetX, offsetY] = getOffset(grid);
+    const [x0, y0] = getOffset(grid);
     return [
-        offsetX +
-            floorToMultiple(effectiveCellSize, clickEvent.offsetX - offsetX),
-        offsetY +
-            floorToMultiple(effectiveCellSize, clickEvent.offsetY - offsetY),
+        x0 + floorToMultiple(effectiveCellSize, offsetX - x0),
+        y0 + floorToMultiple(effectiveCellSize, offsetY - y0),
     ];
-}
-
-/**
- * A click event handler which toggles the colour of the clicked cell.
- *
- * @param {PointerEvent} - The mouse click event.
- */
-function handleClick(clickEvent) {
-    const grid = clickEvent.currentTarget;
-    const ctx = grid.getContext('2d');
-    ctx.fillStyle =
-        colorAtPoint(clickEvent.offsetX, clickEvent.offsetY) ===
-        CELL_ACTIVE_COLOR
-            ? CELL_INACTIVE_COLOR
-            : CELL_ACTIVE_COLOR;
-    const [x, y] = getClickedCellOffset(clickEvent);
-    ctx.fillRect(x, y, grid.cellSize, grid.cellSize);
 }
 
 /**
@@ -118,7 +98,26 @@ export default class UI {
         const grid = this.createElement({
             type: 'canvas',
             'data-testid': 'grid',
-            handleClick,
+            /**
+             * A click event handler which toggles the colour of the clicked
+             * cell.
+             *
+             * @param {PointerEvent} - The mouse click event.
+             */
+            handleClick(clickEvent) {
+                const ctx = this.getContext('2d');
+                ctx.fillStyle =
+                    colorAtPoint(clickEvent.offsetX, clickEvent.offsetY) ===
+                    CELL_ACTIVE_COLOR
+                        ? CELL_INACTIVE_COLOR
+                        : CELL_ACTIVE_COLOR;
+                const [x, y] = getClickedCellOffset(
+                    this,
+                    clickEvent.offsetX,
+                    clickEvent.offsetY,
+                );
+                ctx.fillRect(x, y, this.cellSize, this.cellSize);
+            },
             handleResize,
         });
         this._drawGrid(grid);
