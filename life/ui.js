@@ -4,14 +4,10 @@ const GRID_BG_COLOR = '#000000';
 
 /**
  * Calculates the offset of the grid to ensure that the centre of the middle
- * cell always aligns with the centre of the grid. The offset is such that a
- * margin of approximately 1 cell is drawn outside the boundary of the grid to
- * avoid any blank space showing when resizing the grid element.
+ * cell always aligns with the centre of the grid.
  *
- * @param {Number} width - Width of the grid.
- * @param {Number} height - Height of the grid.
- * @param {Number} cellSize - Effective (including borders) cell size.
- * @returns {Number[]} Offset - A tuple of x and y offset values.
+ * @param {Object} grid
+ * @returns {Number[]}
  */
 function getOffset(grid) {
     // The calculation explained:
