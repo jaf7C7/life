@@ -80,6 +80,47 @@ function colorAtPoint(x, y) {
     return rgb2hex([r, g, b]);
 }
 
+/**
+ * Draws the grid.
+ *
+ * @param {HTMLElement} grid
+ */
+function drawGrid(grid) {
+    grid.cellSize = 20;
+    grid.lineWidth = 2;
+
+    // Fix drawing resolution equal to display resolution to make
+    // calculations simpler.
+    grid.width = grid.clientWidth;
+    grid.height = grid.clientHeight;
+
+    const ctx = grid.getContext('2d');
+    ctx.fillStyle = GRID_BG_COLOR;
+    ctx.fillRect(0, 0, grid.width, grid.height);
+
+    const [offsetX, offsetY] = getOffset(grid);
+    const effectiveCellSize = grid.cellSize + grid.lineWidth;
+
+    // The offset will cause the edge of the grid to become visible,
+    // so the padding serves to plug the visual gap.
+    const gridPadding = 2;
+    const gridCellWidth = grid.width / effectiveCellSize + gridPadding;
+    const gridCellHeight = grid.height / effectiveCellSize + gridPadding;
+
+    ctx.fillStyle = CELL_INACTIVE_COLOR;
+
+    for (let y = 0; y < gridCellHeight; y++) {
+        for (let x = 0; x < gridCellWidth; x++) {
+            ctx.fillRect(
+                offsetX + x * effectiveCellSize,
+                offsetY + y * effectiveCellSize,
+                grid.cellSize,
+                grid.cellSize,
+            );
+        }
+    }
+}
+
 /** Encapsulates all the browser-specific code for rendering the user-interface. */
 export default class UI {
     /** Sets the document title. */
@@ -120,7 +161,7 @@ export default class UI {
             },
             handleResize,
         });
-        this._drawGrid(grid);
+        drawGrid(grid);
     }
 
     /**
@@ -131,49 +172,8 @@ export default class UI {
     _makeResizeHandler() {
         return (entries) => {
             const grid = entries[0].target;
-            return this._drawGrid(grid);
+            return drawGrid(grid);
         };
-    }
-
-    /**
-     * Draws the grid.
-     *
-     * @param {HTMLElement} grid
-     */
-    _drawGrid(grid) {
-        grid.cellSize = 20;
-        grid.lineWidth = 2;
-
-        // Fix drawing resolution equal to display resolution to make
-        // calculations simpler.
-        grid.width = grid.clientWidth;
-        grid.height = grid.clientHeight;
-
-        const ctx = grid.getContext('2d');
-        ctx.fillStyle = GRID_BG_COLOR;
-        ctx.fillRect(0, 0, grid.width, grid.height);
-
-        const [offsetX, offsetY] = getOffset(grid);
-        const effectiveCellSize = grid.cellSize + grid.lineWidth;
-
-        // The offset will cause the edge of the grid to become visible,
-        // so the padding serves to plug the visual gap.
-        const gridPadding = 2;
-        const gridCellWidth = grid.width / effectiveCellSize + gridPadding;
-        const gridCellHeight = grid.height / effectiveCellSize + gridPadding;
-
-        ctx.fillStyle = CELL_INACTIVE_COLOR;
-
-        for (let y = 0; y < gridCellHeight; y++) {
-            for (let x = 0; x < gridCellWidth; x++) {
-                ctx.fillRect(
-                    offsetX + x * effectiveCellSize,
-                    offsetY + y * effectiveCellSize,
-                    grid.cellSize,
-                    grid.cellSize,
-                );
-            }
-        }
     }
 
     /**
