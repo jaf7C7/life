@@ -118,7 +118,7 @@ export default class UI {
             ctx.fillRect(x, y, grid.cellSize, grid.cellSize);
         }
 
-        const handleResize = this.makeResizeHandler();
+        const handleResize = this._makeResizeHandler();
 
         const grid = this.createElement({
             type: 'canvas',
@@ -127,7 +127,7 @@ export default class UI {
             handleResize,
         });
 
-        this.drawGrid(grid);
+        this._drawGrid(grid);
     }
 
     /**
@@ -135,10 +135,10 @@ export default class UI {
      *
      * @returns {Function} - The resize event handler.
      */
-    makeResizeHandler() {
+    _makeResizeHandler() {
         return (entries) => {
             const grid = entries[0].target;
-            return this.drawGrid(grid);
+            return this._drawGrid(grid);
         };
     }
 
@@ -147,7 +147,7 @@ export default class UI {
      *
      * @param {HTMLElement} grid
      */
-    drawGrid(grid) {
+    _drawGrid(grid) {
         grid.cellSize = 20;
         grid.lineWidth = 2;
 
