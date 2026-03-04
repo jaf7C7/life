@@ -1,6 +1,6 @@
-const RED = '#ff0000';
-const WHITE = '#ffffff';
-const BLACK = '#000000';
+const CELL_ACTIVE_COLOR = '#ff0000';
+const CELL_INACTIVE_COLOR = '#ffffff';
+const GRID_BG_COLOR = '#000000';
 
 /**
  * Calculates the offset of the grid to ensure that the centre of the middle
@@ -44,7 +44,14 @@ function floorToMultiple(baseNumber, number) {
     return Math.floor(number / baseNumber) * baseNumber;
 }
 
-function getClickedCellLocation(clickEvent) {
+/**
+ * Returns the offset of the top-left corner of the clicked cell relative to the
+ * top-left corner of the top-left cell in the grid.
+ *
+ * @param {PointerEvent} clickEvent
+ * @returns {Number[]}
+ */
+function getClickedCellOffset(clickEvent) {
     const grid = clickEvent.currentTarget;
     const effectiveCellSize = grid.cellSize + grid.lineWidth;
     const [offsetX, offsetY] = getOffset(grid);
@@ -100,16 +107,14 @@ export default class UI {
         this.drawGrid(grid);
 
         grid.addEventListener('click', (e) => {
-            const [x, y] = getClickedCellLocation(e);
-            const ctx = e.currentTarget.getContext('2d');
+            const grid = e.currentTarget;
+            const ctx = grid.getContext('2d');
             ctx.fillStyle =
-                colorAtPoint(e.offsetX, e.offsetY) === RED ? WHITE : RED;
-            ctx.fillRect(
-                x,
-                y,
-                e.currentTarget.cellSize,
-                e.currentTarget.cellSize,
-            );
+                colorAtPoint(e.offsetX, e.offsetY) === CELL_ACTIVE_COLOR
+                    ? CELL_INACTIVE_COLOR
+                    : CELL_ACTIVE_COLOR;
+            const [x, y] = getClickedCellOffset(e);
+            ctx.fillRect(x, y, grid.cellSize, grid.cellSize);
         });
 
         const resizeObserver = new ResizeObserver((entries) => {
@@ -130,7 +135,7 @@ export default class UI {
         grid.height = grid.clientHeight;
 
         const ctx = grid.getContext('2d');
-        ctx.fillStyle = BLACK;
+        ctx.fillStyle = GRID_BG_COLOR;
         ctx.fillRect(0, 0, grid.width, grid.height);
 
         const [offsetX, offsetY] = getOffset(grid);
@@ -142,7 +147,7 @@ export default class UI {
         const gridCellWidth = grid.width / effectiveCellSize + 2;
         const gridCellHeight = grid.height / effectiveCellSize + 2;
 
-        ctx.fillStyle = WHITE;
+        ctx.fillStyle = CELL_INACTIVE_COLOR;
 
         for (let y = 0; y < gridCellHeight; y++) {
             for (let x = 0; x < gridCellWidth; x++) {
