@@ -135,10 +135,10 @@ export default class UI {
 
     /** Creates the game grid and adds the required event listeners. */
     createGrid() {
-        const handleResize = this._makeResizeHandler();
         const grid = this.createElement({
             type: 'canvas',
             'data-testid': 'grid',
+
             /**
              * A click event handler which toggles the colour of the clicked
              * cell.
@@ -159,21 +159,12 @@ export default class UI {
                 );
                 ctx.fillRect(x, y, this.cellSize, this.cellSize);
             },
-            handleResize,
+
+            handleResize(entries) {
+                drawGrid(entries[0].target);
+            },
         });
         drawGrid(grid);
-    }
-
-    /**
-     * Creates a resize event handler for a given UI object.
-     *
-     * @returns {Function} - The resize event handler.
-     */
-    _makeResizeHandler() {
-        return (entries) => {
-            const grid = entries[0].target;
-            return drawGrid(grid);
-        };
     }
 
     /**
