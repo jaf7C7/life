@@ -149,6 +149,31 @@ export default function createApp(ui, game) {
             game.toggleCell(cellX, cellY);
         },
 
+        /**
+         * A click event handler which toggles the colour of the clicked cell.
+         *
+         * @param {PointerEvent} - The mouse click event.
+         */
+        handleClick(clickEvent) {
+            const ctx = clickEvent.currentTarget.getContext('2d');
+            ctx.fillStyle =
+                colorAtPoint(clickEvent.offsetX, clickEvent.offsetY) ===
+                CELL_ACTIVE_COLOR
+                    ? CELL_INACTIVE_COLOR
+                    : CELL_ACTIVE_COLOR;
+            const [x, y] = getClickedCellOffset(
+                clickEvent.currentTarget,
+                clickEvent.offsetX,
+                clickEvent.offsetY,
+            );
+            ctx.fillRect(
+                x,
+                y,
+                clickEvent.currentTarget.cellSize,
+                clickEvent.currentTarget.cellSize,
+            );
+        },
+
         clickAndDrag(mouseDownPos, mouseUpPos) {
             this.offset = {
                 x: mouseUpPos.x - mouseDownPos.x,
@@ -173,31 +198,6 @@ export default function createApp(ui, game) {
             return {
                 fillRect() {},
             };
-        },
-
-        /**
-         * A click event handler which toggles the colour of the clicked cell.
-         *
-         * @param {PointerEvent} - The mouse click event.
-         */
-        handleClick(clickEvent) {
-            const ctx = this.getContext('2d');
-            ctx.fillStyle =
-                colorAtPoint(clickEvent.offsetX, clickEvent.offsetY) ===
-                CELL_ACTIVE_COLOR
-                    ? CELL_INACTIVE_COLOR
-                    : CELL_ACTIVE_COLOR;
-            const [x, y] = getClickedCellOffset(
-                clickEvent.currentTarget,
-                clickEvent.offsetX,
-                clickEvent.offsetY,
-            );
-            ctx.fillRect(
-                x,
-                y,
-                clickEvent.currentTarget.cellSize,
-                clickEvent.currentTarget.cellSize,
-            );
         },
 
         handleResize(entries) {
