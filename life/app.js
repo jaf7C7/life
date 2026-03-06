@@ -2,11 +2,6 @@ const CELL_ACTIVE_COLOR = '#ff0000';
 const CELL_INACTIVE_COLOR = '#ffffff';
 const GRID_BG_COLOR = '#000000';
 
-/** Creates a level 1 heading. */
-function createHeading(ui, textContent) {
-    ui.createElement({ type: 'h1', 'data-testid': 'title', textContent });
-}
-
 /**
  * Rounds `number` down to the nearest multiple of `baseNumber`.
  *
@@ -128,7 +123,12 @@ function drawGrid(grid) {
 
 export default function createApp(ui, game) {
     ui.setTitle('Life');
-    createHeading(ui, 'Life');
+
+    ui.createElement({
+        type: 'h1',
+        'data-testid': 'title',
+        textContent: 'Life',
+    });
 
     const grid = ui.createElement({
         type: 'canvas',
