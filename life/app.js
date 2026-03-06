@@ -134,8 +134,6 @@ export default function createApp(ui, game) {
         id: 'grid',
         type: 'canvas',
         'data-testid': 'grid',
-        height: 100,
-        width: 100,
         cellSize: 20,
         offset: { x: 0, y: 0 },
 
