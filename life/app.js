@@ -126,8 +126,10 @@ function drawGrid(grid) {
     }
 }
 
-/** Creates the game grid and adds the required event listeners. */
-function createGrid(ui) {
+export default function createApp(ui, game) {
+    ui.setTitle('Life');
+    createHeading(ui, 'Life');
+
     const grid = ui.createElement({
         type: 'canvas',
         'data-testid': 'grid',
@@ -167,13 +169,8 @@ function createGrid(ui) {
             drawGrid(entries[0].target);
         },
     });
-    drawGrid(grid);
-}
 
-export default function createApp(ui, game) {
-    ui.setTitle('Life');
-    createHeading(ui, 'Life');
-    createGrid(ui);
+    drawGrid(grid);
 
     ui.createElement({
         id: 'grid',
