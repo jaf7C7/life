@@ -1,6 +1,4 @@
-import UI from './ui.js';
-
-export default function createApp(ui = new UI(), game) {
+export default function createApp(ui, game) {
     ui.setTitle('Life');
     ui.createHeading('Life');
     ui.createGrid();
