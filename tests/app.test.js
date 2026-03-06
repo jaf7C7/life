@@ -15,6 +15,7 @@ class MockUI {
 
     createElement(element) {
         this._elements.push(element);
+        return element;
     }
 
     findElement(id) {
