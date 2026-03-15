@@ -5,6 +5,7 @@
   "description": "Conway's Game of Life, playable in the browser",
   "main": "index.js",
   "scripts": {
+    "format": "prettier --write .",
     "test": "mocha tests/"
   },
   "repository": {
@@ -19,6 +20,10 @@
   },
   "homepage": "https://github.com/jaf7C7/life#readme",
   "devDependencies": {
-    "mocha": "^11.7.5"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.3",
+    "globals": "^17.4.0",
+    "mocha": "^11.7.5",
+    "prettier": "^3.8.1"
   }
 }
