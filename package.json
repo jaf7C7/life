@@ -5,7 +5,7 @@
   "description": "Conway's Game of Life, playable in the browser",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha tests/"
   },
   "repository": {
     "type": "git",
@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/jaf7C7/life/issues"
   },
-  "homepage": "https://github.com/jaf7C7/life#readme"
+  "homepage": "https://github.com/jaf7C7/life#readme",
+  "devDependencies": {
+    "mocha": "^11.7.5"
+  }
 }
