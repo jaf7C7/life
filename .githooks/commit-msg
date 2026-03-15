@@ -1,0 +1,14 @@
+# Fails the commit if commit message has overlong lines.
+# $1 - The file containing the commit message.
+exec awk '
+	NR == 1 && /.{51}/ {
+		print("The first line of the commit message exceeds 50 characters. Aborting.");
+		exit(1);
+	}
+
+	NR > 1 && /.{73}/ {
+		print("Line " NR " of the commit message exceeds 72 characters. Aborting.");
+		exit(1);
+	}
+' "$1"
+
