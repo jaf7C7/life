@@ -1,24 +1,53 @@
-#!/usr/bin/awk -f
+#!/bin/sh
 #
-# Fails the commit if commit message has overlong lines.
+# Fails the commit if first line of the commit message exceeds "$max_line_length"
+# chars. Filters the rest of the commit message through `fmt(1)`.
 
-# Ignore rest of the file containing '--verbose' output.
-/^# ------------------------ >8 ------------------------$/ {
-	exit(0);
+declutter () {
+	# Removes comments and output from `--verbose` option from the commit message.
+	# $1 - commit message file
+	sed '
+	/^# ------------------------ >8 ------------------------$/q
+	/^#/d
+	' "$1"
 }
 
-# Ignore comments.
-/^[ 	]*#/ {
-	next;
+contains_long_lines () {
+	# Returns 0 if the commit message contains any lines longer than $max_line_length
+	# $1 - commit message file
+	declutter "$1" | grep -q ".\{$((max_line_length + 1))\}"
 }
 
-NR == 1 && /.{51}/ {
-	print("The first line of the commit message exceeds 50 characters. Aborting.");
-	exit(1);
+format () {
+	tmp=$(mktemp)
+	declutter "$1" | fmt -w "$max_line_length" >"$tmp"
+	cp "$tmp" "$1"
+	rm "$tmp"
+	echo "commit message was reformatted"
 }
 
-NR > 1 && /.{73}/ {
-	print("Line " NR " of the commit message exceeds 72 characters. Aborting.");
-	exit(1);
+main () {
+	set -eu
+
+	msg="$1"
+	max_line_length=72
+
+	IFS= read -r line <"$1"
+
+	if test "${#line}" -gt 50
+	then
+		echo 'commit message exceeds 50 characters, consider amending'
+	elif test "${#line}" -gt "$max_line_length"
+	then
+		echo "the first line of the commit message exceeds $max_line_length characters."
+		echo 'aborting commit'
+		exit 1
+	fi
+
+	if contains_long_lines "$msg"
+	then
+		format "$msg"
+	fi
 }
 
+main "$@"
