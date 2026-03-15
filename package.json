@@ -1,0 +1,21 @@
+{
+  "name": "life",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Conway's Game of Life, playable in the browser",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaf7C7/life.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jaf7C7/life/issues"
+  },
+  "homepage": "https://github.com/jaf7C7/life#readme"
+}
