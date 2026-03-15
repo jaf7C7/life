@@ -1,53 +1,77 @@
-#!/bin/sh
+#!/usr/bin/awk -f
 #
-# Fails the commit if first line of the commit message exceeds "$max_line_length"
-# chars. Filters the rest of the commit message through `fmt(1)`.
+# Prints a warning if the summary commit message is longer than 50 chars, and
+# fails the commit if the message exceeds 72 chars.
+#
+# If lines in the body of the commit exceed 72 chars then the commit is
+# reformatted using `fmt(1)`.
+#
+# If there is no blank line between the summary message and the body of the
+# commit message then the commmit fails.
 
-declutter () {
-	# Removes comments and output from `--verbose` option from the commit message.
-	# $1 - commit message file
-	sed '
-	/^# ------------------------ >8 ------------------------$/q
-	/^#/d
-	' "$1"
+BEGIN {
+	commit_msg_file = ARGV[1];
+	max_line_length = 72;
 }
 
-contains_long_lines () {
-	# Returns 0 if the commit message contains any lines longer than $max_line_length
-	# $1 - commit message file
-	declutter "$1" | grep -q ".\{$((max_line_length + 1))\}"
+# Ignore output from `git commit --verbose`.
+/^# ------------------------ >8 ------------------------$/ {
+	exit;
 }
 
-format () {
-	tmp=$(mktemp)
-	declutter "$1" | fmt -w "$max_line_length" >"$tmp"
-	cp "$tmp" "$1"
-	rm "$tmp"
-	echo "commit message was reformatted"
+# Ignore leading blank lines.
+NR == 1,/^./ {
+	if ($0 ~ /^$/)
+		next;
+		
 }
 
-main () {
-	set -eu
-
-	msg="$1"
-	max_line_length=72
-
-	IFS= read -r line <"$1"
-
-	if test "${#line}" -gt 50
-	then
-		echo 'commit message exceeds 50 characters, consider amending'
-	elif test "${#line}" -gt "$max_line_length"
-	then
-		echo "the first line of the commit message exceeds $max_line_length characters."
-		echo 'aborting commit'
-		exit 1
-	fi
-
-	if contains_long_lines "$msg"
-	then
-		format "$msg"
-	fi
+# Ignore comments.
+/^[ 	]*#/ {
+	next;
 }
 
-main "$@"
+length($0) > max_line_length {
+	needs_formatting = "true";
+}
+
+{
+	lines[i++] = $0;
+}
+
+END {
+	summary_msg_length = length(lines[0]);
+
+	if (summary_msg_length >= max_line_length) {
+		print "commit message longer than " max_line_length " characters";
+		print "aborting commit";
+		exit 1;
+	}
+
+	if (summary_msg_length > 50)
+		print "commit message longer than 50 chars, consider amending";
+
+	num_lines = length(lines);
+
+	if (num_lines > 1 && lines[1] !~ /^$/) {
+		print "the second line of a multi-line commit message should be empty";
+		print "aborting commit";
+		exit 1;
+	}
+
+	if (needs_formatting == "true") {
+		"mktemp" | getline tmp;
+		cmd = "fmt -w " max_line_length " >" tmp;
+
+		for (i = 0; i < num_lines; i++)
+			print lines[i] | cmd;
+
+		close(cmd);
+		close(tmp);
+
+		printf "mv %s %s", tmp, commit_msg_file | "sh";
+		close("sh");
+
+		print "commit message reformatted";
+	}
+}
