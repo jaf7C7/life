@@ -1,7 +1,10 @@
 #!/bin/sh
 #
-# Fails the commit if there are formatting errors or failing tests.
+# Fails the operation if there are formatting errors or failing tests.
+#
+# See: https://github.com/jaf7C7/cfg/tree/main/.config/git/hooks
 
-set -eu
-npm run format
-npm run test
+~/.config/git/hooks/pre-commit \
+	--list-different-cmd='npm run --silent format:list-different' \
+	--format-cmd='npm run --silent format' \
+	--test-cmd='npm run --silent test'

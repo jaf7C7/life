@@ -5,7 +5,8 @@
   "description": "Conway's Game of Life, playable in the browser",
   "main": "index.js",
   "scripts": {
-    "format": "prettier --write .",
+    "format": "f () { prettier --write \"${@:-.}\"; }; f",
+    "format:list-different": "prettier --list-different .",
     "test": "eslint && mocha tests/"
   },
   "repository": {

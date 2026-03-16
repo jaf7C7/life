@@ -1,4 +1,4 @@
-#!/usr/bin/awk -f
+#!/bin/sh
 #
 # Prints a warning if the summary commit message is longer than 50 chars, and
 # fails the commit if the message exceeds 72 chars.
@@ -8,70 +8,7 @@
 #
 # If there is no blank line between the summary message and the body of the
 # commit message then the commmit fails.
+#
+# See: https://github.com/jaf7C7/cfg/tree/main/.config/git/hooks
 
-BEGIN {
-	commit_msg_file = ARGV[1];
-	max_line_length = 72;
-}
-
-# Ignore output from `git commit --verbose`.
-/^# ------------------------ >8 ------------------------$/ {
-	exit;
-}
-
-# Ignore leading blank lines.
-NR == 1,/^./ {
-	if ($0 ~ /^$/)
-		next;
-		
-}
-
-# Ignore comments.
-/^[ 	]*#/ {
-	next;
-}
-
-length($0) > max_line_length {
-	needs_formatting = "true";
-}
-
-{
-	lines[i++] = $0;
-}
-
-END {
-	summary_msg_length = length(lines[0]);
-
-	if (summary_msg_length >= max_line_length) {
-		print "commit message longer than " max_line_length " characters";
-		print "aborting commit";
-		exit 1;
-	}
-
-	if (summary_msg_length > 50)
-		print "commit message longer than 50 chars, consider amending";
-
-	num_lines = length(lines);
-
-	if (num_lines > 1 && lines[1] !~ /^$/) {
-		print "the second line of a multi-line commit message should be empty";
-		print "aborting commit";
-		exit 1;
-	}
-
-	if (needs_formatting == "true") {
-		"mktemp" | getline tmp;
-		cmd = "fmt -w " max_line_length " >" tmp;
-
-		for (i = 0; i < num_lines; i++)
-			print lines[i] | cmd;
-
-		close(cmd);
-		close(tmp);
-
-		printf "mv %s %s", tmp, commit_msg_file | "sh";
-		close("sh");
-
-		print "commit message reformatted";
-	}
-}
+~/.config/git/hooks/commit-msg "$@"
