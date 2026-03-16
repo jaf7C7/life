@@ -7,8 +7,8 @@
   "scripts": {
     "format": "f () { prettier --write \"${@:-.}\"; }; f",
     "format:list-different": "prettier --list-different .",
-    "test": "eslint && mocha tests/",
-    "watch": "f () { nodemon --watch life/ --watch tests/ --ext '' --exec \"npm run test -- $@\"; }; f"
+    "test": "eslint && mocha --reporter=list tests/",
+    "watch": "nodemon --no-colors --quiet --watch life/ --watch tests/ --ext '' --exec \"npm run --silent test --\""
   },
   "repository": {
     "type": "git",
