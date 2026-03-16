@@ -6,3 +6,11 @@ test('A lone cell with no neighbours dies', () => {
     const cells = [[0, 0]];
     assert.deepEqual([], next(cells));
 });
+
+test('A lone cell with one neighbour also dies', () => {
+    const cells = [
+        [0, 0],
+        [0, 1]
+    ];
+    assert.deepEqual([], next(cells));
+});
