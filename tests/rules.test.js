@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'mocha';
-import { next } from '../life.js';
+import { next } from '../life/rules.js';
 
 test('A lone cell with no neighbours dies', () => {
     const loneCell = [0, 0];
