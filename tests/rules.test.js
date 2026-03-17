@@ -18,3 +18,17 @@ test('A cell with one neighbour also dies', () => {
 
     assert.deepEqual([], next(cells));
 });
+
+test('A cell with two neighbours survives', () => {
+    const loneCell = [0, 0];
+    const neighbours = [
+        [-1, -1],
+        [1, 1]
+    ];
+
+    // Cells `[-1, -1]` and `[1, 1]` each have less than two neighbours and so
+    // will not survive.
+    const cells = [loneCell, ...neighbours];
+
+    assert.deepEqual([[0, 0]], next(cells));
+});
