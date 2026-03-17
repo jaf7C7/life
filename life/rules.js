@@ -1,7 +1,9 @@
 export function next(cells) {
-    if (cells.length < 3) {
-        return [];
-    } else {
-        return [[0, 0]];
+    const newCells = [];
+
+    if (!(cells.length < 3)) {
+        newCells.push([0, 0]);
     }
+
+    return newCells;
 }
