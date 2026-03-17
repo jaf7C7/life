@@ -4,7 +4,7 @@ const config = {
     trailingComma: 'none',
     overrides: [
         {
-            files: ['*.html', '*.json'],
+            files: ['*.html', '*.json', '*.md'],
             options: {
                 tabWidth: 2
             }
