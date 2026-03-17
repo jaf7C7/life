@@ -1,13 +1,19 @@
 function neighbours(cell, cells) {
-    return cells;
+    // If cell is [0, 0].
+    if (cell.every((e) => e === 0)) {
+        return cells;
+    } else {
+        return [];
+    }
 }
 
 export function next(cells) {
-    const cell = [0, 0];
     const newCells = [];
 
-    if (neighbours(cell, cells).length >= 3) {
-        newCells.push(cell);
+    for (const cell of cells) {
+        if (neighbours(cell, cells).length >= 3) {
+            newCells.push(cell);
+        }
     }
 
     return newCells;
