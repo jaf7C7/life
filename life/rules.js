@@ -13,11 +13,12 @@ function neighbours(cell) {
 }
 
 function contains(cell, cells) {
-    return cells.find(([x, y]) => x === cell[0] && y === cell[1]);
+    return cells.find(([x, y]) => x === cell[0] && y === cell[1]) !== undefined;
 }
 
 export function next(cells) {
-    const newCells = [];
+    let newCells = [];
+    const deadNeighbours = [];
 
     for (const cell of cells) {
         const liveNeighbours = [];
@@ -25,6 +26,8 @@ export function next(cells) {
         for (const neighbour of neighbours(cell)) {
             if (contains(neighbour, cells)) {
                 liveNeighbours.push(neighbour);
+            } else {
+                deadNeighbours.push(neighbour);
             }
         }
 
@@ -33,9 +36,31 @@ export function next(cells) {
         }
     }
 
-    if (!contains([0, 0], cells)) {
-        newCells.unshift([0, 0]);
+    function equals(cell, otherCell) {
+        return cell[0] === otherCell[0] && cell[1] === otherCell[1];
     }
+
+    function count(cell, cells) {
+        return cells.reduce(
+            (counter, c) => counter + (equals(cell, c) ? 1 : 0),
+            0
+        );
+    }
+
+    function resurrectees(deadNeighbours) {
+        const resurrectees = [];
+        for (const cell of deadNeighbours) {
+            if (
+                count(cell, deadNeighbours) === 3 &&
+                !contains(cell, resurrectees)
+            ) {
+                resurrectees.push(cell);
+            }
+        }
+        return resurrectees;
+    }
+
+    newCells = resurrectees(deadNeighbours).concat(newCells);
 
     return newCells;
 }
