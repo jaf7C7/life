@@ -33,5 +33,9 @@ export function next(cells) {
         }
     }
 
+    if (!contains([0, 0], cells)) {
+        newCells.unshift([0, 0]);
+    }
+
     return newCells;
 }

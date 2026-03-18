@@ -32,3 +32,18 @@ test('A cell with two neighbours survives', () => {
 
     assert.deepEqual(next(cells), [cell]);
 });
+
+test('A dead cell with exactly three live neighbours becomes alive', () => {
+    const deadCell = [0, 0];
+    const liveNeighbours = [
+        [-1, 0],
+        [-1, -1],
+        [0, -1]
+    ];
+
+    // The neighbour cells each have two neighbours, and so survive. The dead
+    // cell [0, 0] has three neighbours and so comes to life.
+    const cells = [...liveNeighbours];
+
+    assert.deepEqual(next(cells), [deadCell, ...cells]);
+});
