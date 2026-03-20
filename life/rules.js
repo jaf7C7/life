@@ -55,17 +55,27 @@ function contains(cell, stringCells) {
  * object.
  *
  * @param {Object} counter
- * @returns {Set<Number[]>}
+ * @returns {Set<String>}
  */
-function newCells(counter) {
+function newStringCells(counter) {
     const result = new Set();
-    for (const [cellString, count] of Object.entries(counter)) {
+    for (const [stringCell, count] of Object.entries(counter)) {
         if (count === 3) {
-            const cell = cellString.split(',').map((e) => Number(e));
-            result.add(cell);
+            result.add(stringCell);
         }
     }
     return new Set(result);
+}
+
+/**
+ * Returns a new set with each cell from the original set cast from a string to
+ * an array.
+ *
+ * @param {Set<String>} stringCells
+ * @returns {Set<Number[]>}
+ */
+function destringifySet(stringCells) {
+    return new Set(Array.from(stringCells).map((e) => destringify(e)));
 }
 
 /**
@@ -76,12 +86,11 @@ function newCells(counter) {
  * @returns {Set<Number[]>}
  */
 export function next(cells) {
+    const stringCells = stringifySet(cells);
     let result = new Set();
     const counter = {};
 
-    for (const cell of cells) {
-        const stringCell = cell.toString();
-        const stringCells = stringifySet(cells);
+    for (const stringCell of stringCells) {
         let liveNeighbourCount = 0;
 
         for (const stringNeighbour of neighbours(stringCell)) {
@@ -96,13 +105,13 @@ export function next(cells) {
         }
 
         if (liveNeighbourCount > 1) {
-            result.add(cell);
+            result.add(stringCell);
         }
     }
 
-    for (const newCell of newCells(counter)) {
-        result.add(newCell);
+    for (const newStringCell of newStringCells(counter)) {
+        result.add(newStringCell);
     }
 
-    return result;
+    return destringifySet(result);
 }
