@@ -29,18 +29,6 @@ function arrayFromString(cell) {
 }
 
 /**
- * Returns a boolean value indicating whether a given cell is present in a set
- * of cells.
- *
- * @param {String} cell
- * @param {Set<String>} cells
- * @returns Boolean
- */
-function contains(cell, cells) {
-    return cells.has(cell);
-}
-
-/**
  * Returns the set of cells which each occur exactly three times in the counter
  * object.
  *
@@ -66,7 +54,7 @@ export function next(cells) {
         let liveNeighbourCount = 0;
 
         for (const neighbour of neighbours(cell)) {
-            if (contains(neighbour, cells)) {
+            if (cells.has(neighbour)) {
                 liveNeighbourCount += 1;
             } else {
                 counter[neighbour] =
