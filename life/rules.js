@@ -19,20 +19,25 @@ function neighbours(cell) {
 }
 
 /**
+ * Turns a set of arrays into a set of strings.
+ *
+ * @param {Set<Number[]>} cells
+ * @returns {Set<String>}
+ */
+function stringify(cells) {
+    return new Set(Array.from(cells).map((e) => e.toString()));
+}
+
+/**
  * Returns a boolean value indicating whether a given cell is present in a set
  * of cells.
  *
- * @param {Number[]} cell
- * @param {Set<Number[]>} cells
+ * @param {String} stringCell
+ * @param {Set<String>} stringCells
  * @returns Boolean
  */
-function contains(cell, cells) {
-    for (const c of cells) {
-        if (cell[0] === c[0] && cell[1] === c[1]) {
-            return true;
-        }
-    }
-    return false;
+function contains(cell, stringCells) {
+    return stringCells.has(cell);
 }
 
 /**
@@ -68,7 +73,9 @@ export function next(cells) {
         const liveNeighbours = new Set();
 
         for (const neighbour of neighbours(cell)) {
-            if (contains(neighbour, cells)) {
+            const stringCells = stringify(cells);
+            const stringNeighbour = neighbour.toString();
+            if (contains(stringNeighbour, stringCells)) {
                 liveNeighbours.add(neighbour);
             } else {
                 counter[neighbour] =
