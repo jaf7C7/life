@@ -1,11 +1,11 @@
 /**
  * Returns an array of cell co-ordinates immediately adjacent to the given cell.
  *
- * @param {Number[]} cell
- * @returns {Number[]}
+ * @param {String} stringCell
+ * @returns {String[]}
  */
-function neighbours(cell) {
-    const [x, y] = cell;
+function neighbours(stringCell) {
+    const [x, y] = destringify(stringCell);
     return [
         [x, y + 1],
         [x + 1, y + 1],
@@ -15,7 +15,17 @@ function neighbours(cell) {
         [x - 1, y - 1],
         [x - 1, y],
         [x - 1, y + 1]
-    ];
+    ].map((e) => e.toString());
+}
+
+/**
+ * Turns a cell string into a cell array.
+ *
+ * @param {String} stringCell
+ * @returns {Number[]}
+ */
+function destringify(stringCell) {
+    return stringCell.split(',').map((e) => Number(e));
 }
 
 /**
@@ -24,7 +34,7 @@ function neighbours(cell) {
  * @param {Set<Number[]>} cells
  * @returns {Set<String>}
  */
-function stringify(cells) {
+function stringifySet(cells) {
     return new Set(Array.from(cells).map((e) => e.toString()));
 }
 
@@ -70,13 +80,13 @@ export function next(cells) {
     const counter = {};
 
     for (const cell of cells) {
+        const stringCell = cell.toString();
+        const stringCells = stringifySet(cells);
         const liveNeighbours = new Set();
 
-        for (const neighbour of neighbours(cell)) {
-            const stringCells = stringify(cells);
-            const stringNeighbour = neighbour.toString();
+        for (const stringNeighbour of neighbours(stringCell)) {
             if (contains(stringNeighbour, stringCells)) {
-                liveNeighbours.add(neighbour);
+                liveNeighbours.add(stringNeighbour);
             } else {
                 counter[stringNeighbour] =
                     stringNeighbour in counter
