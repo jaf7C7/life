@@ -1,7 +1,8 @@
 # TODO
 
 - [x] Automated test scripts.
-- [ ] **Add docstrings (and `prettier-jsdoc` plugin).**
+- [x] Add docstrings (and `prettier-jsdoc` plugin).
+- [ ] **Make order of cells unimportant (use `Set` instead of `Array`)**
 
 - [ ] Basic Rules
   - [x] Any live cell with fewer than two live neighbours dies, as if by underpopulation.
