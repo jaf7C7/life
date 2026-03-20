@@ -5,7 +5,7 @@
  * @returns {String[]}
  */
 function neighbours(stringCell) {
-    const [x, y] = destringify(stringCell);
+    const [x, y] = arrayFromString(stringCell);
     return [
         [x, y + 1],
         [x + 1, y + 1],
@@ -15,7 +15,7 @@ function neighbours(stringCell) {
         [x - 1, y - 1],
         [x - 1, y],
         [x - 1, y + 1]
-    ].map((e) => e.toString());
+    ].map((cell) => cell.toString());
 }
 
 /**
@@ -24,7 +24,7 @@ function neighbours(stringCell) {
  * @param {String} stringCell
  * @returns {Number[]}
  */
-function destringify(stringCell) {
+function arrayFromString(stringCell) {
     return stringCell.split(',').map((e) => Number(e));
 }
 
