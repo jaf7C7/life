@@ -9,7 +9,8 @@ const config = {
                 tabWidth: 2
             }
         }
-    ]
+    ],
+    plugins: ['prettier-plugin-jsdoc']
 };
 
 export default config;
