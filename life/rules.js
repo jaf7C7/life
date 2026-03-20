@@ -83,7 +83,7 @@ function destringifySet(stringCells) {
  */
 export function next(cells) {
     const stringCells = stringifySet(cells);
-    let result = new Set();
+    const result = new Set();
     const counter = {};
 
     for (const stringCell of stringCells) {
