@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import { test } from 'mocha';
 import { next } from '../life/rules.js';
 
-test('A lone cell with no neighbours dies', () => {
-    const loneCell = [0, 0];
-    const cells = [loneCell];
+test('A cell with no neighbours dies', () => {
+    const cell = [0, 0];
+    const cells = [cell];
 
     assert.deepEqual(next(cells), []);
 });
