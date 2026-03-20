@@ -82,11 +82,11 @@ export function next(cells) {
     for (const cell of cells) {
         const stringCell = cell.toString();
         const stringCells = stringifySet(cells);
-        const liveNeighbours = new Set();
+        let liveNeighbourCount = 0;
 
         for (const stringNeighbour of neighbours(stringCell)) {
             if (contains(stringNeighbour, stringCells)) {
-                liveNeighbours.add(stringNeighbour);
+                liveNeighbourCount += 1;
             } else {
                 counter[stringNeighbour] =
                     stringNeighbour in counter
@@ -95,7 +95,7 @@ export function next(cells) {
             }
         }
 
-        if (liveNeighbours.size > 1) {
+        if (liveNeighbourCount > 1) {
             result.add(cell);
         }
     }
