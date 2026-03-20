@@ -23,7 +23,7 @@ function neighbours(cell) {
  * of cells.
  *
  * @param {Number[]} cell
- * @param {Number[][]} cells
+ * @param {Set<Number[]>} cells
  * @returns Boolean
  */
 function contains(cell, cells) {
@@ -36,40 +36,18 @@ function contains(cell, cells) {
 }
 
 /**
- * Returns a boolean value indicating whether or not two cells are equivalent.
+ * Returns the set of cells which each occur exactly three times in the counter
+ * object.
  *
- * @param {Number[]} cell
- * @param {Number[]} otherCell
- * @returns Boolean
- */
-function equals(cell, otherCell) {
-    return cell[0] === otherCell[0] && cell[1] === otherCell[1];
-}
-
-/**
- * Returns an integer representing the number of times a given cell value occurs
- * in a group of cells.
- *
- * @param {Number[]} cell
- * @param {Number[][]} cells
- * @returns {Number}
- */
-function count(cell, cells) {
-    return cells.reduce((counter, c) => counter + (equals(cell, c) ? 1 : 0), 0);
-}
-
-/**
- * Returns the set of cells which each occur exactly three times in a given
- * array of cells.
- *
- * @param {Number[][]} deadNeighbours
+ * @param {Object} counter
  * @returns {Set<Number[]>}
  */
-function resurrectees(deadNeighbours) {
-    const result = [];
-    for (const cell of deadNeighbours) {
-        if (count(cell, deadNeighbours) === 3 && !contains(cell, result)) {
-            result.push(cell);
+function newCells(counter) {
+    const result = new Set();
+    for (const [cellString, count] of Object.entries(counter)) {
+        if (count === 3) {
+            const cell = cellString.split(',').map((e) => Number(e));
+            result.add(cell);
         }
     }
     return new Set(result);
@@ -84,7 +62,7 @@ function resurrectees(deadNeighbours) {
  */
 export function next(cells) {
     let result = new Set();
-    const deadNeighbours = [];
+    const counter = {};
 
     for (const cell of cells) {
         const liveNeighbours = new Set();
@@ -93,7 +71,8 @@ export function next(cells) {
             if (contains(neighbour, cells)) {
                 liveNeighbours.add(neighbour);
             } else {
-                deadNeighbours.push(neighbour);
+                counter[neighbour] =
+                    neighbour in counter ? counter[neighbour] + 1 : 1;
             }
         }
 
@@ -102,8 +81,8 @@ export function next(cells) {
         }
     }
 
-    for (const resurrectee of resurrectees(deadNeighbours)) {
-        result.add(resurrectee);
+    for (const newCell of newCells(counter)) {
+        result.add(newCell);
     }
 
     return result;
