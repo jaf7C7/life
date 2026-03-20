@@ -78,8 +78,10 @@ export function next(cells) {
             if (contains(stringNeighbour, stringCells)) {
                 liveNeighbours.add(neighbour);
             } else {
-                counter[neighbour] =
-                    neighbour in counter ? counter[neighbour] + 1 : 1;
+                counter[stringNeighbour] =
+                    stringNeighbour in counter
+                        ? counter[stringNeighbour] + 1
+                        : 1;
             }
         }
 
