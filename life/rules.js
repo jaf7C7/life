@@ -78,7 +78,7 @@ export function next(stringCells) {
             }
         }
 
-        if (liveNeighbourCount > 1) {
+        if (liveNeighbourCount > 1 && liveNeighbourCount < 4) {
             result.add(stringCell);
         }
     }
