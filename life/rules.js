@@ -46,8 +46,8 @@ function stringifySet(cells) {
  * @param {Set<String>} stringCells
  * @returns Boolean
  */
-function contains(cell, stringCells) {
-    return stringCells.has(cell);
+function contains(stringCell, stringCells) {
+    return stringCells.has(stringCell);
 }
 
 /**
