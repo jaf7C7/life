@@ -15,7 +15,7 @@ function neighbours(cell) {
         [x - 1, y - 1],
         [x - 1, y],
         [x - 1, y + 1]
-    ].map((cell) => cell.toString());
+    ].map((e) => e.toString());
 }
 
 /**
@@ -35,7 +35,7 @@ function arrayFromString(cell) {
  * @param {Object} counter
  * @returns {Set<String>}
  */
-function newStringCells(counter) {
+function newCells(counter) {
     return new Set(Object.keys(counter).filter((cell) => counter[cell] === 3));
 }
 
@@ -67,7 +67,7 @@ export function next(cells) {
         }
     }
 
-    for (const newStringCell of newStringCells(counter)) {
+    for (const newStringCell of newCells(counter)) {
         result.add(newStringCell);
     }
 
