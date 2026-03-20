@@ -58,13 +58,9 @@ function contains(stringCell, stringCells) {
  * @returns {Set<String>}
  */
 function newStringCells(counter) {
-    const result = new Set();
-    for (const [stringCell, count] of Object.entries(counter)) {
-        if (count === 3) {
-            result.add(stringCell);
-        }
-    }
-    return new Set(result);
+    return new Set(
+        Object.keys(counter).filter((stringCell) => counter[stringCell] === 3)
+    );
 }
 
 /**
