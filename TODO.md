@@ -8,10 +8,10 @@
   - [x] Any live cell with fewer than two live neighbours dies, as if by underpopulation.
     - [x] A lone cell with no neighbours dies.
     - [x] A lone cell with a single neighbour dies.
-  - [ ] Any live cell with two or three live neighbours lives on to the next generation.
+  - [ ] **Any live cell with two or three live neighbours lives on to the next generation.**
     - [x] A cell with two neighbours survives.
-    - [ ] A cell with three neighbours also survives.
-  - [ ] **Any live cell with more than three live neighbours dies, as if by overpopulation.**
+    - [ ] **A cell with three neighbours also survives.**
+  - [x] Any live cell with more than three live neighbours dies, as if by overpopulation.
   - [x] Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
   - [ ] Blinker oscillator
 
