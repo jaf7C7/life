@@ -5,7 +5,7 @@
 - [x] Make order of cells unimportant (use `Set` instead of `Array`)
 - [x] Clearer assertions: `expect(next(cells)).not.toContain(cell)`
 
-- [ ] Basic Rules
+- [x] Basic Rules
   - [x] Any live cell with fewer than two live neighbours dies, as if by underpopulation.
     - [x] A lone cell with no neighbours dies.
     - [x] A lone cell with a single neighbour dies.
@@ -14,10 +14,10 @@
     - [x] A cell with three neighbours also survives.
   - [x] Any live cell with more than three live neighbours dies, as if by overpopulation.
   - [x] Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-  - [ ] **Blinker oscillator**
+  - [x] Blinker oscillator
 
-- [ ] UI
-  - [ ] Cells are rendered properly on a grid.
+- [ ] **UI**
+  - [ ] **Cells are rendered properly on a grid.**
   - [ ] Clicking a cell toggles it live/dead.
   - [ ] Click-and-drag to pan around the grid.
   - [ ] Pinch/mousewheel to zoom in/out.
