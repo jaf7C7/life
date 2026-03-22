@@ -61,7 +61,7 @@ test('A live cell with more than three live neighbours dies', () => {
 
 test('A live cell with three live neighbours also survives', () => {
     const cell = '0,0';
-    const neighbours = ['1,1', '2,0', '1,-1'];
+    const neighbours = ['-1,0', '-1,1', '0,1'];
 
     // Each cell has exactly three neighbours so all cells survive and the the
     // pattern is stable.
