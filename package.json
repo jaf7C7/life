@@ -23,6 +23,7 @@
   "homepage": "https://github.com/jaf7C7/life#readme",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "chai": "^6.2.2",
     "eslint": "^10.0.3",
     "globals": "^17.4.0",
     "mocha": "^11.7.5",
