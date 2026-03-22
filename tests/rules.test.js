@@ -48,3 +48,13 @@ test('A live cell with three live neighbours also survives', () => {
 
     expect(next(cells)).to.include(cell);
 });
+
+test('The blinker oscillator', () => {
+    // The blinker the simplest oscillator in 'Life'. It oscillates between
+    // a 3-cell column and a 3-cell row, with a period of 2.
+    // See: https://conways-game-of-life.fandom.com/wiki/Blinker
+    const blinker = ['0,0', '0,1', '0,-1'];
+    const cells = new Set(blinker);
+
+    expect(next(next(cells))).to.deep.equal(cells);
+});
