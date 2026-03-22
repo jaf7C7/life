@@ -58,3 +58,14 @@ test('A live cell with more than three live neighbours dies', () => {
 
     assert.deepEqual(next(cells), new Set(['-1,0', '0,1', '1,0', '0,-1']));
 });
+
+test('A live cell with three live neighbours also survives', () => {
+    const cell = '0,0';
+    const neighbours = ['1,1', '2,0', '1,-1'];
+
+    // Each cell has exactly three neighbours so all cells survive and the the
+    // pattern is stable.
+    const cells = new Set([cell, ...neighbours]);
+
+    assert.deepEqual(next(cells), cells);
+});
