@@ -7,7 +7,7 @@
   "scripts": {
     "format": "f () { prettier --write \"${@:-.}\"; }; f",
     "format:list-different": "prettier --list-different .",
-    "test": "eslint && mocha tests/",
+    "test": "eslint && mocha tests/unit",
     "watch": "nodemon --no-colors --quiet --watch life/ --watch tests/ --ext '' --exec \"npm run --silent test --\""
   },
   "repository": {
@@ -23,11 +23,14 @@
   "homepage": "https://github.com/jaf7C7/life#readme",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.5.0",
     "chai": "^6.2.2",
     "eslint": "^10.0.3",
     "globals": "^17.4.0",
     "mocha": "^11.7.5",
     "nodemon": "^3.1.14",
+    "playwright": "^1.58.2",
     "prettier": "^3.8.1",
     "prettier-plugin-jsdoc": "^1.8.0"
   }

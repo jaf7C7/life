@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { next } from '../life/rules.js';
+import { next } from '../../life/rules.js';
 describe('Basic rules', () => {
     it('A cell with no neighbours dies', () => {
         const cell = '0,0';
