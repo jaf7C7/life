@@ -8,7 +8,8 @@
     "format": "f () { prettier --write \"${@:-.}\"; }; f",
     "format:list-different": "prettier --list-different .",
     "test": "eslint && mocha tests/unit",
-    "watch": "nodemon --no-colors --quiet --watch life/ --watch tests/ --ext '' --exec \"npm run --silent test --\""
+    "watch": "f () { nodemon --no-colors --quiet --watch life/ --watch tests/ --ext '' --exec \"${@:-npm run --silent test --}\"; }; f",
+    "start": "browser-sync start --server life/ --port 3000 --no-open"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.58.2",
     "@types/node": "^25.5.0",
+    "browser-sync": "^3.0.4",
     "chai": "^6.2.2",
     "eslint": "^10.0.3",
     "globals": "^17.4.0",
