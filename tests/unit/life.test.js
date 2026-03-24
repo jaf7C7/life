@@ -1,12 +1,12 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { suite, test } from 'mocha';
 
 function initApp(createElement) {
     createElement('canvas');
 }
 
-describe('User Interface', () => {
-    it('A canvas element is created', () => {
+suite('User Interface', () => {
+    test('A canvas element is created', () => {
         let elementCreated;
 
         function createElement(type) {
