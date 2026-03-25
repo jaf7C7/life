@@ -17,10 +17,7 @@
   - [x] Blinker oscillator
 
 - [ ] **UI**
-  - [ ] **Cells are rendered properly on a grid.**
-    - [ ] **Unit test (mocked UI)**
-    - [ ] System test (headless browser)
-  - [ ] Clicking a cell toggles it live/dead.
+  - [ ] **Clicking a cell on the canvas toggles it live/dead.**
   - [ ] Click-and-drag to pan around the grid.
   - [ ] Pinch/mousewheel to zoom in/out.
   - [ ] Play/stop buttons
