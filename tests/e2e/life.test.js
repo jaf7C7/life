@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-test('Has correct title', async ({ page }) => {
+test('Has a canvas element', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page).toHaveTitle(/Life/);
+    await expect(page.getByTestId('canvas')).toBeVisible();
 });
