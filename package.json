@@ -9,7 +9,8 @@
     "format:list-different": "prettier --list-different .",
     "test": "eslint && mocha tests/unit",
     "watch": "f () { nodemon --no-colors --quiet --watch life/ --watch tests/ --ext '' --exec \"${@:-npm run --silent test --}\"; }; f",
-    "start": "browser-sync start --server life/ --port 3000 --no-open"
+    "start": "browser-sync start --server life/ --port 3000 --no-open",
+    "start:dev": "browser-sync start --server life/ --watch life/ --port 8080"
   },
   "repository": {
     "type": "git",
