@@ -7,7 +7,9 @@
   "scripts": {
     "format": "f () { prettier --write \"${@:-.}\"; }; f",
     "format:list-different": "prettier --list-different .",
-    "test": "f () { eslint && mocha \"${@:-tests/unit}\"; }; f",
+    "test": "eslint && mocha tests/unit && playwright test",
+    "test:unit": "f () { eslint && mocha \"${@:-tests/unit}\"; }; f",
+    "test:e2e": "eslint && playwright test",
     "watch": "f () { nodemon --no-colors --quiet --watch life/ --watch tests/ --ext '' --exec \"${@:-npm run --silent test --}\"; }; f",
     "start": "browser-sync start --server life/ --port 3000 --no-open",
     "start:dev": "browser-sync start --server life/ --watch life/ --port 8080"
