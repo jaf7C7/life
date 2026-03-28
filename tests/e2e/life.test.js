@@ -7,17 +7,16 @@ test('Has a canvas element', async ({ page }) => {
 });
 
 function cellIsAlive({ x0, y0, effectiveCellSize }) {
-    function isBorderPixel(x, y, effectiveCellSize) {
-        const max = effectiveCellSize - 1;
-        return x === 0 || x === max || y === 0 || y === max;
+    function isBorderPixel(x, y) {
+        return [x, y].some((e) => e === 0 || e === effectiveCellSize - 1);
     }
 
-    function isBorderColor([r, g, b, a]) {
-        return r === 0 && g === 0 && b === 0 && a === 255; // black
+    function isBlack([r, g, b, a]) {
+        return [r, g, b].every((e) => e === 0) && a === 255;
     }
 
-    function isCellColor([r, g, b, a]) {
-        return r === 255 && g === 255 && b === 255 && a === 255; // white
+    function isWhite([r, g, b, a]) {
+        return [r, g, b].every((e) => e === 0) && a === 255;
     }
 
     const canvas = document.querySelector('canvas');
@@ -26,9 +25,9 @@ function cellIsAlive({ x0, y0, effectiveCellSize }) {
     for (let i = 0; i < effectiveCellSize; i++) {
         for (let j = 0; j < effectiveCellSize; j++) {
             const pixelData = ctx.getImageData(x0 + i, y0 + j, 1, 1).data;
-            return isBorderPixel(i, j, effectiveCellSize)
-                ? isBorderColor(pixelData)
-                : isCellColor(pixelData);
+            return isBorderPixel(i, j)
+                ? isBlack(pixelData)
+                : isWhite(pixelData);
         }
     }
 }
