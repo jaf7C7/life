@@ -19,17 +19,23 @@ function cellIsAlive({ x0, y0, effectiveCellSize }) {
         return [r, g, b].every((e) => e === 0) && a === 255;
     }
 
+    function pixelOK(x, y) {
+        const pixelColor = ctx.getImageData(x0 + x, y0 + y, 1, 1).data;
+        return isBorderPixel(x, y) ? isBlack(pixelColor) : isWhite(pixelColor);
+    }
+
     const canvas = document.querySelector('canvas');
     const ctx = canvas.getContext('2d');
 
-    for (let i = 0; i < effectiveCellSize; i++) {
-        for (let j = 0; j < effectiveCellSize; j++) {
-            const pixelData = ctx.getImageData(x0 + i, y0 + j, 1, 1).data;
-            return isBorderPixel(i, j)
-                ? isBlack(pixelData)
-                : isWhite(pixelData);
+    let cellOK = false;
+
+    for (let x = 0; x < effectiveCellSize; x++) {
+        for (let y = 0; y < effectiveCellSize; y++) {
+            cellOK = pixelOK(x, y);
         }
     }
+
+    return cellOK;
 }
 
 test('The central cell is white with a black border', async ({ page }) => {
