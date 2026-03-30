@@ -37,6 +37,24 @@
         cellSize,
         cellSize
       );
+
+      // cell 1,1 border
+      ctx.fillStyle = '#000';
+      ctx.fillRect(
+        x0 + effectiveCellSize,
+        y0 - effectiveCellSize,
+        effectiveCellSize,
+        effectiveCellSize
+      );
+
+      // cell 1,1 body
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(
+        x0 + effectiveCellSize + borderWidth / 2,
+        y0 - effectiveCellSize + borderWidth / 2,
+        cellSize,
+        cellSize
+      );
     </script>
   </body>
 </html>
