@@ -16,8 +16,8 @@
       const canvas = document.querySelector('canvas');
       const ctx = canvas.getContext('2d');
       const cellSize = 20;
-      const lineWidth = 2;
-      const effectiveCellSize = cellSize + lineWidth;
+      const borderWidth = 2;
+      const effectiveCellSize = cellSize + borderWidth;
       const x0 = canvas.clientWidth / 2 - effectiveCellSize / 2;
       const y0 = canvas.clientHeight / 2 - effectiveCellSize / 2;
 
@@ -31,7 +31,12 @@
 
       // central cell
       ctx.fillStyle = '#fff';
-      ctx.fillRect(x0 + lineWidth / 2, y0 + lineWidth / 2, cellSize, cellSize);
+      ctx.fillRect(
+        x0 + borderWidth / 2,
+        y0 + borderWidth / 2,
+        cellSize,
+        cellSize
+      );
     </script>
   </body>
 </html>

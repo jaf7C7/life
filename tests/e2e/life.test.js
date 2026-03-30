@@ -87,8 +87,8 @@ test('The central cell is white with a black border', async ({ page }) => {
     const canvas = await page.getByTestId('canvas');
     const { width, height } = await canvas.boundingBox();
     const cellSize = 20;
-    const lineWidth = 2;
-    const effectiveCellSize = cellSize + lineWidth;
+    const borderWidth = 2;
+    const effectiveCellSize = cellSize + borderWidth;
 
     // `x0` and `y0` are the coords of the top-left corner of the central cell.
     const x0 = width / 2 - effectiveCellSize / 2;
