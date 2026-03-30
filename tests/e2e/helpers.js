@@ -4,18 +4,19 @@
  * true if the cell is rendered correctly at the given position on the canvas,
  * false if not.
  *
- * @param {Object} cell
- * @param {Number} cell.x
- * @param {Number} cell.y
+ * @param {Object} context
+ * @param {String} context.cell
  * @returns {Boolean}
  */
-export function cellIsRendered({ x, y }) {
+export function cellIsRendered({ cell }) {
     const cellBorderWidth = 2;
     const cellSize = 20;
     const canvas = document.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const [cellX, cellY] = cell.split(',');
     const { width: canvasWidth, height: canvasHeight } =
         canvas.getBoundingClientRect();
-    const ctx = canvas.getContext('2d');
 
     // The cell co-ords have their origin at the centre of the canvas, and y
     // increases in the upwards direction, whereas the canvas drawing co-ords
@@ -24,11 +25,11 @@ export function cellIsRendered({ x, y }) {
     const x0 =
         canvasWidth / 2 -
         (cellSize + cellBorderWidth) / 2 +
-        x * (cellSize + cellBorderWidth);
+        cellX * (cellSize + cellBorderWidth);
     const y0 =
         canvasHeight / 2 -
         (cellSize + cellBorderWidth) / 2 -
-        y * (cellSize + cellBorderWidth);
+        cellY * (cellSize + cellBorderWidth);
 
     /**
      * Returns true if the pixel is at the edge of the cell, x and y
