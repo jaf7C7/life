@@ -11,12 +11,16 @@ test('Has a canvas element', async ({ page }) => {
  * pixel. Returns true if the cell is rendered correctly at the given position
  * on the canvas, false if not.
  *
- * @param {Number} x0 - X coord of the top-left corner of the cell.
- * @param {Number} y0 - Y coord of the top-left corner of the cell.
- * @param {Number} effectiveCellSize - Size of the cell including its border.
+ * @param {Object} params - The single parameter object required by
+ *   `page.evaluate()`.
+ * @param {Number} params.x0 - X coord of the top-left corner of the cell.
+ * @param {Number} params.y0 - Y coord of the top-left corner of the cell.
+ * @param {Number} params.cellSize - Size of the cell in pixels excluding its
+ *   border.
+ * @param {Number} params.borderWidth - Width of the cell border in pixels.
  * @returns {Boolean}
  */
-function cellIsAlive({ x0, y0, effectiveCellSize }) {
+function cellIsAlive({ x0, y0, cellSize, borderWidth }) {
     /**
      * Returns true if the pixel is at the edge of the cell, x and y
      * co-ordinates are relative to the top-left corner of the cell.
@@ -26,7 +30,7 @@ function cellIsAlive({ x0, y0, effectiveCellSize }) {
      * @returns {Boolean}
      */
     function isBorderPixel(x, y) {
-        return [x, y].some((e) => e === 0 || e === effectiveCellSize - 1);
+        return [x, y].some((e) => e === 0 || e === cellSize + borderWidth / 2);
     }
 
     /**
@@ -70,8 +74,8 @@ function cellIsAlive({ x0, y0, effectiveCellSize }) {
 
     let cellOK = false;
 
-    for (let x = 0; x < effectiveCellSize; x++) {
-        for (let y = 0; y < effectiveCellSize; y++) {
+    for (let x = 0; x < cellSize + borderWidth; x++) {
+        for (let y = 0; y < cellSize + borderWidth; y++) {
             cellOK = pixelOK(x, y);
             if (!cellOK) {
                 break;
@@ -88,13 +92,12 @@ test('The central cell is white with a black border', async ({ page }) => {
     const { width, height } = await canvas.boundingBox();
     const cellSize = 20;
     const borderWidth = 2;
-    const effectiveCellSize = cellSize + borderWidth;
 
     // `x0` and `y0` are the coords of the top-left corner of the central cell.
-    const x0 = width / 2 - effectiveCellSize / 2;
-    const y0 = height / 2 - effectiveCellSize / 2;
+    const x0 = width / 2 - (cellSize + borderWidth) / 2;
+    const y0 = height / 2 - (cellSize + borderWidth) / 2;
 
     expect(
-        await page.evaluate(cellIsAlive, { x0, y0, effectiveCellSize })
+        await page.evaluate(cellIsAlive, { x0, y0, cellSize, borderWidth })
     ).toBeTruthy();
 });
