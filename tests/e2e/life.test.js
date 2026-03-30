@@ -48,7 +48,7 @@ function cellIsAlive({ x0, y0, effectiveCellSize }) {
      * @returns {Boolean}
      */
     function isWhite([r, g, b, a]) {
-        return [r, g, b].every((e) => e === 0) && a === 255;
+        return [r, g, b].every((e) => e === 255) && a === 255;
     }
 
     /**
