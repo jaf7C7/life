@@ -1,18 +1,35 @@
 /**
- * Grabs a cell-sized chunk of image data from the canvas and checks it pixel by
- * pixel. Returns true if the cell is rendered correctly at the given position
- * on the canvas, false if not.
+ * Grabs a cell-sized chunk of image data from the canvas at the co-ordinates
+ * where the specified cell should be, and checks it pixel by pixel. Returns
+ * true if the cell is rendered correctly at the given position on the canvas,
+ * false if not.
  *
- * @param {Object} params - The single parameter object required by
- *   `page.evaluate()`.
- * @param {Number} params.x0 - X coord of the top-left corner of the cell.
- * @param {Number} params.y0 - Y coord of the top-left corner of the cell.
- * @param {Number} params.cellSize - Size of the cell in pixels excluding its
- *   border.
- * @param {Number} params.borderWidth - Width of the cell border in pixels.
+ * @param {Object} cell
+ * @param {Number} cell.x
+ * @param {Number} cell.y
  * @returns {Boolean}
  */
-export function cellIsRendered({ x0, y0, cellSize, borderWidth }) {
+export function cellIsRendered({ x, y }) {
+    const cellBorderWidth = 2;
+    const cellSize = 20;
+    const canvas = document.querySelector('canvas');
+    const { width: canvasWidth, height: canvasHeight } =
+        canvas.getBoundingClientRect();
+    const ctx = canvas.getContext('2d');
+
+    // The cell co-ords have their origin at the centre of the canvas, and y
+    // increases in the upwards direction, whereas the canvas drawing co-ords
+    // have their origin at the top left corner of the canvas, and y increases
+    // in the downwards direction.
+    const x0 =
+        canvasWidth / 2 -
+        (cellSize + cellBorderWidth) / 2 +
+        x * (cellSize + cellBorderWidth);
+    const y0 =
+        canvasHeight / 2 -
+        (cellSize + cellBorderWidth) / 2 -
+        y * (cellSize + cellBorderWidth);
+
     /**
      * Returns true if the pixel is at the edge of the cell, x and y
      * co-ordinates are relative to the top-left corner of the cell.
@@ -22,7 +39,9 @@ export function cellIsRendered({ x0, y0, cellSize, borderWidth }) {
      * @returns {Boolean}
      */
     function isBorderPixel(x, y) {
-        return [x, y].some((e) => e === 0 || e === cellSize + borderWidth / 2);
+        return [x, y].some(
+            (e) => e === 0 || e === cellSize + cellBorderWidth / 2
+        );
     }
 
     /**
@@ -61,13 +80,10 @@ export function cellIsRendered({ x0, y0, cellSize, borderWidth }) {
         return isBorderPixel(x, y) ? isBlack(pixelColor) : isWhite(pixelColor);
     }
 
-    const canvas = document.querySelector('canvas');
-    const ctx = canvas.getContext('2d');
-
     let cellOK = false;
 
-    for (let x = 0; x < cellSize + borderWidth; x++) {
-        for (let y = 0; y < cellSize + borderWidth; y++) {
+    for (let x = 0; x < cellSize + cellBorderWidth; x++) {
+        for (let y = 0; y < cellSize + cellBorderWidth; y++) {
             cellOK = pixelOK(x, y);
             if (!cellOK) {
                 break;
