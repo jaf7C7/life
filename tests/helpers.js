@@ -12,7 +12,7 @@
  * @param {Number} params.borderWidth - Width of the cell border in pixels.
  * @returns {Boolean}
  */
-export function cellIsAlive({ x0, y0, cellSize, borderWidth }) {
+export function cellIsRendered({ x0, y0, cellSize, borderWidth }) {
     /**
      * Returns true if the pixel is at the edge of the cell, x and y
      * co-ordinates are relative to the top-left corner of the cell.

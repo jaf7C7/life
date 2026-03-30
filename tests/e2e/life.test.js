@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { cellIsAlive } from '../helpers.js';
+import { cellIsRendered } from '../helpers.js';
 
 test('Has a canvas element', async ({ page }) => {
     await page.goto('/');
@@ -19,7 +19,7 @@ test('The central cell is white with a black border', async ({ page }) => {
         (e) => (e - cellSize - borderWidth) / 2
     );
 
-    const result = await page.evaluate(cellIsAlive, {
+    const result = await page.evaluate(cellIsRendered, {
         x0,
         y0,
         cellSize,
