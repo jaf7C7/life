@@ -94,8 +94,9 @@ test('The central cell is white with a black border', async ({ page }) => {
     const borderWidth = 2;
 
     // `x0` and `y0` are the coords of the top-left corner of the central cell.
-    const x0 = width / 2 - (cellSize + borderWidth) / 2;
-    const y0 = height / 2 - (cellSize + borderWidth) / 2;
+    const [x0, y0] = [width, height].map(
+        (e) => (e - cellSize - borderWidth) / 2
+    );
 
     expect(
         await page.evaluate(cellIsAlive, { x0, y0, cellSize, borderWidth })
