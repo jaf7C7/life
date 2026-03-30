@@ -73,6 +73,9 @@ function cellIsAlive({ x0, y0, effectiveCellSize }) {
     for (let x = 0; x < effectiveCellSize; x++) {
         for (let y = 0; y < effectiveCellSize; y++) {
             cellOK = pixelOK(x, y);
+            if (!cellOK) {
+                break;
+            }
         }
     }
 
