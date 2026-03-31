@@ -60,13 +60,13 @@ function pixelOK(pixelData, pixelX, pixelY, cell) {
  *
  * @param {Number} x
  * @param {Number} y
- * @param {Number} width
+ * @param {Number} cellWidth
  * @param {Number[]} cellData
  * @returns {Number[]}
  */
-function getPixelDataFromCellData(x, y, width, cellData) {
+function getPixelDataFromCellData(pixelX, pixelY, cellWidth, cellData) {
     const pixelDataSize = 4;
-    const index = (x + y * width) * pixelDataSize;
+    const index = (pixelX + pixelY * cellWidth) * pixelDataSize;
     return cellData.slice(index, index + pixelDataSize);
 }
 
@@ -110,15 +110,15 @@ function getCellLocation(cell, canvasWidth, canvasHeight) {
 function cellOK(cell, cellData) {
     let result = false;
 
-    for (let x = 0; x < cell.size + cell.borderWidth; x++) {
-        for (let y = 0; y < cell.size + cell.borderWidth; y++) {
+    for (let pixelX = 0; pixelX < cell.size + cell.borderWidth; pixelX++) {
+        for (let pixelY = 0; pixelY < cell.size + cell.borderWidth; pixelY++) {
             const pixelData = getPixelDataFromCellData(
-                x,
-                y,
+                pixelX,
+                pixelY,
                 cell.size + cell.borderWidth,
                 cellData
             );
-            result = pixelOK(pixelData, x, y, cell);
+            result = pixelOK(pixelData, pixelX, pixelY, cell);
 
             if (!result) {
                 break;
