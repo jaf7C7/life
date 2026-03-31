@@ -50,8 +50,7 @@ function isBorderPixel(pixelX, pixelY, { size, borderWidth }) {
  * @param {Number} cellBorderWidth
  * @returns {Boolean}
  */
-function pixelOK(pixelData, x, y, cellSize, cellBorderWidth) {
-    const cell = { size: cellSize, borderWidth: cellBorderWidth };
+function pixelOK(pixelData, x, y, cell) {
     return isBorderPixel(x, y, cell) ? isBlack(pixelData) : isWhite(pixelData);
 }
 
@@ -129,7 +128,8 @@ function cellOK(cellSize, cellBorderWidth, cellData) {
                 cellSize + cellBorderWidth,
                 cellData
             );
-            result = pixelOK(pixelData, x, y, cellSize, cellBorderWidth);
+            const cell = { size: cellSize, borderWidth: cellBorderWidth };
+            result = pixelOK(pixelData, x, y, cell);
 
             if (!result) {
                 break;
