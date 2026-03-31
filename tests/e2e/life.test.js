@@ -139,18 +139,17 @@ function cellOK(cell, cellData) {
  * @param {Object} context
  * @param {Number} context.x0
  * @param {Number} context.y0
- * @param {Number} context.cellSize
- * @param {Number} context.cellBorderWidth
+ * @param {Object} context.cell
  * @returns {Number[]}
  */
-function getCellData({ x0, y0, cellSize, cellBorderWidth }) {
+function getCellData({ x0, y0, cell }) {
     const canvas = document.querySelector('canvas');
     const ctx = canvas.getContext('2d');
     return ctx.getImageData(
         x0,
         y0,
-        cellSize + cellBorderWidth,
-        cellSize + cellBorderWidth
+        cell.size + cell.borderWidth,
+        cell.size + cell.borderWidth
     ).data;
 }
 
@@ -174,8 +173,7 @@ test('Cell `0,0` is rendered', async ({ page }) => {
     const cellData = await page.evaluate(getCellData, {
         x0,
         y0,
-        cellSize: cell.size,
-        cellBorderWidth: cell.borderWidth
+        cell
     });
 
     expect(cellOK(cell, cellData)).toBeTruthy();
