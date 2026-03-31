@@ -82,17 +82,16 @@ function getPixelDataFromCellData(pixelX, pixelY, cellWidth, cellData) {
  * Cell `0,0` is defined to be at the centre of the canvas.
  *
  * @param {Object} cell
- * @param {Number} canvasWidth
- * @param {Number} canvasHeight
+ * @param {Object} canvas
  * @returns {Number[]}
  */
-function getCellLocation(cell, canvasWidth, canvasHeight) {
+function getCellLocation(cell, canvas) {
     const x0 =
-        canvasWidth / 2 -
+        canvas.width / 2 -
         (cell.size + cell.borderWidth) / 2 +
         cell.x * (cell.size + cell.borderWidth);
     const y0 =
-        canvasHeight / 2 -
+        canvas.height / 2 -
         (cell.size + cell.borderWidth) / 2 -
         cell.y * (cell.size + cell.borderWidth);
 
@@ -164,11 +163,9 @@ test('Cell `0,0` is rendered', async ({ page }) => {
 
     const cell = { x: 0, y: 0, borderWidth: 2, size: 20 };
 
-    const canvas = await page.getByTestId('canvas');
-    const { width: canvasWidth, height: canvasHeight } =
-        await canvas.boundingBox();
+    const canvas = await page.getByTestId('canvas').boundingBox();
 
-    const [x0, y0] = getCellLocation(cell, canvasWidth, canvasHeight);
+    const [x0, y0] = getCellLocation(cell, canvas);
 
     const cellData = await page.evaluate(getCellData, {
         x0,
