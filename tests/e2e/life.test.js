@@ -162,11 +162,8 @@ test('Cell `0,0` is rendered', async ({ page }) => {
     await page.goto('/');
 
     const cell = { x: 0, y: 0, borderWidth: 2, size: 20 };
-
     const canvas = await page.getByTestId('canvas').boundingBox();
-
     const [x0, y0] = getCellLocation(cell, canvas);
-
     const cellData = await page.evaluate(getCellData, {
         x0,
         y0,
