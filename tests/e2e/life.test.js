@@ -103,23 +103,21 @@ function getCellLocation(cell, canvasWidth, canvasHeight) {
  * Checks each pixel in the given cell and returns `true` if all pixels are the
  * correct color, else `false.
  *
- * @param {Number} cellSize
- * @param {Number} cellBorderWidth
+ * @param {Object} cell
  * @param {Number[]} cellData
  * @returns {Boolean}
  */
-function cellOK(cellSize, cellBorderWidth, cellData) {
+function cellOK(cell, cellData) {
     let result = false;
 
-    for (let x = 0; x < cellSize + cellBorderWidth; x++) {
-        for (let y = 0; y < cellSize + cellBorderWidth; y++) {
+    for (let x = 0; x < cell.size + cell.borderWidth; x++) {
+        for (let y = 0; y < cell.size + cell.borderWidth; y++) {
             const pixelData = getPixelDataFromCellData(
                 x,
                 y,
-                cellSize + cellBorderWidth,
+                cell.size + cell.borderWidth,
                 cellData
             );
-            const cell = { size: cellSize, borderWidth: cellBorderWidth };
             result = pixelOK(pixelData, x, y, cell);
 
             if (!result) {
@@ -180,5 +178,5 @@ test('Cell `0,0` is rendered', async ({ page }) => {
         cellBorderWidth: cell.borderWidth
     });
 
-    expect(cellOK(cell.size, cell.borderWidth, cellData)).toBeTruthy();
+    expect(cellOK(cell, cellData)).toBeTruthy();
 });
