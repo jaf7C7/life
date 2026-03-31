@@ -28,8 +28,7 @@ function isWhite([r, g, b, a]) {
  *
  * @param {Number} x
  * @param {Number} y
- * @param {Number} cellSize
- * @param {Number} cellBorderWidth
+ * @param {Object} cell
  * @returns {Boolean}
  */
 function isBorderPixel(pixelX, pixelY, cell) {
@@ -46,8 +45,7 @@ function isBorderPixel(pixelX, pixelY, cell) {
  *
  * @param {Number} x
  * @param {Number} y
- * @param {Number} cellSize
- * @param {Number} cellBorderWidth
+ * @param {Object} cell
  * @returns {Boolean}
  */
 function pixelOK(pixelData, x, y, cell) {
