@@ -86,22 +86,14 @@ function getPixelDataFromCellData(x, y, width, cellData) {
  * @returns {Number[]}
  */
 function getCellLocation(
-    cell,
-    cellSize,
-    cellBorderWidth,
+    { x, y, size, borderWidth },
     canvasWidth,
     canvasHeight
 ) {
-    const [cellX, cellY] = cell.split(',');
-
     const x0 =
-        canvasWidth / 2 -
-        (cellSize + cellBorderWidth) / 2 +
-        cellX * (cellSize + cellBorderWidth);
+        canvasWidth / 2 - (size + borderWidth) / 2 + x * (size + borderWidth);
     const y0 =
-        canvasHeight / 2 -
-        (cellSize + cellBorderWidth) / 2 -
-        cellY * (cellSize + cellBorderWidth);
+        canvasHeight / 2 - (size + borderWidth) / 2 - y * (size + borderWidth);
 
     return [x0, y0];
 }
@@ -172,28 +164,20 @@ test('A canvas element is created', async ({ page }) => {
 test('Cell `0,0` is rendered', async ({ page }) => {
     await page.goto('/');
 
-    const cell = '0,0';
-    const cellBorderWidth = 2;
-    const cellSize = 20;
+    const cell = { x: 0, y: 0, borderWidth: 2, size: 20 };
 
     const canvas = await page.getByTestId('canvas');
     const { width: canvasWidth, height: canvasHeight } =
         await canvas.boundingBox();
 
-    const [x0, y0] = getCellLocation(
-        cell,
-        cellSize,
-        cellBorderWidth,
-        canvasWidth,
-        canvasHeight
-    );
+    const [x0, y0] = getCellLocation(cell, canvasWidth, canvasHeight);
 
     const cellData = await page.evaluate(getCellData, {
         x0,
         y0,
-        cellSize,
-        cellBorderWidth
+        cellSize: cell.size,
+        cellBorderWidth: cell.borderWidth
     });
 
-    expect(cellOK(cellSize, cellBorderWidth, cellData)).toBeTruthy();
+    expect(cellOK(cell.size, cell.borderWidth, cellData)).toBeTruthy();
 });
