@@ -32,9 +32,9 @@ function isWhite([r, g, b, a]) {
  * @param {Number} cellBorderWidth
  * @returns {Boolean}
  */
-function isBorderPixel(pixelX, pixelY, { size, borderWidth }) {
+function isBorderPixel(pixelX, pixelY, cell) {
     return [pixelX, pixelY].some(
-        (e) => e === 0 || e === size + borderWidth / 2
+        (e) => e === 0 || e === cell.size + cell.borderWidth / 2
     );
 }
 
