@@ -32,8 +32,10 @@ function isWhite([r, g, b, a]) {
  * @param {Number} cellBorderWidth
  * @returns {Boolean}
  */
-function isBorderPixel(x, y, cellSize, cellBorderWidth) {
-    return [x, y].some((e) => e === 0 || e === cellSize + cellBorderWidth / 2);
+function isBorderPixel(pixelX, pixelY, { size, borderWidth }) {
+    return [pixelX, pixelY].some(
+        (e) => e === 0 || e === size + borderWidth / 2
+    );
 }
 
 /**
@@ -49,9 +51,8 @@ function isBorderPixel(x, y, cellSize, cellBorderWidth) {
  * @returns {Boolean}
  */
 function pixelOK(pixelData, x, y, cellSize, cellBorderWidth) {
-    return isBorderPixel(x, y, cellSize, cellBorderWidth)
-        ? isBlack(pixelData)
-        : isWhite(pixelData);
+    const cell = { size: cellSize, borderWidth: cellBorderWidth };
+    return isBorderPixel(x, y, cell) ? isBlack(pixelData) : isWhite(pixelData);
 }
 
 /**
