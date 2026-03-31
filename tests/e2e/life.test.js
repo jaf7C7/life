@@ -43,13 +43,15 @@ function isBorderPixel(pixelX, pixelY, cell) {
  * pixels should be white. The co-ordinates are relative to the top-left corner
  * of the cell.
  *
- * @param {Number} x
- * @param {Number} y
+ * @param {Number} pixelX
+ * @param {Number} pixelY
  * @param {Object} cell
  * @returns {Boolean}
  */
-function pixelOK(pixelData, x, y, cell) {
-    return isBorderPixel(x, y, cell) ? isBlack(pixelData) : isWhite(pixelData);
+function pixelOK(pixelData, pixelX, pixelY, cell) {
+    return isBorderPixel(pixelX, pixelY, cell)
+        ? isBlack(pixelData)
+        : isWhite(pixelData);
 }
 
 /**
