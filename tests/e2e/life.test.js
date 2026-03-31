@@ -81,21 +81,20 @@ function getPixelDataFromCellData(x, y, width, cellData) {
  *
  * Cell `0,0` is defined to be at the centre of the canvas.
  *
- * @param {String} cell
- * @param {Number} cellSize
+ * @param {Object} cell
  * @param {Number} canvasWidth
  * @param {Number} canvasHeight
  * @returns {Number[]}
  */
-function getCellLocation(
-    { x, y, size, borderWidth },
-    canvasWidth,
-    canvasHeight
-) {
+function getCellLocation(cell, canvasWidth, canvasHeight) {
     const x0 =
-        canvasWidth / 2 - (size + borderWidth) / 2 + x * (size + borderWidth);
+        canvasWidth / 2 -
+        (cell.size + cell.borderWidth) / 2 +
+        cell.x * (cell.size + cell.borderWidth);
     const y0 =
-        canvasHeight / 2 - (size + borderWidth) / 2 - y * (size + borderWidth);
+        canvasHeight / 2 -
+        (cell.size + cell.borderWidth) / 2 -
+        cell.y * (cell.size + cell.borderWidth);
 
     return [x0, y0];
 }
