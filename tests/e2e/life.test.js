@@ -65,7 +65,7 @@ function pixelOK(pixelData, pixelX, pixelY, cell) {
  * @param {Object} cell
  * @returns {Number[]}
  */
-function getPixelDataFromCellImgData(pixelX, pixelY, cell) {
+function getPixelDataFromCellImgData({ pixelX, pixelY }, cell) {
     const pixelDataSize = 4;
     const index =
         (pixelX + pixelY * (cell.size + cell.borderWidth)) * pixelDataSize;
@@ -97,8 +97,7 @@ class Cell {
                 pixelY++
             ) {
                 const pixelData = getPixelDataFromCellImgData(
-                    pixelX,
-                    pixelY,
+                    { pixelX, pixelY },
                     this
                 );
                 result = pixelOK(pixelData, pixelX, pixelY, this);
