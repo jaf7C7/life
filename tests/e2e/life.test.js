@@ -70,33 +70,47 @@ function getPixelDataFromCellData(pixelX, pixelY, cellWidth, cellData) {
     return cellData.slice(index, index + pixelDataSize);
 }
 
-/**
- * Checks each pixel in the given cell and returns `true` if all pixels are the
- * correct color, else `false.
- *
- * @param {Object} cell
- * @returns {Boolean}
- */
-function cellIsRendered(cell) {
-    let result = false;
+class Cell {
+    borderWidth = 2;
+    size = 20;
 
-    for (let pixelX = 0; pixelX < cell.size + cell.borderWidth; pixelX++) {
-        for (let pixelY = 0; pixelY < cell.size + cell.borderWidth; pixelY++) {
-            const pixelData = getPixelDataFromCellData(
-                pixelX,
-                pixelY,
-                cell.size + cell.borderWidth,
-                cell.imgData
-            );
-            result = pixelOK(pixelData, pixelX, pixelY, cell);
-
-            if (!result) {
-                break;
-            }
-        }
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
     }
 
-    return result;
+    /**
+     * Checks each pixel in the given cell and returns `true` if all pixels are
+     * the correct color, else `false.
+     *
+     * @param {Object} cell
+     * @returns {Boolean}
+     */
+    isRendered() {
+        let result = false;
+
+        for (let pixelX = 0; pixelX < this.size + this.borderWidth; pixelX++) {
+            for (
+                let pixelY = 0;
+                pixelY < this.size + this.borderWidth;
+                pixelY++
+            ) {
+                const pixelData = getPixelDataFromCellData(
+                    pixelX,
+                    pixelY,
+                    this.size + this.borderWidth,
+                    this.imgData
+                );
+                result = pixelOK(pixelData, pixelX, pixelY, this);
+
+                if (!result) {
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
 }
 
 class Canvas {
@@ -115,7 +129,7 @@ class Canvas {
     }
 
     async cell(x, y) {
-        const cell = { x, y, borderWidth: 2, size: 20 };
+        const cell = new Cell(x, y);
         const [x0, y0] = this.cellLocation(cell);
         cell.canvasX = x0;
         cell.canvasY = y0;
@@ -185,5 +199,5 @@ test('Cell `0,0` is rendered', async ({ page }) => {
     const canvas = await Canvas.fromPage(page);
     const cell = await canvas.cell(0, 0);
 
-    expect(cellIsRendered(cell)).toBeTruthy();
+    expect(cell.isRendered()).toBeTruthy();
 });
