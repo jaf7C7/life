@@ -113,6 +113,13 @@ class Cell {
 }
 
 class Canvas {
+    static async fromPage(page) {
+        const locator = await page.getByTestId('canvas');
+        const { width, height } = await locator.boundingBox();
+
+        return new this(width, height, locator);
+    }
+
     constructor(width, height, locator) {
         this.width = width;
         this.height = height;
@@ -121,20 +128,15 @@ class Canvas {
         }
     }
 
-    static async fromPage(page) {
-        const locator = await page.getByTestId('canvas');
-        const { width, height } = await locator.boundingBox();
-        return new this(width, height, locator);
-    }
-
     async cell(x, y) {
         const cell = new Cell(x, y);
 
-        const [canvasX, canvasY] = this.cellLocation(cell);
-        cell.canvasX = canvasX;
-        cell.canvasY = canvasY;
+        const [posX, posY] = this.cellPosition(cell);
+        cell.posX = posX;
+        cell.posY = posY;
 
         cell.imgData = await this.cellImgData(cell);
+
         return cell;
     }
 
@@ -152,17 +154,17 @@ class Canvas {
      * @param {Object} cell
      * @returns {Number[]}
      */
-    cellLocation(cell) {
-        const canvasX =
+    cellPosition(cell) {
+        const posX =
             this.width / 2 -
             (cell.size + cell.borderWidth) / 2 +
             cell.x * (cell.size + cell.borderWidth);
-        const canvasY =
+        const posY =
             this.height / 2 -
             (cell.size + cell.borderWidth) / 2 -
             cell.y * (cell.size + cell.borderWidth);
 
-        return [canvasX, canvasY];
+        return [posX, posY];
     }
 
     /**
@@ -179,8 +181,8 @@ class Canvas {
         return await this.locator.evaluate((element, cell) => {
             const ctx = element.getContext('2d');
             return ctx.getImageData(
-                cell.canvasX,
-                cell.canvasY,
+                cell.posX,
+                cell.posY,
                 cell.size + cell.borderWidth,
                 cell.size + cell.borderWidth
             ).data;
