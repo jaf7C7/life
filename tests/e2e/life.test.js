@@ -71,42 +71,13 @@ function getPixelDataFromCellData(pixelX, pixelY, cellWidth, cellData) {
 }
 
 /**
- * Returns the location on the canvas of the top-left corner of the given cell,
- * relative to the top-left corner of the canvas.
- *
- * The cell co-ords have their origin at the centre of the canvas, and y
- * increases in the upwards direction, whereas the canvas drawing co-ords have
- * their origin at the top left corner of the canvas, and y increases in the
- * downwards direction.
- *
- * Cell `0,0` is defined to be at the centre of the canvas.
- *
- * @param {Object} cell
- * @param {Object} canvas
- * @returns {Number[]}
- */
-function getCellLocation(cell, canvas) {
-    const x0 =
-        canvas.width / 2 -
-        (cell.size + cell.borderWidth) / 2 +
-        cell.x * (cell.size + cell.borderWidth);
-    const y0 =
-        canvas.height / 2 -
-        (cell.size + cell.borderWidth) / 2 -
-        cell.y * (cell.size + cell.borderWidth);
-
-    return [x0, y0];
-}
-
-/**
  * Checks each pixel in the given cell and returns `true` if all pixels are the
  * correct color, else `false.
  *
  * @param {Object} cell
- * @param {Number[]} cellData
  * @returns {Boolean}
  */
-function cellOK(cell, cellData) {
+function cellIsRendered(cell) {
     let result = false;
 
     for (let pixelX = 0; pixelX < cell.size + cell.borderWidth; pixelX++) {
@@ -115,7 +86,7 @@ function cellOK(cell, cellData) {
                 pixelX,
                 pixelY,
                 cell.size + cell.borderWidth,
-                cellData
+                cell.imgData
             );
             result = pixelOK(pixelData, pixelX, pixelY, cell);
 
@@ -128,28 +99,78 @@ function cellOK(cell, cellData) {
     return result;
 }
 
-/**
- * Grabs a cell-sized chunk of image data from the rendered canvas and returns
- * it.
- *
- * The `cellData` array is a 1-dimensional array containing a sequence of 4
- * elements, containing the RGBA color information for each pixel.
- *
- * @param {Object} context
- * @param {Number} context.x0
- * @param {Number} context.y0
- * @param {Object} context.cell
- * @returns {Number[]}
- */
-function getCellData({ x0, y0, cell }) {
-    const canvas = document.querySelector('canvas');
-    const ctx = canvas.getContext('2d');
-    return ctx.getImageData(
-        x0,
-        y0,
-        cell.size + cell.borderWidth,
-        cell.size + cell.borderWidth
-    ).data;
+class Canvas {
+    constructor(width, height, locator) {
+        this.width = width;
+        this.height = height;
+        if (locator) {
+            this.locator = locator;
+        }
+    }
+
+    static async fromPage(page) {
+        const locator = await page.getByTestId('canvas');
+        const { width, height } = await locator.boundingBox();
+        return new this(width, height, locator);
+    }
+
+    async cell(x, y) {
+        const cell = { x, y, borderWidth: 2, size: 20 };
+        const [x0, y0] = this.cellLocation(cell);
+        cell.canvasX = x0;
+        cell.canvasY = y0;
+        cell.imgData = await this.cellData(cell);
+        return cell;
+    }
+
+    /**
+     * Returns the location on the canvas of the top-left corner of the given
+     * cell, relative to the top-left corner of the canvas.
+     *
+     * The cell co-ords have their origin at the centre of the canvas, and y
+     * increases in the upwards direction, whereas the canvas drawing co-ords
+     * have their origin at the top left corner of the canvas, and y increases
+     * in the downwards direction.
+     *
+     * Cell `0,0` is defined to be at the centre of the canvas.
+     *
+     * @param {Object} cell
+     * @returns {Number[]}
+     */
+    cellLocation(cell) {
+        const canvasX =
+            this.width / 2 -
+            (cell.size + cell.borderWidth) / 2 +
+            cell.x * (cell.size + cell.borderWidth);
+        const canvasY =
+            this.height / 2 -
+            (cell.size + cell.borderWidth) / 2 -
+            cell.y * (cell.size + cell.borderWidth);
+
+        return [canvasX, canvasY];
+    }
+
+    /**
+     * Grabs a cell-sized chunk of image data from the rendered canvas and
+     * returns it. The `cellData` array is a 1-dimensional array containing a
+     * sequence of 4 elements, containing the RGBA color information for each
+     * pixel.
+     *
+     * @param {Object} canvas
+     * @param {Object} cell
+     * @returns {Number[]}
+     */
+    async cellData(cell) {
+        return await this.locator.evaluate((element, cell) => {
+            const ctx = element.getContext('2d');
+            return ctx.getImageData(
+                cell.canvasX,
+                cell.canvasY,
+                cell.size + cell.borderWidth,
+                cell.size + cell.borderWidth
+            ).data;
+        }, cell);
+    }
 }
 
 test('A canvas element is created', async ({ page }) => {
@@ -161,10 +182,8 @@ test('A canvas element is created', async ({ page }) => {
 test('Cell `0,0` is rendered', async ({ page }) => {
     await page.goto('/');
 
-    const cell = { x: 0, y: 0, borderWidth: 2, size: 20 };
-    const canvas = await page.getByTestId('canvas').boundingBox();
-    const [x0, y0] = getCellLocation(cell, canvas);
-    const cellData = await page.evaluate(getCellData, { x0, y0, cell });
+    const canvas = await Canvas.fromPage(page);
+    const cell = await canvas.cell(0, 0);
 
-    expect(cellOK(cell, cellData)).toBeTruthy();
+    expect(cellIsRendered(cell)).toBeTruthy();
 });
