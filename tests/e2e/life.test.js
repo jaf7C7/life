@@ -55,19 +55,19 @@ function pixelOK(pixelData, pixelX, pixelY, cell) {
 }
 
 /**
- * Grabs a slice of the `cellData` array containing the RGBA color information
- * for the pixel at position `x,y` in the rendered cell.
+ * Grabs a slice of the `cellImgData` array containing the RGBA color
+ * information for the pixel at position `x,y` in the rendered cell.
  *
  * @param {Number} x
  * @param {Number} y
  * @param {Number} cellWidth
- * @param {Number[]} cellData
+ * @param {Number[]} cellImgData
  * @returns {Number[]}
  */
-function getPixelDataFromCellData(pixelX, pixelY, cellWidth, cellData) {
+function getPixelDataFromCellImgData(pixelX, pixelY, cellWidth, cellImgData) {
     const pixelDataSize = 4;
     const index = (pixelX + pixelY * cellWidth) * pixelDataSize;
-    return cellData.slice(index, index + pixelDataSize);
+    return cellImgData.slice(index, index + pixelDataSize);
 }
 
 class Cell {
@@ -83,7 +83,6 @@ class Cell {
      * Checks each pixel in the given cell and returns `true` if all pixels are
      * the correct color, else `false.
      *
-     * @param {Object} cell
      * @returns {Boolean}
      */
     isRendered() {
@@ -95,7 +94,7 @@ class Cell {
                 pixelY < this.size + this.borderWidth;
                 pixelY++
             ) {
-                const pixelData = getPixelDataFromCellData(
+                const pixelData = getPixelDataFromCellImgData(
                     pixelX,
                     pixelY,
                     this.size + this.borderWidth,
@@ -130,10 +129,12 @@ class Canvas {
 
     async cell(x, y) {
         const cell = new Cell(x, y);
-        const [x0, y0] = this.cellLocation(cell);
-        cell.canvasX = x0;
-        cell.canvasY = y0;
-        cell.imgData = await this.cellData(cell);
+
+        const [canvasX, canvasY] = this.cellLocation(cell);
+        cell.canvasX = canvasX;
+        cell.canvasY = canvasY;
+
+        cell.imgData = await this.cellImgData(cell);
         return cell;
     }
 
@@ -166,7 +167,7 @@ class Canvas {
 
     /**
      * Grabs a cell-sized chunk of image data from the rendered canvas and
-     * returns it. The `cellData` array is a 1-dimensional array containing a
+     * returns it. The `cellImgData` array is a 1-dimensional array containing a
      * sequence of 4 elements, containing the RGBA color information for each
      * pixel.
      *
@@ -174,7 +175,7 @@ class Canvas {
      * @param {Object} cell
      * @returns {Number[]}
      */
-    async cellData(cell) {
+    async cellImgData(cell) {
         return await this.locator.evaluate((element, cell) => {
             const ctx = element.getContext('2d');
             return ctx.getImageData(
