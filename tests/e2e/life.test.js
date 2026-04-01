@@ -28,13 +28,12 @@ function isWhite(pixelData) {
  * Returns true if the pixel is at the edge of the cell. X and Y co-ordinates
  * are relative to the top-left corner of the cell.
  *
- * @param {Number} x
- * @param {Number} y
+ * @param {Object} pixel
  * @param {Object} cell
  * @returns {Boolean}
  */
-function isBorderPixel(pixelX, pixelY, cell) {
-    return [pixelX, pixelY].some(
+function isBorderPixel(pixel, cell) {
+    return [pixel.x, pixel.y].some(
         (e) => e === 0 || e === cell.size + cell.borderWidth / 2
     );
 }
@@ -45,15 +44,12 @@ function isBorderPixel(pixelX, pixelY, cell) {
  * pixels should be white. The co-ordinates are relative to the top-left corner
  * of the cell.
  *
- * @param {Number} pixelX
- * @param {Number} pixelY
+ * @param {Object} pixel
  * @param {Object} cell
  * @returns {Boolean}
  */
-function pixelOK(pixelData, pixelX, pixelY, cell) {
-    return isBorderPixel(pixelX, pixelY, cell)
-        ? isBlack(pixelData)
-        : isWhite(pixelData);
+function pixelOK(pixelData, pixel, cell) {
+    return isBorderPixel(pixel, cell) ? isBlack(pixelData) : isWhite(pixelData);
 }
 
 /**
@@ -65,10 +61,10 @@ function pixelOK(pixelData, pixelX, pixelY, cell) {
  * @param {Object} cell
  * @returns {Number[]}
  */
-function getPixelDataFromCellImgData({ pixelX, pixelY }, cell) {
+function getPixelDataFromCellImgData(cell, pixel) {
     const pixelDataSize = 4;
     const index =
-        (pixelX + pixelY * (cell.size + cell.borderWidth)) * pixelDataSize;
+        (pixel.x + pixel.y * (cell.size + cell.borderWidth)) * pixelDataSize;
     return cell.imgData.slice(index, index + pixelDataSize);
 }
 
@@ -90,17 +86,11 @@ class Cell {
     isRendered() {
         let result = false;
 
-        for (let pixelX = 0; pixelX < this.size + this.borderWidth; pixelX++) {
-            for (
-                let pixelY = 0;
-                pixelY < this.size + this.borderWidth;
-                pixelY++
-            ) {
-                const pixelData = getPixelDataFromCellImgData(
-                    { pixelX, pixelY },
-                    this
-                );
-                result = pixelOK(pixelData, pixelX, pixelY, this);
+        for (let x = 0; x < this.size + this.borderWidth; x++) {
+            for (let y = 0; y < this.size + this.borderWidth; y++) {
+                const pixel = { x, y };
+                const pixelData = getPixelDataFromCellImgData(this, pixel);
+                result = pixelOK(pixelData, pixel, this);
 
                 if (!result) {
                     break;
