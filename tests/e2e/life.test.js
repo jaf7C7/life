@@ -7,7 +7,8 @@ import { test, expect } from '@playwright/test';
  * @param {Number[]} pixelData
  * @returns {Boolean}
  */
-function isBlack([r, g, b, a]) {
+function isBlack(pixelData) {
+    const [r, g, b, a] = pixelData;
     return [r, g, b].every((e) => e === 0) && a === 255;
 }
 
@@ -18,7 +19,8 @@ function isBlack([r, g, b, a]) {
  * @param {Number[]} pixelData
  * @returns {Boolean}
  */
-function isWhite([r, g, b, a]) {
+function isWhite(pixelData) {
+    const [r, g, b, a] = pixelData;
     return [r, g, b].every((e) => e === 255) && a === 255;
 }
 
@@ -60,14 +62,14 @@ function pixelOK(pixelData, pixelX, pixelY, cell) {
  *
  * @param {Number} x
  * @param {Number} y
- * @param {Number} cellWidth
- * @param {Number[]} cellImgData
+ * @param {Object} cell
  * @returns {Number[]}
  */
-function getPixelDataFromCellImgData(pixelX, pixelY, cellWidth, cellImgData) {
+function getPixelDataFromCellImgData(pixelX, pixelY, cell) {
     const pixelDataSize = 4;
-    const index = (pixelX + pixelY * cellWidth) * pixelDataSize;
-    return cellImgData.slice(index, index + pixelDataSize);
+    const index =
+        (pixelX + pixelY * (cell.size + cell.borderWidth)) * pixelDataSize;
+    return cell.imgData.slice(index, index + pixelDataSize);
 }
 
 class Cell {
@@ -97,8 +99,7 @@ class Cell {
                 const pixelData = getPixelDataFromCellImgData(
                     pixelX,
                     pixelY,
-                    this.size + this.borderWidth,
-                    this.imgData
+                    this
                 );
                 result = pixelOK(pixelData, pixelX, pixelY, this);
 
