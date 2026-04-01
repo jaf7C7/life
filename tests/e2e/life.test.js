@@ -195,9 +195,7 @@ test('A canvas element is created', async ({ page }) => {
 
 test('Cell `0,0` is rendered', async ({ page }) => {
     await page.goto('/');
-
     const canvas = await Canvas.fromPage(page);
-    const cell = await canvas.cell(0, 0);
 
-    expect(cell.isRendered()).toBeTruthy();
+    expect((await canvas.cell(0, 0)).isRendered()).toBe(true);
 });
