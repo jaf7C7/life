@@ -25,36 +25,6 @@ function isWhite(pixelData) {
 }
 
 /**
- * Returns true if the pixel is at the edge of the cell. X and Y co-ordinates
- * are relative to the top-left corner of the cell.
- *
- * @param {Object} pixel
- * @param {Object} cell
- * @returns {Boolean}
- */
-function isBorderPixel(pixel, cell) {
-    return [pixel.x, pixel.y].some(
-        (e) => e === 0 || e === cell.size + cell.borderWidth / 2
-    );
-}
-
-/**
- * Checks the given pixel and returns a boolean indicating whether it is the
- * correct color given its position. Border pixels should be black, and other
- * pixels should be white. The co-ordinates are relative to the top-left corner
- * of the cell.
- *
- * @param {Object} pixel
- * @param {Object} cell
- * @returns {Boolean}
- */
-function pixelOK(pixel, cell) {
-    return isBorderPixel(pixel, cell)
-        ? isBlack(pixel.data)
-        : isWhite(pixel.data);
-}
-
-/**
  * Grabs a slice of the `cellImgData` array containing the RGBA color
  * information for the pixel at position `x,y` in the rendered cell.
  *
@@ -86,6 +56,19 @@ class Cell {
     }
 
     /**
+     * Returns true if the pixel is at the edge of the cell. X and Y
+     * co-ordinates are relative to the top-left corner of the cell.
+     *
+     * @param {Object} pixel
+     * @returns {Boolean}
+     */
+    hasBorderPixel(pixel) {
+        return [pixel.x, pixel.y].some(
+            (e) => e === 0 || e === this.size + this.borderWidth / 2
+        );
+    }
+
+    /**
      * Checks each pixel in the given cell and returns `true` if all pixels are
      * the correct color, else `false.
      *
@@ -97,7 +80,9 @@ class Cell {
         for (let x = 0; x < this.size + this.borderWidth; x++) {
             for (let y = 0; y < this.size + this.borderWidth; y++) {
                 const pixel = this.pixel(x, y);
-                result = pixelOK(pixel, this);
+                result = this.hasBorderPixel(pixel)
+                    ? isBlack(pixel.data)
+                    : isWhite(pixel.data);
 
                 if (!result) {
                     break;
