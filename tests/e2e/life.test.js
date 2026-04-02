@@ -1,9 +1,25 @@
 import { test, expect } from '@playwright/test';
 
-/** TODO */
+/**
+ * Represents a pixel with position and color information.
+ *
+ * @property {Number} x - The X co-ordinate relative to the cell's top left
+ *   corner.
+ * @property {Number} y - The X co-ordinate relative to the cell's top left
+ *   corner.
+ * @property {Number[]} data - An array containing the pixel's RGBA color
+ *   information.
+ */
 class Pixel {
     data;
 
+    /**
+     * Creates a new pixel.
+     *
+     * @param {Number} x
+     * @param {Number} y
+     * @returns {Pixel}
+     */
     constructor(x, y) {
         this.x = x;
         this.y = y;
@@ -32,17 +48,42 @@ class Pixel {
     }
 }
 
-/** TODO */
+/**
+ * Represents a cell on the canvas.
+ *
+ * @param {Number} x - The X co-ordinate of the cell relative to the centre of
+ *   the canvas.
+ * @param {Number} y - The Y co-ordinate of the cell relative to the centre of
+ *   the canvas.
+ * @param {Number} borderWidth - The thickness in canvas pixels of the lines
+ *   separating each cell.
+ * @param {Number} size - The size in canvas pixels of the cell body.
+ */
 class Cell {
     borderWidth = 2;
     size = 20;
 
+    /**
+     * Creates a new cell.
+     *
+     * @param {Number} x
+     * @param {Number} y
+     * @returns {Cell}
+     */
     constructor(x, y) {
         this.x = x;
         this.y = y;
     }
 
-    /** TODO */
+    /**
+     * Fetches information about a specific pixel of the rendered cell.
+     *
+     * @param x - The X co-ordinate of the pixel relative to the cell's top left
+     *   corner.
+     * @param y - The Y co-ordinate of the pixel relative to the cell's top left
+     *   corner.
+     * @returns {Pixel}
+     */
     pixel(x, y) {
         const pixel = new Pixel(x, y);
         pixel.data = this.pixelData(pixel);
@@ -50,10 +91,10 @@ class Cell {
     }
 
     /**
-     * Grabs a slice of the `cellImgData` array containing the RGBA color
-     * information for the pixel at position `x,y` in the rendered cell.
+     * Returns a slice of the cell's image data containing the RGBA color
+     * information for the specified pixel.
      *
-     * @param {Object} pixel
+     * @param {Pixel} pixel
      * @returns {Number[]}
      */
     pixelData(pixel) {
@@ -65,10 +106,9 @@ class Cell {
     }
 
     /**
-     * Returns true if the pixel is at the edge of the cell. X and Y
-     * co-ordinates are relative to the top-left corner of the cell.
+     * Returns true if the pixel is at the edge of the cell.
      *
-     * @param {Object} pixel
+     * @param {Pixel} pixel
      * @returns {Boolean}
      */
     hasBorderPixel(pixel) {
@@ -104,9 +144,20 @@ class Cell {
     }
 }
 
-/** TODO */
+/**
+ * Represents the canvas of cells where the game state is displayed.
+ *
+ * @param {Number} width - The width of the rendered canvas in pixels.
+ * @param {Number} height - The height of the rendered canvas in pixels.
+ * @param {Object} locator - The Playwright `Locator` object for the rendered
+ *   canvas.
+ */
 class Canvas {
-    /** TODO */
+    /**
+     * Alternative constructor to create a Canvas from a rendered page.
+     *
+     * @param {Object} page - A Playwright `Page` object.
+     */
     static async fromPage(page) {
         const locator = await page.getByTestId('canvas');
         const { width, height } = await locator.boundingBox();
@@ -114,6 +165,13 @@ class Canvas {
         return new this(width, height, locator);
     }
 
+    /**
+     * Creates a new Canvas.
+     *
+     * @param {Number} width
+     * @param {Number} height
+     * @param {Object} locator
+     */
     constructor(width, height, locator) {
         this.width = width;
         this.height = height;
@@ -122,7 +180,16 @@ class Canvas {
         }
     }
 
-    /** TODO */
+    /**
+     * Returns a new Cell object containing position and image data about a
+     * particular cell on the rendered canvas.
+     *
+     * @param {Number} x - The X co-ordinate of the cell relative to the centre
+     *   of the canvas.
+     * @param {Number} y - The Y co-ordinate of the cell relative to the centre
+     *   of the canvas.
+     * @returns {Cell}
+     */
     async cell(x, y) {
         const cell = new Cell(x, y);
 
@@ -139,14 +206,14 @@ class Canvas {
      * Returns the location on the canvas of the top-left corner of the given
      * cell, relative to the top-left corner of the canvas.
      *
-     * The cell co-ords have their origin at the centre of the canvas, and y
+     * The cell co-ords have their origin at the centre of the canvas, and Y
      * increases in the upwards direction, whereas the canvas drawing co-ords
-     * have their origin at the top left corner of the canvas, and y increases
+     * have their origin at the top left corner of the canvas, and Y increases
      * in the downwards direction.
      *
      * Cell `0,0` is defined to be at the centre of the canvas.
      *
-     * @param {Object} cell
+     * @param {Cell} cell
      * @returns {Number[]}
      */
     cellPosition(cell) {
@@ -164,12 +231,11 @@ class Canvas {
 
     /**
      * Grabs a cell-sized chunk of image data from the rendered canvas and
-     * returns it. The `cellImgData` array is a 1-dimensional array containing a
-     * sequence of 4 elements, containing the RGBA color information for each
-     * pixel.
+     * returns it. The image data array is a 1-dimensional array containing
+     * sequences of 4 elements, each containing the RGBA color information for a
+     * single pixel.
      *
-     * @param {Object} canvas
-     * @param {Object} cell
+     * @param {Cell} cell
      * @returns {Number[]}
      */
     async cellImgData(cell) {
@@ -194,6 +260,7 @@ test('A canvas element is created', async ({ page }) => {
 test('Cell `0,0` is rendered', async ({ page }) => {
     await page.goto('/');
     const canvas = await Canvas.fromPage(page);
+    const cell = await canvas.cell(0, 0);
 
-    expect((await canvas.cell(0, 0)).isRendered()).toBe(true);
+    expect(cell.isRendered()).toBe(true);
 });
