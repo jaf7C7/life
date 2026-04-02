@@ -1,45 +1,38 @@
 import { test, expect } from '@playwright/test';
 
-/**
- * Returns true if the given pixel color data represents opaque black, else
- * false.
- *
- * @param {Number[]} pixelData
- * @returns {Boolean}
- */
-function isBlack(pixelData) {
-    const [r, g, b, a] = pixelData;
-    return [r, g, b].every((e) => e === 0) && a === 255;
+/** TODO */
+class Pixel {
+    data;
+
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    /**
+     * Returns true if the given pixel color data represents opaque black, else
+     * false.
+     *
+     * @returns {Boolean}
+     */
+    isBlack() {
+        const [r, g, b, a] = this.data;
+        return [r, g, b].every((e) => e === 0) && a === 255;
+    }
+
+    /**
+     * Returns true if the given pixel color data represents opaque white, else
+     * false.
+     *
+     * @returns {Boolean}
+     */
+    isWhite() {
+        const [r, g, b, a] = this.data;
+        return [r, g, b].every((e) => e === 255) && a === 255;
+    }
 }
 
-/**
- * Returns true if the given pixel color data represents opaque white, else
- * false.
- *
- * @param {Number[]} pixelData
- * @returns {Boolean}
- */
-function isWhite(pixelData) {
-    const [r, g, b, a] = pixelData;
-    return [r, g, b].every((e) => e === 255) && a === 255;
-}
-
-/**
- * Grabs a slice of the `cellImgData` array containing the RGBA color
- * information for the pixel at position `x,y` in the rendered cell.
- *
- * @param {Number} x
- * @param {Number} y
- * @param {Object} cell
- * @returns {Number[]}
- */
-function pixelData(cell, pixel) {
-    const pixelDataSize = 4;
-    const index =
-        (pixel.x + pixel.y * (cell.size + cell.borderWidth)) * pixelDataSize;
-    return cell.imgData.slice(index, index + pixelDataSize);
-}
-
+/** TODO */
 class Cell {
     borderWidth = 2;
     size = 20;
@@ -49,10 +42,26 @@ class Cell {
         this.y = y;
     }
 
+    /** TODO */
     pixel(x, y) {
-        const pixel = { x, y };
-        pixel.data = pixelData(this, pixel);
+        const pixel = new Pixel(x, y);
+        pixel.data = this.pixelData(pixel);
         return pixel;
+    }
+
+    /**
+     * Grabs a slice of the `cellImgData` array containing the RGBA color
+     * information for the pixel at position `x,y` in the rendered cell.
+     *
+     * @param {Object} pixel
+     * @returns {Number[]}
+     */
+    pixelData(pixel) {
+        const pixelDataSize = 4;
+        const index =
+            (pixel.x + pixel.y * (this.size + this.borderWidth)) *
+            pixelDataSize;
+        return this.imgData.slice(index, index + pixelDataSize);
     }
 
     /**
@@ -80,9 +89,10 @@ class Cell {
         for (let x = 0; x < this.size + this.borderWidth; x++) {
             for (let y = 0; y < this.size + this.borderWidth; y++) {
                 const pixel = this.pixel(x, y);
+
                 result = this.hasBorderPixel(pixel)
-                    ? isBlack(pixel.data)
-                    : isWhite(pixel.data);
+                    ? pixel.isBlack()
+                    : pixel.isWhite();
 
                 if (!result) {
                     break;
@@ -94,7 +104,9 @@ class Cell {
     }
 }
 
+/** TODO */
 class Canvas {
+    /** TODO */
     static async fromPage(page) {
         const locator = await page.getByTestId('canvas');
         const { width, height } = await locator.boundingBox();
@@ -110,6 +122,7 @@ class Canvas {
         }
     }
 
+    /** TODO */
     async cell(x, y) {
         const cell = new Cell(x, y);
 
