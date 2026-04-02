@@ -48,8 +48,10 @@ function isBorderPixel(pixel, cell) {
  * @param {Object} cell
  * @returns {Boolean}
  */
-function pixelOK(pixelData, pixel, cell) {
-    return isBorderPixel(pixel, cell) ? isBlack(pixelData) : isWhite(pixelData);
+function pixelOK(pixel, cell) {
+    return isBorderPixel(pixel, cell)
+        ? isBlack(pixel.data)
+        : isWhite(pixel.data);
 }
 
 /**
@@ -61,7 +63,7 @@ function pixelOK(pixelData, pixel, cell) {
  * @param {Object} cell
  * @returns {Number[]}
  */
-function getPixelDataFromCellImgData(cell, pixel) {
+function pixelData(cell, pixel) {
     const pixelDataSize = 4;
     const index =
         (pixel.x + pixel.y * (cell.size + cell.borderWidth)) * pixelDataSize;
@@ -77,6 +79,12 @@ class Cell {
         this.y = y;
     }
 
+    pixel(x, y) {
+        const pixel = { x, y };
+        pixel.data = pixelData(this, pixel);
+        return pixel;
+    }
+
     /**
      * Checks each pixel in the given cell and returns `true` if all pixels are
      * the correct color, else `false.
@@ -88,9 +96,8 @@ class Cell {
 
         for (let x = 0; x < this.size + this.borderWidth; x++) {
             for (let y = 0; y < this.size + this.borderWidth; y++) {
-                const pixel = { x, y };
-                const pixelData = getPixelDataFromCellImgData(this, pixel);
-                result = pixelOK(pixelData, pixel, this);
+                const pixel = this.pixel(x, y);
+                result = pixelOK(pixel, this);
 
                 if (!result) {
                     break;
