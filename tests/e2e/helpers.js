@@ -124,7 +124,7 @@ class Cell {
     isRendered() {
         let result = false;
 
-        for (let x = 0; x < this.size + this.borderWidth; x++) {
+        outerLoop: for (let x = 0; x < this.size + this.borderWidth; x++) {
             for (let y = 0; y < this.size + this.borderWidth; y++) {
                 const pixel = this.pixel(x, y);
 
@@ -133,7 +133,7 @@ class Cell {
                     : pixel.isWhite();
 
                 if (!result) {
-                    break;
+                    break outerLoop;
                 }
             }
         }
