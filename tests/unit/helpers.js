@@ -1,7 +1,6 @@
 export class UI {
-    constructor(cells) {
+    constructor() {
         this.elements = [];
-        this.cells = cells;
     }
 
     createElement(type) {
@@ -9,13 +8,16 @@ export class UI {
             type,
             width: 100,
             height: 100,
-            click: ({ position: { x, y } }) => {
-                if (x === element.width / 2 && y === element.height / 2) {
-                    this.cells.add('0,0');
-                }
+            _handlers: {},
+            addEventListener(event, handler) {
+                this._handlers[event] = handler;
+            },
+            click(event) {
+                this._handlers['click']?.(event);
             }
         };
         this.elements.push(element);
+        return element;
     }
 
     findElement(type) {
