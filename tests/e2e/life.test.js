@@ -7,10 +7,14 @@ test('A canvas element is created', async ({ page }) => {
     await expect(page.getByTestId('canvas')).toBeVisible();
 });
 
-test('Cell `0,0` is rendered', async ({ page }) => {
+test('Clicking on the center of the canvas renders cell `0,0`', async ({
+    page
+}) => {
     await page.goto('/');
     const canvas = await Canvas.fromPage(page);
-    const cell = await canvas.cell(0, 0);
 
+    await canvas.locator.click();
+
+    const cell = await canvas.cell(0, 0);
     expect(cell.isRendered()).toBe(true);
 });

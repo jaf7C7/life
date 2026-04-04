@@ -24,14 +24,15 @@
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // central cell
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(
-        x0 + cellBorderWidth / 2,
-        y0 + cellBorderWidth / 2,
-        cellSize,
-        cellSize
-      );
+      canvas.addEventListener('click', () => {
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(
+          x0 + cellBorderWidth / 2,
+          y0 + cellBorderWidth / 2,
+          cellSize,
+          cellSize
+        );
+      });
     </script>
   </body>
 </html>
