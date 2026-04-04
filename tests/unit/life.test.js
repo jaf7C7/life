@@ -6,38 +6,38 @@ function initApp(createElement) {
 }
 
 suite('User Interface', () => {
-    test('A canvas element is created', () => {
-        let elementCreated;
+    let cells;
+    let elements;
 
-        function createElement(type) {
-            elementCreated = type;
-        }
+    function createElement(type) {
+        elements.push({
+            type,
+            width: 100,
+            height: 100,
+            click({ position: { x, y } }) {
+                if (x === this.width / 2 && y === this.height / 2) {
+                    cells.add('0,0');
+                }
+            }
+        });
+    }
+
+    function findElement(type) {
+        return elements.find((e) => e.type === type);
+    }
+
+    test('A canvas element is created', () => {
+        cells = new Set();
+        elements = [];
 
         initApp(createElement);
 
-        expect(elementCreated).to.equal('canvas');
+        expect(elements[0].type).to.equal('canvas');
     });
 
     test('Clicking on the center of the canvas toggles cell "0,0"', () => {
-        const cells = new Set();
-        const elements = [];
-
-        function createElement(type) {
-            elements.push({
-                type,
-                width: 100,
-                height: 100,
-                click({ position: { x, y } }) {
-                    if (x === this.width / 2 && y === this.height / 2) {
-                        cells.add('0,0');
-                    }
-                }
-            });
-        }
-
-        function findElement(type) {
-            return elements.find((e) => e.type === type);
-        }
+        cells = new Set();
+        elements = [];
 
         initApp(createElement, cells);
         const canvas = findElement('canvas');
