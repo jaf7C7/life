@@ -1,46 +1,50 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
 
-function initApp(createElement) {
-    createElement('canvas');
+function initApp(ui) {
+    ui.createElement('canvas');
 }
 
-suite('User Interface', () => {
-    let cells;
-    let elements;
+class UI {
+    constructor(cells) {
+        this.elements = [];
+        this.cells = cells;
+    }
 
-    function createElement(type) {
-        elements.push({
+    createElement(type) {
+        const element = {
             type,
             width: 100,
             height: 100,
-            click({ position: { x, y } }) {
-                if (x === this.width / 2 && y === this.height / 2) {
-                    cells.add('0,0');
+            click: ({ position: { x, y } }) => {
+                if (x === element.width / 2 && y === element.height / 2) {
+                    this.cells.add('0,0');
                 }
             }
-        });
+        };
+        this.elements.push(element);
     }
 
-    function findElement(type) {
-        return elements.find((e) => e.type === type);
+    findElement(type) {
+        return this.elements.find((e) => e.type === type);
     }
+}
 
+suite('User Interface', () => {
     test('A canvas element is created', () => {
-        cells = new Set();
-        elements = [];
+        const ui = new UI(new Set());
 
-        initApp(createElement);
+        initApp(ui);
 
-        expect(elements[0].type).to.equal('canvas');
+        expect(ui.elements[0].type).to.equal('canvas');
     });
 
     test('Clicking on the center of the canvas toggles cell "0,0"', () => {
-        cells = new Set();
-        elements = [];
+        const cells = new Set();
+        const ui = new UI(cells);
 
-        initApp(createElement, cells);
-        const canvas = findElement('canvas');
+        initApp(ui);
+        const canvas = ui.findElement('canvas');
         canvas.click({
             position: { x: canvas.width / 2, y: canvas.height / 2 }
         });
