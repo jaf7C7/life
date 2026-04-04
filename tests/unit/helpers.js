@@ -14,6 +14,9 @@ export class UI {
             },
             click(event) {
                 this._handlers['click']?.(event);
+            },
+            getContext() {
+                return { fillRect() {} };
             }
         };
         this.elements.push(element);
