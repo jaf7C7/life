@@ -1,9 +1,6 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
-
-function initApp(ui) {
-    ui.createElement('canvas');
-}
+import { initApp } from '../../life/app.js';
 
 class UI {
     constructor(cells) {
