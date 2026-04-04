@@ -12,11 +12,6 @@ export function initApp(ui, cells) {
         const cellY = -Math.floor(
             (event.offsetY - (canvas.height / 2 - step / 2)) / step
         );
-        const key = `${cellX},${cellY}`;
-        if (cells.has(key)) {
-            cells.delete(key);
-        } else {
-            cells.add(key);
-        }
+        cells.add(`${cellX},${cellY}`);
     });
 }

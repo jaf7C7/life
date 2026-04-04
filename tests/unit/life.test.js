@@ -13,7 +13,7 @@ suite('User Interface', () => {
         expect(ui.elements[0].type).to.equal('canvas');
     });
 
-    test('Clicking on the center of the canvas toggles cell "0,0"', () => {
+    test('Clicking on the center of the canvas adds cell "0,0"', () => {
         const cells = new Set();
         const ui = new UI();
 
