@@ -1,9 +1,11 @@
+import { arrayFromString } from './rules.js';
+
 export const cellSize = 20;
 export const cellBorderWidth = 2;
+const step = cellSize + cellBorderWidth;
 
 function render(canvas, cells) {
     const ctx = canvas.getContext('2d');
-    const step = cellSize + cellBorderWidth;
     const x0 = canvas.width / 2 - step / 2;
     const y0 = canvas.height / 2 - step / 2;
 
@@ -12,7 +14,7 @@ function render(canvas, cells) {
 
     ctx.fillStyle = '#fff';
     for (const cell of cells) {
-        const [cellX, cellY] = cell.split(',').map(Number);
+        const [cellX, cellY] = arrayFromString(cell);
         ctx.fillRect(
             x0 + cellX * step + cellBorderWidth / 2,
             y0 - cellY * step + cellBorderWidth / 2,
@@ -24,7 +26,6 @@ function render(canvas, cells) {
 
 export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
-    const step = cellSize + cellBorderWidth;
 
     canvas.addEventListener('click', (event) => {
         const cellX = Math.floor(

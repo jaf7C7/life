@@ -24,7 +24,7 @@ function neighbours(cell) {
  * @param {String} cell
  * @returns {Number[]}
  */
-function arrayFromString(cell) {
+export function arrayFromString(cell) {
     return cell.split(',').map((e) => Number(e));
 }
 

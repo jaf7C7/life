@@ -1,3 +1,5 @@
+import { cellSize, cellBorderWidth } from '../../life/app.js';
+
 /**
  * Represents a pixel with position and color information.
  *
@@ -58,8 +60,8 @@ class Pixel {
  * @param {Number} size - The size in canvas pixels of the cell body.
  */
 class Cell {
-    borderWidth = 2;
-    size = 20;
+    borderWidth = cellBorderWidth;
+    size = cellSize;
 
     /**
      * Creates a new cell.
@@ -122,23 +124,15 @@ class Cell {
      * @returns {Boolean}
      */
     isRendered() {
-        let result = false;
-
-        outerLoop: for (let x = 0; x < this.size + this.borderWidth; x++) {
-            for (let y = 0; y < this.size + this.borderWidth; y++) {
+        const size = this.size + this.borderWidth;
+        return Array.from({ length: size }, (_, x) =>
+            Array.from({ length: size }, (_, y) => {
                 const pixel = this.pixel(x, y);
-
-                result = this.hasBorderPixel(pixel)
+                return this.hasBorderPixel(pixel)
                     ? pixel.isBlack()
                     : pixel.isWhite();
-
-                if (!result) {
-                    break outerLoop;
-                }
-            }
-        }
-
-        return result;
+            })
+        ).every((row) => row.every(Boolean));
     }
 }
 
