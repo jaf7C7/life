@@ -34,7 +34,12 @@ export function initApp(ui, cells) {
         const cellY = -Math.floor(
             (event.offsetY - (canvas.height / 2 - step / 2)) / step
         );
-        cells.add(`${cellX},${cellY}`);
+        const cell = `${cellX},${cellY}`;
+        if (cells.has(cell)) {
+            cells.delete(cell);
+        } else {
+            cells.add(cell);
+        }
         render(canvas, cells);
     });
 
