@@ -24,6 +24,18 @@ suite('User Interface', () => {
         expect(cells).to.deep.equal(new Set(['1,1']));
     });
 
+    test('Clicking on a cell twice leaves it dead', () => {
+        const cells = new Set();
+        const ui = new UI();
+
+        initApp(ui, cells);
+        const canvas = ui.findElement('canvas');
+        canvas.clickCell(1, 1);
+        canvas.clickCell(1, 1);
+
+        expect(cells).to.deep.equal(new Set());
+    });
+
     test('Clicking on the center of the canvas adds cell "0,0"', () => {
         const cells = new Set();
         const ui = new UI();
