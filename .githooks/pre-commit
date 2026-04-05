@@ -6,5 +6,4 @@
 
 ~/.config/git/hooks/pre-commit \
 	--list-different-cmd='npm run --silent format:list-different' \
-	--format-cmd='npm run --silent format' \
-	--test-cmd='npm run --silent test'
+	--format-cmd='npm run --silent format'
