@@ -12,8 +12,8 @@ export class UI {
             addEventListener(event, handler) {
                 this._handlers[event] = handler;
             },
-            click(event) {
-                this._handlers['click']?.(event);
+            click({ x, y }) {
+                this._handlers['click']?.({ offsetX: x, offsetY: y });
             },
             getContext() {
                 return { fillRect() {} };
