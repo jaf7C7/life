@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
-import { initApp, cellSize, cellBorderWidth } from '../../life/app.js';
+import { initApp } from '../../life/app.js';
 import { UI } from './helpers.js';
 
 suite('User Interface', () => {
@@ -19,10 +19,7 @@ suite('User Interface', () => {
 
         initApp(ui, cells);
         const canvas = ui.findElement('canvas');
-        canvas.click({
-            x: canvas.width / 2 + cellSize + cellBorderWidth,
-            y: canvas.height / 2 - cellSize - cellBorderWidth
-        });
+        canvas.clickCell(1, 1);
 
         expect(cells).to.deep.equal(new Set(['1,1']));
     });
