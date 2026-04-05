@@ -17,8 +17,8 @@
   - [x] Blinker oscillator
 
 - [ ] **UI**
-  - [ ] **Clicking a cell on the canvas toggles it live/dead.**
-  - [ ] Click-and-drag to pan around the grid.
+  - [x] Clicking a cell on the canvas toggles it live/dead.
+  - [ ] **Click-and-drag to pan around the grid.**
   - [ ] Pinch/mousewheel to zoom in/out.
   - [ ] Play/stop buttons
   - [ ] Presets for interesting patterns.
