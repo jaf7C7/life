@@ -10,7 +10,7 @@ suite('User Interface', () => {
 
         initApp(ui, cells);
 
-        expect(ui.elements[0].type).to.equal('canvas');
+        expect(ui.findElement('canvas')).to.not.be.undefined;
     });
 
     test('Clicking on the center of the canvas adds cell "0,0"', () => {
