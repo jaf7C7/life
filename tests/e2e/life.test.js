@@ -12,11 +12,9 @@ test('Clicking on cell `1,1` renders cell `1,1`', async ({ page }) => {
     await page.goto('/');
     const canvas = await Canvas.fromPage(page);
 
-    await canvas.locator.click({
-        position: {
-            x: canvas.width / 2 + cellSize + cellBorderWidth,
-            y: canvas.height / 2 - cellSize - cellBorderWidth
-        }
+    await canvas.click({
+        x: canvas.width / 2 + cellSize + cellBorderWidth,
+        y: canvas.height / 2 - cellSize - cellBorderWidth
     });
 
     const cell = await canvas.cell(1, 1);
@@ -29,11 +27,9 @@ test('Clicking on the center of the canvas renders cell `0,0`', async ({
     await page.goto('/');
     const canvas = await Canvas.fromPage(page);
 
-    await canvas.locator.click({
-        position: {
-            x: canvas.width / 2,
-            y: canvas.height / 2
-        }
+    await canvas.click({
+        x: canvas.width / 2,
+        y: canvas.height / 2
     });
 
     const cell = await canvas.cell(0, 0);

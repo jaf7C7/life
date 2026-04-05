@@ -182,6 +182,10 @@ export class Canvas {
      *   of the canvas.
      * @returns {Cell}
      */
+    async click({ x, y }) {
+        await this.locator.click({ position: { x, y } });
+    }
+
     async cell(x, y) {
         const cell = new Cell(x, y);
 

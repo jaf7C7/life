@@ -20,8 +20,8 @@ suite('User Interface', () => {
         initApp(ui, cells);
         const canvas = ui.findElement('canvas');
         canvas.click({
-            offsetX: canvas.width / 2 + cellSize + cellBorderWidth,
-            offsetY: canvas.height / 2 - cellSize - cellBorderWidth
+            x: canvas.width / 2 + cellSize + cellBorderWidth,
+            y: canvas.height / 2 - cellSize - cellBorderWidth
         });
 
         expect(cells).to.deep.equal(new Set(['1,1']));
@@ -34,8 +34,8 @@ suite('User Interface', () => {
         initApp(ui, cells);
         const canvas = ui.findElement('canvas');
         canvas.click({
-            offsetX: canvas.width / 2,
-            offsetY: canvas.height / 2
+            x: canvas.width / 2,
+            y: canvas.height / 2
         });
 
         expect(cells).to.deep.equal(new Set(['0,0']));
