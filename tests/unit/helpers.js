@@ -17,9 +17,20 @@ export class UI {
             click({ x, y }) {
                 this._handlers['click']?.({ offsetX: x, offsetY: y });
             },
+            drag({ from, to }) {
+                this._handlers['mousedown']?.({
+                    offsetX: from.x,
+                    offsetY: from.y
+                });
+                this._handlers['mousemove']?.({ offsetX: to.x, offsetY: to.y });
+                this._handlers['mouseup']?.();
+            },
             clickCell(cellX, cellY) {
                 const step = cellSize + cellBorderWidth;
-                this.click({ x: this.width / 2 + cellX * step, y: this.height / 2 - cellY * step });
+                this.click({
+                    x: this.width / 2 + cellX * step,
+                    y: this.height / 2 - cellY * step
+                });
             },
             getContext() {
                 return { fillRect() {} };

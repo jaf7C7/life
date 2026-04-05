@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
-import { initApp } from '../../life/app.js';
+import { initApp, cellSize, cellBorderWidth } from '../../life/app.js';
 import { UI } from './helpers.js';
 
 suite('User Interface', () => {
@@ -22,6 +22,22 @@ suite('User Interface', () => {
         canvas.clickCell(1, 1);
 
         expect(cells).to.deep.equal(new Set(['1,1']));
+    });
+
+    test('Dragging down and right by 1 cell then clicking the center toggles cell "-1,1"', () => {
+        const cells = new Set();
+        const ui = new UI();
+
+        initApp(ui, cells);
+        const canvas = ui.findElement('canvas');
+        const step = cellSize + cellBorderWidth;
+        canvas.drag({
+            from: { x: canvas.width / 2, y: canvas.height / 2 },
+            to: { x: canvas.width / 2 + step, y: canvas.height / 2 + step }
+        });
+        canvas.click({ x: canvas.width / 2, y: canvas.height / 2 });
+
+        expect(cells).to.deep.equal(new Set(['-1,1']));
     });
 
     test('Clicking on a cell twice leaves it dead', () => {

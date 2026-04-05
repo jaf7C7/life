@@ -27,12 +27,30 @@ function render(canvas, cells) {
 export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
 
+    let panX = 0,
+        panY = 0;
+    let dragStart = null;
+
+    canvas.addEventListener('mousedown', (e) => {
+        dragStart = { x: e.offsetX, y: e.offsetY };
+    });
+    canvas.addEventListener('mousemove', (e) => {
+        if (dragStart) {
+            panX += e.offsetX - dragStart.x;
+            panY += e.offsetY - dragStart.y;
+            dragStart = { x: e.offsetX, y: e.offsetY };
+        }
+    });
+    canvas.addEventListener('mouseup', () => {
+        dragStart = null;
+    });
+
     canvas.addEventListener('click', (event) => {
         const cellX = Math.floor(
-            (event.offsetX - (canvas.width / 2 - step / 2)) / step
+            (event.offsetX - (canvas.width / 2 - step / 2) - panX) / step
         );
         const cellY = -Math.floor(
-            (event.offsetY - (canvas.height / 2 - step / 2)) / step
+            (event.offsetY - (canvas.height / 2 - step / 2) - panY) / step
         );
         const cell = `${cellX},${cellY}`;
         if (cells.has(cell)) {
