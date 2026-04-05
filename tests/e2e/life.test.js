@@ -29,7 +29,12 @@ test('Clicking on the center of the canvas renders cell `0,0`', async ({
     await page.goto('/');
     const canvas = await Canvas.fromPage(page);
 
-    await canvas.locator.click();
+    await canvas.locator.click({
+        position: {
+            x: canvas.width / 2,
+            y: canvas.height / 2
+        }
+    });
 
     const cell = await canvas.cell(0, 0);
     expect(cell.isRendered()).toBe(true);
