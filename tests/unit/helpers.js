@@ -1,3 +1,5 @@
+import { cellSize, cellBorderWidth } from '../../life/app.js';
+
 export class UI {
     constructor() {
         this.elements = [];
@@ -14,6 +16,10 @@ export class UI {
             },
             click({ x, y }) {
                 this._handlers['click']?.({ offsetX: x, offsetY: y });
+            },
+            clickCell(cellX, cellY) {
+                const step = cellSize + cellBorderWidth;
+                this.click({ x: this.width / 2 + cellX * step, y: this.height / 2 - cellY * step });
             },
             getContext() {
                 return { fillRect() {} };
