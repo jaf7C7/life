@@ -5,10 +5,10 @@ on: push
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      HOME: /root
     container:
       image: mcr.microsoft.com/playwright:v1.58.2-noble
-      env:
-        HOME: /root
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
