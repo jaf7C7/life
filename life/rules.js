@@ -1,3 +1,5 @@
+import { Cell } from './cell.js';
+
 /**
  * Returns an array of cell co-ordinates immediately adjacent to the given cell.
  *
@@ -5,17 +7,17 @@
  * @returns {String[]}
  */
 function neighbours(cell) {
-    const [x, y] = arrayFromString(cell);
+    const { x, y } = Cell.fromString(cell);
     return [
-        [x, y + 1],
-        [x + 1, y + 1],
-        [x + 1, y],
-        [x + 1, y - 1],
-        [x, y - 1],
-        [x - 1, y - 1],
-        [x - 1, y],
-        [x - 1, y + 1]
-    ].map((e) => e.toString());
+        new Cell(x, y + 1),
+        new Cell(x + 1, y + 1),
+        new Cell(x + 1, y),
+        new Cell(x + 1, y - 1),
+        new Cell(x, y - 1),
+        new Cell(x - 1, y - 1),
+        new Cell(x - 1, y),
+        new Cell(x - 1, y + 1)
+    ].map(String);
 }
 
 /**
