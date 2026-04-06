@@ -1,13 +1,13 @@
 import { Cell } from './cell.js';
 
 /**
- * Returns an array of cell co-ordinates immediately adjacent to the given cell.
+ * Returns an array of cells immediately adjacent to the given cell.
  *
- * @param {String} cell
- * @returns {String[]}
+ * @param {Cell} cell
+ * @returns {Cell[]}
  */
 function neighbours(cell) {
-    const { x, y } = Cell.fromString(cell);
+    const { x, y } = cell;
     return [
         new Cell(x, y + 1),
         new Cell(x + 1, y + 1),
@@ -17,7 +17,7 @@ function neighbours(cell) {
         new Cell(x - 1, y - 1),
         new Cell(x - 1, y),
         new Cell(x - 1, y + 1)
-    ].map(String);
+    ];
 }
 
 /**
@@ -42,25 +42,25 @@ export function next(cells) {
     const result = new Set();
     const counter = {};
 
-    for (const cell of cells) {
+    for (const cell of [...cells].map(Cell.fromString)) {
         let liveNeighbourCount = 0;
 
         for (const neighbour of neighbours(cell)) {
-            if (cells.has(neighbour)) {
+            const key = neighbour.toString();
+            if (cells.has(key)) {
                 liveNeighbourCount += 1;
             } else {
-                counter[neighbour] =
-                    neighbour in counter ? counter[neighbour] + 1 : 1;
+                counter[key] = key in counter ? counter[key] + 1 : 1;
             }
         }
 
         if (liveNeighbourCount > 1 && liveNeighbourCount < 4) {
-            result.add(cell);
+            result.add(cell.toString());
         }
     }
 
-    for (const newStringCell of newCells(counter)) {
-        result.add(newStringCell);
+    for (const cell of newCells(counter)) {
+        result.add(cell);
     }
 
     return result;
