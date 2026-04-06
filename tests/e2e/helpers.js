@@ -59,22 +59,7 @@ class Pixel {
  *   separating each cell.
  * @param {Number} size - The size in canvas pixels of the cell body.
  */
-class RenderedCell {
-    borderWidth = Cell.borderWidth;
-    size = Cell.size;
-
-    /**
-     * Creates a new cell.
-     *
-     * @param {Number} x
-     * @param {Number} y
-     * @returns {RenderedCell}
-     */
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-
+class RenderedCell extends Cell {
     /**
      * Fetches information about a specific pixel of the rendered cell.
      *
@@ -100,8 +85,7 @@ class RenderedCell {
     pixelData(pixel) {
         const pixelDataSize = 4;
         const index =
-            (pixel.x + pixel.y * (this.size + this.borderWidth)) *
-            pixelDataSize;
+            (pixel.x + pixel.y * this.constructor.step) * pixelDataSize;
         return this.imgData.slice(index, index + pixelDataSize);
     }
 
@@ -113,7 +97,9 @@ class RenderedCell {
      */
     hasBorderPixel(pixel) {
         return [pixel.x, pixel.y].some(
-            (e) => e === 0 || e === this.size + this.borderWidth / 2
+            (e) =>
+                e === 0 ||
+                e === this.constructor.size + this.constructor.borderWidth / 2
         );
     }
 
@@ -124,13 +110,13 @@ class RenderedCell {
      * @returns {Boolean}
      */
     isAlive() {
-        const size = this.size + this.borderWidth;
-        return Array.from({ length: size }, (_, x) =>
-            Array.from({ length: size }, (_, y) => {
+        const { step, borderColor, aliveColor } = this.constructor;
+        return Array.from({ length: step }, (_, x) =>
+            Array.from({ length: step }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
-                    ? pixel.color === Cell.borderColor
-                    : pixel.color === Cell.aliveColor;
+                    ? pixel.color === borderColor
+                    : pixel.color === aliveColor;
             })
         ).every((row) => row.every(Boolean));
     }
@@ -142,13 +128,13 @@ class RenderedCell {
      * @returns {Boolean}
      */
     isDead() {
-        const size = this.size + this.borderWidth;
-        return Array.from({ length: size }, (_, x) =>
-            Array.from({ length: size }, (_, y) => {
+        const { step, borderColor, deadColor } = this.constructor;
+        return Array.from({ length: step }, (_, x) =>
+            Array.from({ length: step }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
-                    ? pixel.color === Cell.borderColor
-                    : pixel.color === Cell.deadColor;
+                    ? pixel.color === borderColor
+                    : pixel.color === deadColor;
             })
         ).every((row) => row.every(Boolean));
     }
@@ -252,14 +238,8 @@ export class Canvas {
      * @returns {Number[]}
      */
     cellPosition(cell) {
-        const posX =
-            this.width / 2 -
-            (cell.size + cell.borderWidth) / 2 +
-            cell.x * (cell.size + cell.borderWidth);
-        const posY =
-            this.height / 2 -
-            (cell.size + cell.borderWidth) / 2 -
-            cell.y * (cell.size + cell.borderWidth);
+        const posX = this.width / 2 - Cell.step / 2 + cell.x * Cell.step;
+        const posY = this.height / 2 - Cell.step / 2 - cell.y * Cell.step;
 
         return [posX, posY];
     }
@@ -274,14 +254,12 @@ export class Canvas {
      * @returns {Number[]}
      */
     async cellImgData(cell) {
-        return await this.locator.evaluate((element, cell) => {
-            const ctx = element.getContext('2d');
-            return ctx.getImageData(
-                cell.posX,
-                cell.posY,
-                cell.size + cell.borderWidth,
-                cell.size + cell.borderWidth
-            ).data;
-        }, cell);
+        return await this.locator.evaluate(
+            (element, { posX, posY, step }) => {
+                const ctx = element.getContext('2d');
+                return ctx.getImageData(posX, posY, step, step).data;
+            },
+            { posX: cell.posX, posY: cell.posY, step: Cell.step }
+        );
     }
 }

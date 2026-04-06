@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
 import { next } from '../../life/rules.js';
+
 suite('Basic rules', () => {
     test('A cell with no neighbours dies', () => {
         const cell = '0,0';
