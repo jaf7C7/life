@@ -17,7 +17,7 @@ function rgbToHex(r, g, b) {
  *
  * @property {Number} x - The X co-ordinate relative to the cell's top left
  *   corner.
- * @property {Number} y - The X co-ordinate relative to the cell's top left
+ * @property {Number} y - The Y co-ordinate relative to the cell's top left
  *   corner.
  * @property {Number[]} data - An array containing the pixel's RGBA color
  *   information.
@@ -49,24 +49,22 @@ class Pixel {
 }
 
 /**
- * Represents a cell on the canvas.
+ * Represents a cell on the canvas, with methods for asserting on its rendered
+ * pixel data.
  *
  * @param {Number} x - The X co-ordinate of the cell relative to the centre of
  *   the canvas.
  * @param {Number} y - The Y co-ordinate of the cell relative to the centre of
  *   the canvas.
- * @param {Number} borderWidth - The thickness in canvas pixels of the lines
- *   separating each cell.
- * @param {Number} size - The size in canvas pixels of the cell body.
  */
 class RenderedCell extends Cell {
     /**
      * Fetches information about a specific pixel of the rendered cell.
      *
-     * @param x - The X co-ordinate of the pixel relative to the cell's top left
-     *   corner.
-     * @param y - The Y co-ordinate of the pixel relative to the cell's top left
-     *   corner.
+     * @param {Number} x - The X co-ordinate of the pixel relative to the cell's
+     *   top left corner.
+     * @param {Number} y - The Y co-ordinate of the pixel relative to the cell's
+     *   top left corner.
      * @returns {Pixel}
      */
     pixel(x, y) {
@@ -104,8 +102,8 @@ class RenderedCell extends Cell {
     }
 
     /**
-     * Checks each pixel in the given cell and returns `true` if all pixels are
-     * the correct color, else `false.
+     * Returns true if the cell's border pixels are black and its body pixels
+     * are the alive color, else false.
      *
      * @returns {Boolean}
      */
@@ -232,7 +230,7 @@ export class Canvas {
      * have their origin at the top left corner of the canvas, and Y increases
      * in the downwards direction.
      *
-     * RenderedCell `0,0` is defined to be at the centre of the canvas.
+     * Cell `0,0` is defined to be at the centre of the canvas.
      *
      * @param {RenderedCell} cell
      * @returns {Number[]}
