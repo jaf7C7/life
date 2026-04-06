@@ -209,10 +209,9 @@ export class Canvas {
      * @param {Number} cellY - The Y co-ordinate of the cell.
      */
     async clickCell(cellX, cellY) {
-        const step = GameCell.size + GameCell.borderWidth;
         await this.click({
-            x: this.width / 2 + cellX * step,
-            y: this.height / 2 - cellY * step
+            x: this.width / 2 + cellX * GameCell.step,
+            y: this.height / 2 - cellY * GameCell.step
         });
     }
 

@@ -4,6 +4,7 @@ export class Cell {
     static aliveColor = '#ff0000';
     static deadColor = '#ffffff';
     static borderColor = '#000000';
+    static step = this.size + this.borderWidth;
 
     constructor(x, y) {
         this.x = x;

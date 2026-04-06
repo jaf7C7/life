@@ -20,10 +20,12 @@ suite('User Interface', () => {
 
         initApp(ui, cells);
         const canvas = ui.findElement('canvas');
-        const step = Cell.size + Cell.borderWidth;
         canvas.drag({
             from: { x: canvas.width / 2, y: canvas.height / 2 },
-            to: { x: canvas.width / 2 + step, y: canvas.height / 2 + step }
+            to: {
+                x: canvas.width / 2 + Cell.step,
+                y: canvas.height / 2 + Cell.step
+            }
         });
         canvas.click({ x: canvas.width / 2, y: canvas.height / 2 });
 

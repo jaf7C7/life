@@ -26,10 +26,9 @@ export class UI {
                 this._handlers['mouseup']?.();
             },
             clickCell(cellX, cellY) {
-                const step = Cell.size + Cell.borderWidth;
                 this.click({
-                    x: this.width / 2 + cellX * step,
-                    y: this.height / 2 - cellY * step
+                    x: this.width / 2 + cellX * Cell.step,
+                    y: this.height / 2 - cellY * Cell.step
                 });
             },
             getContext() {
