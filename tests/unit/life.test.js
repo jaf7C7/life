@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
-import { initApp, cellSize, cellBorderWidth } from '../../life/app.js';
+import { initApp } from '../../life/app.js';
+import { Cell } from '../../life/cell.js';
 import { UI } from './helpers.js';
 
 suite('User Interface', () => {
@@ -19,7 +20,7 @@ suite('User Interface', () => {
 
         initApp(ui, cells);
         const canvas = ui.findElement('canvas');
-        const step = cellSize + cellBorderWidth;
+        const step = Cell.size + Cell.borderWidth;
         canvas.drag({
             from: { x: canvas.width / 2, y: canvas.height / 2 },
             to: { x: canvas.width / 2 + step, y: canvas.height / 2 + step }

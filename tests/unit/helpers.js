@@ -1,4 +1,4 @@
-import { cellSize, cellBorderWidth } from '../../life/app.js';
+import { Cell } from '../../life/cell.js';
 
 export class UI {
     constructor() {
@@ -26,7 +26,7 @@ export class UI {
                 this._handlers['mouseup']?.();
             },
             clickCell(cellX, cellY) {
-                const step = cellSize + cellBorderWidth;
+                const step = Cell.size + Cell.borderWidth;
                 this.click({
                     x: this.width / 2 + cellX * step,
                     y: this.height / 2 - cellY * step

@@ -1,10 +1,4 @@
-import {
-    cellSize,
-    cellBorderWidth,
-    cellAliveColor,
-    cellDeadColor,
-    cellBorderColor
-} from '../../life/app.js';
+import { Cell as GameCell } from '../../life/cell.js';
 
 /**
  * Converts RGB channel values to a CSS hex color string.
@@ -66,8 +60,8 @@ class Pixel {
  * @param {Number} size - The size in canvas pixels of the cell body.
  */
 class Cell {
-    borderWidth = cellBorderWidth;
-    size = cellSize;
+    borderWidth = GameCell.borderWidth;
+    size = GameCell.size;
 
     /**
      * Creates a new cell.
@@ -135,8 +129,8 @@ class Cell {
             Array.from({ length: size }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
-                    ? pixel.color === cellBorderColor
-                    : pixel.color === cellAliveColor;
+                    ? pixel.color === GameCell.borderColor
+                    : pixel.color === GameCell.aliveColor;
             })
         ).every((row) => row.every(Boolean));
     }
@@ -153,8 +147,8 @@ class Cell {
             Array.from({ length: size }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
-                    ? pixel.color === cellBorderColor
-                    : pixel.color === cellDeadColor;
+                    ? pixel.color === GameCell.borderColor
+                    : pixel.color === GameCell.deadColor;
             })
         ).every((row) => row.every(Boolean));
     }
@@ -215,7 +209,7 @@ export class Canvas {
      * @param {Number} cellY - The Y co-ordinate of the cell.
      */
     async clickCell(cellX, cellY) {
-        const step = cellSize + cellBorderWidth;
+        const step = GameCell.size + GameCell.borderWidth;
         await this.click({
             x: this.width / 2 + cellX * step,
             y: this.height / 2 - cellY * step

@@ -1,11 +1,6 @@
 import { Cell } from './cell.js';
 
-export const cellSize = 20;
-export const cellBorderWidth = 2;
-export const cellAliveColor = '#ff0000';
-export const cellDeadColor = '#ffffff';
-export const cellBorderColor = '#000000';
-const step = cellSize + cellBorderWidth;
+const step = Cell.size + Cell.borderWidth;
 
 function renderDeadCells(ctx, x0, y0, canvas) {
     const minX = Math.floor(-x0 / step);
@@ -13,27 +8,27 @@ function renderDeadCells(ctx, x0, y0, canvas) {
     const minY = Math.floor(-(canvas.height - y0) / step);
     const maxY = Math.ceil(y0 / step);
 
-    ctx.fillStyle = cellDeadColor;
+    ctx.fillStyle = Cell.deadColor;
     for (let x = minX; x <= maxX; x++) {
         for (let y = minY; y <= maxY; y++) {
             ctx.fillRect(
-                x0 + x * step + cellBorderWidth / 2,
-                y0 - y * step + cellBorderWidth / 2,
-                cellSize,
-                cellSize
+                x0 + x * step + Cell.borderWidth / 2,
+                y0 - y * step + Cell.borderWidth / 2,
+                Cell.size,
+                Cell.size
             );
         }
     }
 }
 
 function renderLiveCells(ctx, x0, y0, cells) {
-    ctx.fillStyle = cellAliveColor;
+    ctx.fillStyle = Cell.aliveColor;
     for (const cell of [...cells].map(Cell.fromString)) {
         ctx.fillRect(
-            x0 + cell.x * step + cellBorderWidth / 2,
-            y0 - cell.y * step + cellBorderWidth / 2,
-            cellSize,
-            cellSize
+            x0 + cell.x * step + Cell.borderWidth / 2,
+            y0 - cell.y * step + Cell.borderWidth / 2,
+            Cell.size,
+            Cell.size
         );
     }
 }
@@ -43,7 +38,7 @@ function render(canvas, cells) {
     const x0 = canvas.width / 2 - step / 2;
     const y0 = canvas.height / 2 - step / 2;
 
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = Cell.borderColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     renderDeadCells(ctx, x0, y0, canvas);

@@ -1,4 +1,10 @@
 export class Cell {
+    static size = 20;
+    static borderWidth = 2;
+    static aliveColor = '#ff0000';
+    static deadColor = '#ffffff';
+    static borderColor = '#000000';
+
     constructor(x, y) {
         this.x = x;
         this.y = y;
