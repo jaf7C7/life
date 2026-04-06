@@ -73,7 +73,7 @@ export function initApp(ui, cells) {
             (event.offsetY - (canvas.height / 2 - Cell.step / 2) - panY) /
                 Cell.step
         );
-        const cell = `${cellX},${cellY}`;
+        const cell = new Cell(cellX, cellY).toString();
         if (cells.has(cell)) {
             cells.delete(cell);
         } else {
