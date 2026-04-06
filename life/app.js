@@ -13,11 +13,10 @@ function render(canvas, cells) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.fillStyle = '#fff';
-    for (const cell of cells) {
-        const { x: cellX, y: cellY } = Cell.fromString(cell);
+    for (const cell of [...cells].map(Cell.fromString)) {
         ctx.fillRect(
-            x0 + cellX * step + cellBorderWidth / 2,
-            y0 - cellY * step + cellBorderWidth / 2,
+            x0 + cell.x * step + cellBorderWidth / 2,
+            y0 - cell.y * step + cellBorderWidth / 2,
             cellSize,
             cellSize
         );
