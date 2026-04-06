@@ -4,14 +4,7 @@ export const cellSize = 20;
 export const cellBorderWidth = 2;
 const step = cellSize + cellBorderWidth;
 
-function render(canvas, cells) {
-    const ctx = canvas.getContext('2d');
-    const x0 = canvas.width / 2 - step / 2;
-    const y0 = canvas.height / 2 - step / 2;
-
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+function renderDeadCells(ctx, x0, y0, canvas) {
     const minX = Math.floor(-x0 / step);
     const maxX = Math.floor((canvas.width - x0) / step);
     const minY = Math.floor(-(canvas.height - y0) / step);
@@ -28,7 +21,9 @@ function render(canvas, cells) {
             );
         }
     }
+}
 
+function renderLiveCells(ctx, x0, y0, cells) {
     ctx.fillStyle = '#f00';
     for (const cell of [...cells].map(Cell.fromString)) {
         ctx.fillRect(
@@ -38,6 +33,18 @@ function render(canvas, cells) {
             cellSize
         );
     }
+}
+
+function render(canvas, cells) {
+    const ctx = canvas.getContext('2d');
+    const x0 = canvas.width / 2 - step / 2;
+    const y0 = canvas.height / 2 - step / 2;
+
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    renderDeadCells(ctx, x0, y0, canvas);
+    renderLiveCells(ctx, x0, y0, cells);
 }
 
 export function initApp(ui, cells) {
