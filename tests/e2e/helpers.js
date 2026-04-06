@@ -1,4 +1,22 @@
-import { cellSize, cellBorderWidth } from '../../life/app.js';
+import {
+    cellSize,
+    cellBorderWidth,
+    cellAliveColor,
+    cellDeadColor,
+    cellBorderColor
+} from '../../life/app.js';
+
+/**
+ * Converts RGB channel values to a CSS hex color string.
+ *
+ * @param {Number} r - Red channel (0-255).
+ * @param {Number} g - Green channel (0-255).
+ * @param {Number} b - Blue channel (0-255).
+ * @returns {String}
+ */
+function rgbToHex(r, g, b) {
+    return '#' + [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('');
+}
 
 /**
  * Represents a pixel with position and color information.
@@ -26,30 +44,13 @@ class Pixel {
     }
 
     /**
-     * Returns true if the given pixel color data represents opaque black, else
-     * false.
+     * Returns the pixel's color as a CSS hex color string.
      *
-     * @returns {Boolean}
+     * @returns {String}
      */
-    isBlack() {
-        const [r, g, b, a] = this.data;
-        return [r, g, b].every((e) => e === 0) && a === 255;
-    }
-
-    /**
-     * Returns true if the given pixel color data represents opaque white, else
-     * false.
-     *
-     * @returns {Boolean}
-     */
-    isWhite() {
-        const [r, g, b, a] = this.data;
-        return [r, g, b].every((e) => e === 255) && a === 255;
-    }
-
-    isRed() {
-        const [r, g, b, a] = this.data;
-        return r === 255 && g === 0 && b === 0 && a === 255;
+    get color() {
+        const [r, g, b] = this.data;
+        return rgbToHex(r, g, b);
     }
 }
 
@@ -134,20 +135,26 @@ class Cell {
             Array.from({ length: size }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
-                    ? pixel.isBlack()
-                    : pixel.isRed();
+                    ? pixel.color === cellBorderColor
+                    : pixel.color === cellAliveColor;
             })
         ).every((row) => row.every(Boolean));
     }
 
+    /**
+     * Returns true if all pixels in the cell match the dead cell color, else
+     * false.
+     *
+     * @returns {Boolean}
+     */
     isDead() {
         const size = this.size + this.borderWidth;
         return Array.from({ length: size }, (_, x) =>
             Array.from({ length: size }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
-                    ? pixel.isBlack()
-                    : pixel.isWhite();
+                    ? pixel.color === cellBorderColor
+                    : pixel.color === cellDeadColor;
             })
         ).every((row) => row.every(Boolean));
     }
@@ -190,6 +197,32 @@ export class Canvas {
     }
 
     /**
+     * Clicks the canvas at the given position.
+     *
+     * @param {Number} x - The X co-ordinate relative to the canvas top-left
+     *   corner.
+     * @param {Number} y - The Y co-ordinate relative to the canvas top-left
+     *   corner.
+     */
+    async click({ x, y }) {
+        await this.locator.click({ position: { x, y } });
+    }
+
+    /**
+     * Clicks the centre of the cell at the given cell co-ordinates.
+     *
+     * @param {Number} cellX - The X co-ordinate of the cell.
+     * @param {Number} cellY - The Y co-ordinate of the cell.
+     */
+    async clickCell(cellX, cellY) {
+        const step = cellSize + cellBorderWidth;
+        await this.click({
+            x: this.width / 2 + cellX * step,
+            y: this.height / 2 - cellY * step
+        });
+    }
+
+    /**
      * Returns a new Cell object containing position and image data about a
      * particular cell on the rendered canvas.
      *
@@ -199,18 +232,6 @@ export class Canvas {
      *   of the canvas.
      * @returns {Cell}
      */
-    async click({ x, y }) {
-        await this.locator.click({ position: { x, y } });
-    }
-
-    async clickCell(cellX, cellY) {
-        const step = cellSize + cellBorderWidth;
-        await this.click({
-            x: this.width / 2 + cellX * step,
-            y: this.height / 2 - cellY * step
-        });
-    }
-
     async cell(x, y) {
         const cell = new Cell(x, y);
 

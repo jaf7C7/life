@@ -2,6 +2,9 @@ import { Cell } from './cell.js';
 
 export const cellSize = 20;
 export const cellBorderWidth = 2;
+export const cellAliveColor = '#ff0000';
+export const cellDeadColor = '#ffffff';
+export const cellBorderColor = '#000000';
 const step = cellSize + cellBorderWidth;
 
 function renderDeadCells(ctx, x0, y0, canvas) {
@@ -10,7 +13,7 @@ function renderDeadCells(ctx, x0, y0, canvas) {
     const minY = Math.floor(-(canvas.height - y0) / step);
     const maxY = Math.ceil(y0 / step);
 
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = cellDeadColor;
     for (let x = minX; x <= maxX; x++) {
         for (let y = minY; y <= maxY; y++) {
             ctx.fillRect(
@@ -24,7 +27,7 @@ function renderDeadCells(ctx, x0, y0, canvas) {
 }
 
 function renderLiveCells(ctx, x0, y0, cells) {
-    ctx.fillStyle = '#f00';
+    ctx.fillStyle = cellAliveColor;
     for (const cell of [...cells].map(Cell.fromString)) {
         ctx.fillRect(
             x0 + cell.x * step + cellBorderWidth / 2,
