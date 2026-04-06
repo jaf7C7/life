@@ -193,8 +193,8 @@ export class Canvas {
      */
     async clickCell(cellX, cellY) {
         await this.click({
-            x: this.width / 2 + cellX * Cell.step,
-            y: this.height / 2 - cellY * Cell.step
+            x: this.width / 2 + cellX * RenderedCell.step,
+            y: this.height / 2 - cellY * RenderedCell.step
         });
     }
 
@@ -235,8 +235,12 @@ export class Canvas {
      * @returns {Number[]}
      */
     cellPosition(cell) {
-        const posX = this.width / 2 - Cell.step / 2 + cell.x * Cell.step;
-        const posY = this.height / 2 - Cell.step / 2 - cell.y * Cell.step;
+        const posX =
+            this.width / 2 - RenderedCell.step / 2 + cell.x * RenderedCell.step;
+        const posY =
+            this.height / 2 -
+            RenderedCell.step / 2 -
+            cell.y * RenderedCell.step;
 
         return [posX, posY];
     }
@@ -256,7 +260,7 @@ export class Canvas {
                 const ctx = element.getContext('2d');
                 return ctx.getImageData(posX, posY, step, step).data;
             },
-            { posX: cell.posX, posY: cell.posY, step: Cell.step }
+            { posX: cell.posX, posY: cell.posY, step: RenderedCell.step }
         );
     }
 }
