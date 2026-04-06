@@ -1,4 +1,4 @@
-import { Cell as GameCell } from '../../life/cell.js';
+import { Cell } from '../../life/cell.js';
 
 /**
  * Converts RGB channel values to a CSS hex color string.
@@ -59,16 +59,16 @@ class Pixel {
  *   separating each cell.
  * @param {Number} size - The size in canvas pixels of the cell body.
  */
-class Cell {
-    borderWidth = GameCell.borderWidth;
-    size = GameCell.size;
+class RenderedCell {
+    borderWidth = Cell.borderWidth;
+    size = Cell.size;
 
     /**
      * Creates a new cell.
      *
      * @param {Number} x
      * @param {Number} y
-     * @returns {Cell}
+     * @returns {RenderedCell}
      */
     constructor(x, y) {
         this.x = x;
@@ -129,8 +129,8 @@ class Cell {
             Array.from({ length: size }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
-                    ? pixel.color === GameCell.borderColor
-                    : pixel.color === GameCell.aliveColor;
+                    ? pixel.color === Cell.borderColor
+                    : pixel.color === Cell.aliveColor;
             })
         ).every((row) => row.every(Boolean));
     }
@@ -147,8 +147,8 @@ class Cell {
             Array.from({ length: size }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
-                    ? pixel.color === GameCell.borderColor
-                    : pixel.color === GameCell.deadColor;
+                    ? pixel.color === Cell.borderColor
+                    : pixel.color === Cell.deadColor;
             })
         ).every((row) => row.every(Boolean));
     }
@@ -210,23 +210,23 @@ export class Canvas {
      */
     async clickCell(cellX, cellY) {
         await this.click({
-            x: this.width / 2 + cellX * GameCell.step,
-            y: this.height / 2 - cellY * GameCell.step
+            x: this.width / 2 + cellX * Cell.step,
+            y: this.height / 2 - cellY * Cell.step
         });
     }
 
     /**
-     * Returns a new Cell object containing position and image data about a
-     * particular cell on the rendered canvas.
+     * Returns a new RenderedCell object containing position and image data
+     * about a particular cell on the rendered canvas.
      *
      * @param {Number} x - The X co-ordinate of the cell relative to the centre
      *   of the canvas.
      * @param {Number} y - The Y co-ordinate of the cell relative to the centre
      *   of the canvas.
-     * @returns {Cell}
+     * @returns {RenderedCell}
      */
     async cell(x, y) {
-        const cell = new Cell(x, y);
+        const cell = new RenderedCell(x, y);
 
         const [posX, posY] = this.cellPosition(cell);
         cell.posX = posX;
@@ -246,9 +246,9 @@ export class Canvas {
      * have their origin at the top left corner of the canvas, and Y increases
      * in the downwards direction.
      *
-     * Cell `0,0` is defined to be at the centre of the canvas.
+     * RenderedCell `0,0` is defined to be at the centre of the canvas.
      *
-     * @param {Cell} cell
+     * @param {RenderedCell} cell
      * @returns {Number[]}
      */
     cellPosition(cell) {
@@ -270,7 +270,7 @@ export class Canvas {
      * sequences of 4 elements, each containing the RGBA color information for a
      * single pixel.
      *
-     * @param {Cell} cell
+     * @param {RenderedCell} cell
      * @returns {Number[]}
      */
     async cellImgData(cell) {
