@@ -81,9 +81,9 @@ class RenderedCell extends Cell {
      * @returns {Number[]}
      */
     pixelData(pixel) {
+        const { step } = this.constructor;
         const pixelDataSize = 4;
-        const index =
-            (pixel.x + pixel.y * this.constructor.step) * pixelDataSize;
+        const index = (pixel.x + pixel.y * step) * pixelDataSize;
         return this.imgData.slice(index, index + pixelDataSize);
     }
 
@@ -94,10 +94,9 @@ class RenderedCell extends Cell {
      * @returns {Boolean}
      */
     hasBorderPixel(pixel) {
+        const { size, borderWidth } = this.constructor;
         return [pixel.x, pixel.y].some(
-            (e) =>
-                e === 0 ||
-                e === this.constructor.size + this.constructor.borderWidth / 2
+            (e) => e === 0 || e === size + borderWidth / 2
         );
     }
 
