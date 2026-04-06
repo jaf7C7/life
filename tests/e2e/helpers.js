@@ -46,6 +46,11 @@ class Pixel {
         const [r, g, b, a] = this.data;
         return [r, g, b].every((e) => e === 255) && a === 255;
     }
+
+    isRed() {
+        const [r, g, b, a] = this.data;
+        return r === 255 && g === 0 && b === 0 && a === 255;
+    }
 }
 
 /**
@@ -130,7 +135,7 @@ class Cell {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
                     ? pixel.isBlack()
-                    : pixel.isWhite();
+                    : pixel.isRed();
             })
         ).every((row) => row.every(Boolean));
     }
@@ -188,7 +193,10 @@ export class Canvas {
 
     async clickCell(cellX, cellY) {
         const step = cellSize + cellBorderWidth;
-        await this.click({ x: this.width / 2 + cellX * step, y: this.height / 2 - cellY * step });
+        await this.click({
+            x: this.width / 2 + cellX * step,
+            y: this.height / 2 - cellY * step
+        });
     }
 
     async cell(x, y) {

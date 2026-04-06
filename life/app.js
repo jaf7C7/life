@@ -12,7 +12,7 @@ function render(canvas, cells) {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#f00';
     for (const cell of [...cells].map(Cell.fromString)) {
         ctx.fillRect(
             x0 + cell.x * step + cellBorderWidth / 2,
