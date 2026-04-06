@@ -21,16 +21,6 @@ function neighbours(cell) {
 }
 
 /**
- * Turns a cell string into a cell array.
- *
- * @param {String} cell
- * @returns {Number[]}
- */
-export function arrayFromString(cell) {
-    return cell.split(',').map((e) => Number(e));
-}
-
-/**
  * Returns the set of cells which each occur exactly three times in the counter
  * object.
  *

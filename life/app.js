@@ -1,4 +1,4 @@
-import { arrayFromString } from './rules.js';
+import { Cell } from './cell.js';
 
 export const cellSize = 20;
 export const cellBorderWidth = 2;
@@ -14,7 +14,7 @@ function render(canvas, cells) {
 
     ctx.fillStyle = '#fff';
     for (const cell of cells) {
-        const [cellX, cellY] = arrayFromString(cell);
+        const { x: cellX, y: cellY } = Cell.fromString(cell);
         ctx.fillRect(
             x0 + cellX * step + cellBorderWidth / 2,
             y0 - cellY * step + cellBorderWidth / 2,
