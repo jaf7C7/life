@@ -12,6 +12,23 @@ function render(canvas, cells) {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    const minX = Math.floor(-x0 / step);
+    const maxX = Math.floor((canvas.width - x0) / step);
+    const minY = Math.floor(-(canvas.height - y0) / step);
+    const maxY = Math.ceil(y0 / step);
+
+    ctx.fillStyle = '#fff';
+    for (let x = minX; x <= maxX; x++) {
+        for (let y = minY; y <= maxY; y++) {
+            ctx.fillRect(
+                x0 + x * step + cellBorderWidth / 2,
+                y0 - y * step + cellBorderWidth / 2,
+                cellSize,
+                cellSize
+            );
+        }
+    }
+
     ctx.fillStyle = '#f00';
     for (const cell of [...cells].map(Cell.fromString)) {
         ctx.fillRect(

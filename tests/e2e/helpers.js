@@ -128,7 +128,7 @@ class Cell {
      *
      * @returns {Boolean}
      */
-    isRendered() {
+    isAlive() {
         const size = this.size + this.borderWidth;
         return Array.from({ length: size }, (_, x) =>
             Array.from({ length: size }, (_, y) => {
@@ -136,6 +136,18 @@ class Cell {
                 return this.hasBorderPixel(pixel)
                     ? pixel.isBlack()
                     : pixel.isRed();
+            })
+        ).every((row) => row.every(Boolean));
+    }
+
+    isDead() {
+        const size = this.size + this.borderWidth;
+        return Array.from({ length: size }, (_, x) =>
+            Array.from({ length: size }, (_, y) => {
+                const pixel = this.pixel(x, y);
+                return this.hasBorderPixel(pixel)
+                    ? pixel.isBlack()
+                    : pixel.isWhite();
             })
         ).every((row) => row.every(Boolean));
     }

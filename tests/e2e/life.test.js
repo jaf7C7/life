@@ -7,14 +7,11 @@ test('A canvas element is created', async ({ page }) => {
     await expect(page.getByTestId('canvas')).toBeVisible();
 });
 
-test('Clicking on cell `1,1` renders cell `1,1`', async ({ page }) => {
+test('Cell `1,1` is rendered in the initial grid', async ({ page }) => {
     await page.goto('/');
     const canvas = await Canvas.fromPage(page);
 
-    await canvas.clickCell(1, 1);
-
-    const cell = await canvas.cell(1, 1);
-    expect(cell.isRendered()).toBe(true);
+    expect((await canvas.cell(1, 1)).isDead()).toBe(true);
 });
 
 test('Clicking on the center of the canvas renders cell `0,0`', async ({
@@ -29,7 +26,7 @@ test('Clicking on the center of the canvas renders cell `0,0`', async ({
     });
 
     const cell = await canvas.cell(0, 0);
-    expect(cell.isRendered()).toBe(true);
+    expect(cell.isAlive()).toBe(true);
 });
 
 test('Clicking on a cell twice leaves it dead', async ({ page }) => {
@@ -39,5 +36,5 @@ test('Clicking on a cell twice leaves it dead', async ({ page }) => {
     await canvas.clickCell(1, 1);
     await canvas.clickCell(1, 1);
 
-    expect((await canvas.cell(1, 1)).isRendered()).toBe(false);
+    expect((await canvas.cell(1, 1)).isAlive()).toBe(false);
 });
