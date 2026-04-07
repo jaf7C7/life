@@ -1,5 +1,13 @@
 import { Cell } from './cell.js';
 
+function cellToScreenX(x0, x) {
+    return x0 + x * Cell.step + Cell.borderWidth / 2;
+}
+
+function cellToScreenY(y0, y) {
+    return y0 - y * Cell.step + Cell.borderWidth / 2;
+}
+
 function renderDeadCells(ctx, x0, y0, canvas) {
     const minX = Math.floor(-x0 / Cell.step);
     const maxX = Math.floor((canvas.width - x0) / Cell.step);
@@ -10,8 +18,8 @@ function renderDeadCells(ctx, x0, y0, canvas) {
     for (let x = minX; x <= maxX; x++) {
         for (let y = minY; y <= maxY; y++) {
             ctx.fillRect(
-                x0 + x * Cell.step + Cell.borderWidth / 2,
-                y0 - y * Cell.step + Cell.borderWidth / 2,
+                cellToScreenX(x0, x),
+                cellToScreenY(y0, y),
                 Cell.size,
                 Cell.size
             );
@@ -23,8 +31,8 @@ function renderLiveCells(ctx, x0, y0, cells) {
     ctx.fillStyle = Cell.aliveColor;
     for (const cell of [...cells].map(Cell.fromString)) {
         ctx.fillRect(
-            x0 + cell.x * Cell.step + Cell.borderWidth / 2,
-            y0 - cell.y * Cell.step + Cell.borderWidth / 2,
+            cellToScreenX(x0, cell.x),
+            cellToScreenY(y0, cell.y),
             Cell.size,
             Cell.size
         );
