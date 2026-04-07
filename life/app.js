@@ -8,7 +8,7 @@ function cellToScreenY(y0, y) {
     return y0 - y * Cell.step + Cell.borderWidth / 2;
 }
 
-function renderCell(ctx, cell, x0, y0, alive) {
+function renderCell(ctx, x0, y0, cell, alive) {
     ctx.fillStyle = alive ? Cell.aliveColor : Cell.deadColor;
     ctx.fillRect(
         cellToScreenX(x0, cell.x),
@@ -18,7 +18,7 @@ function renderCell(ctx, cell, x0, y0, alive) {
     );
 }
 
-function renderDeadCells(ctx, x0, y0, canvas) {
+function renderDeadCells(canvas, ctx, x0, y0) {
     const minX = Math.floor(-x0 / Cell.step);
     const maxX = Math.floor((canvas.width - x0) / Cell.step);
     const minY = Math.floor(-(canvas.height - y0) / Cell.step);
@@ -27,14 +27,14 @@ function renderDeadCells(ctx, x0, y0, canvas) {
     for (let x = minX; x <= maxX; x++) {
         for (let y = minY; y <= maxY; y++) {
             const cell = new Cell(x, y);
-            renderCell(ctx, cell, x0, y0, false);
+            renderCell(ctx, x0, y0, cell, false);
         }
     }
 }
 
 function renderLiveCells(ctx, x0, y0, cells) {
     for (const cell of [...cells].map(Cell.fromString)) {
-        renderCell(ctx, cell, x0, y0, true);
+        renderCell(ctx, x0, y0, cell, true);
     }
 }
 
@@ -46,7 +46,7 @@ function render(canvas, cells) {
     ctx.fillStyle = Cell.borderColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    renderDeadCells(ctx, x0, y0, canvas);
+    renderDeadCells(canvas, ctx, x0, y0);
     renderLiveCells(ctx, x0, y0, cells);
 }
 
