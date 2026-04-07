@@ -18,9 +18,8 @@
 
 - [ ] **UI**
   - [x] Clicking a cell on the canvas toggles it live/dead.
-  - [ ] **Change the color of a living cell to red, a rendered/dead cell is still colored white.**
-  - [ ] The grid is initially filled with rendered cells.
-  - [ ] Click-and-drag to pan around the grid.
+  - [ ] **Click-and-drag to pan around the grid.**
+    - [ ] **Refactoring**
   - [ ] Pinch/mousewheel to zoom in/out.
   - [ ] Play/stop buttons
   - [ ] Presets for interesting patterns.
