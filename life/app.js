@@ -8,8 +8,8 @@ function cellToScreenY(originY, y) {
     return originY - y * Cell.step + Cell.borderWidth / 2;
 }
 
-function renderCell(ctx, { originX, originY }, cell, alive) {
-    ctx.fillStyle = alive ? Cell.aliveColor : Cell.deadColor;
+function renderCell(ctx, { originX, originY }, cell, color) {
+    ctx.fillStyle = color;
     ctx.fillRect(
         cellToScreenX(originX, cell.x),
         cellToScreenY(originY, cell.y),
@@ -35,13 +35,13 @@ function render(canvas, cells) {
         for (let y = minY; y <= maxY; y++) {
             const cell = new Cell(x, y);
             const origin = { originX, originY };
-            renderCell(ctx, origin, cell, false);
+            renderCell(ctx, origin, cell, Cell.deadColor);
         }
     }
 
     for (const cell of [...cells].map(Cell.fromString)) {
         const origin = { originX, originY };
-        renderCell(ctx, origin, cell, true);
+        renderCell(ctx, origin, cell, Cell.aliveColor);
     }
 }
 
