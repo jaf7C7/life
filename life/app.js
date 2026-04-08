@@ -18,7 +18,14 @@ function renderCell(ctx, { originX, originY }, cell, alive) {
     );
 }
 
-function renderDeadCells(canvas, ctx, { originX, originY }) {
+function render(canvas, cells) {
+    const ctx = canvas.getContext('2d');
+    const originX = canvas.width / 2 - Cell.step / 2;
+    const originY = canvas.height / 2 - Cell.step / 2;
+
+    ctx.fillStyle = Cell.borderColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     const minX = Math.floor(-originX / Cell.step);
     const maxX = Math.floor((canvas.width - originX) / Cell.step);
     const minY = Math.floor(-(canvas.height - originY) / Cell.step);
@@ -31,17 +38,7 @@ function renderDeadCells(canvas, ctx, { originX, originY }) {
             renderCell(ctx, origin, cell, false);
         }
     }
-}
 
-function render(canvas, cells) {
-    const ctx = canvas.getContext('2d');
-    const originX = canvas.width / 2 - Cell.step / 2;
-    const originY = canvas.height / 2 - Cell.step / 2;
-
-    ctx.fillStyle = Cell.borderColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    renderDeadCells(canvas, ctx, { originX, originY });
     for (const cell of [...cells].map(Cell.fromString)) {
         const origin = { originX, originY };
         renderCell(ctx, origin, cell, true);
