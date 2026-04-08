@@ -1,53 +1,55 @@
 import { Cell } from './cell.js';
 
-function cellToScreenX(x0, x) {
-    return x0 + x * Cell.step + Cell.borderWidth / 2;
+function cellToScreenX(originX, x) {
+    return originX + x * Cell.step + Cell.borderWidth / 2;
 }
 
-function cellToScreenY(y0, y) {
-    return y0 - y * Cell.step + Cell.borderWidth / 2;
+function cellToScreenY(originY, y) {
+    return originY - y * Cell.step + Cell.borderWidth / 2;
 }
 
-function renderCell(ctx, { x0, y0 }, cell, alive) {
+function renderCell(ctx, { originX, originY }, cell, alive) {
     ctx.fillStyle = alive ? Cell.aliveColor : Cell.deadColor;
     ctx.fillRect(
-        cellToScreenX(x0, cell.x),
-        cellToScreenY(y0, cell.y),
+        cellToScreenX(originX, cell.x),
+        cellToScreenY(originY, cell.y),
         Cell.size,
         Cell.size
     );
 }
 
-function renderDeadCells(canvas, ctx, { x0, y0 }) {
-    const minX = Math.floor(-x0 / Cell.step);
-    const maxX = Math.floor((canvas.width - x0) / Cell.step);
-    const minY = Math.floor(-(canvas.height - y0) / Cell.step);
-    const maxY = Math.ceil(y0 / Cell.step);
+function renderDeadCells(canvas, ctx, { originX, originY }) {
+    const minX = Math.floor(-originX / Cell.step);
+    const maxX = Math.floor((canvas.width - originX) / Cell.step);
+    const minY = Math.floor(-(canvas.height - originY) / Cell.step);
+    const maxY = Math.ceil(originY / Cell.step);
 
     for (let x = minX; x <= maxX; x++) {
         for (let y = minY; y <= maxY; y++) {
             const cell = new Cell(x, y);
-            renderCell(ctx, { x0, y0 }, cell, false);
+            const origin = { originX, originY };
+            renderCell(ctx, origin, cell, false);
         }
     }
 }
 
-function renderLiveCells(ctx, { x0, y0 }, cells) {
+function renderLiveCells(ctx, { originX, originY }, cells) {
     for (const cell of [...cells].map(Cell.fromString)) {
-        renderCell(ctx, { x0, y0 }, cell, true);
+        const origin = { originX, originY };
+        renderCell(ctx, origin, cell, true);
     }
 }
 
 function render(canvas, cells) {
     const ctx = canvas.getContext('2d');
-    const x0 = canvas.width / 2 - Cell.step / 2;
-    const y0 = canvas.height / 2 - Cell.step / 2;
+    const originX = canvas.width / 2 - Cell.step / 2;
+    const originY = canvas.height / 2 - Cell.step / 2;
 
     ctx.fillStyle = Cell.borderColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    renderDeadCells(canvas, ctx, { x0, y0 });
-    renderLiveCells(ctx, { x0, y0 }, cells);
+    renderDeadCells(canvas, ctx, { originX, originY });
+    renderLiveCells(ctx, { originX, originY }, cells);
 }
 
 export function initApp(ui, cells) {
