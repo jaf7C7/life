@@ -33,13 +33,6 @@ function renderDeadCells(canvas, ctx, { originX, originY }) {
     }
 }
 
-function renderLiveCells(ctx, { originX, originY }, cells) {
-    for (const cell of [...cells].map(Cell.fromString)) {
-        const origin = { originX, originY };
-        renderCell(ctx, origin, cell, true);
-    }
-}
-
 function render(canvas, cells) {
     const ctx = canvas.getContext('2d');
     const originX = canvas.width / 2 - Cell.step / 2;
@@ -49,7 +42,10 @@ function render(canvas, cells) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     renderDeadCells(canvas, ctx, { originX, originY });
-    renderLiveCells(ctx, { originX, originY }, cells);
+    for (const cell of [...cells].map(Cell.fromString)) {
+        const origin = { originX, originY };
+        renderCell(ctx, origin, cell, true);
+    }
 }
 
 export function initApp(ui, cells) {
