@@ -32,7 +32,7 @@ function render(canvas, cells, origin) {
     for (let x = minX; x <= maxX; x++) {
         for (let y = minY; y <= maxY; y++) {
             const cell = new Cell(x, y);
-            renderCell(ctx, origin, cell, Cell.deadColor, origin.x, origin.y);
+            renderCell(ctx, origin, cell, Cell.deadColor);
         }
     }
 
