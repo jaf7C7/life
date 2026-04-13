@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
 import { initApp } from '../../life/app.js';
-import { UI } from './helpers.js';
+import { MockUI } from './helpers.js';
 
 suite('User Interface', () => {
     test('A canvas element is created', () => {
         const cells = new Set();
-        const ui = new UI();
+        const ui = new MockUI();
 
         initApp(ui, cells);
 
@@ -15,7 +15,7 @@ suite('User Interface', () => {
 
     test('Clicking on the center of the canvas adds cell "0,0"', () => {
         const cells = new Set();
-        const ui = new UI();
+        const ui = new MockUI();
 
         initApp(ui, cells);
         const canvas = ui.findElement('canvas');
@@ -29,7 +29,7 @@ suite('User Interface', () => {
 
     test('Clicking on a cell twice leaves it dead', () => {
         const cells = new Set();
-        const ui = new UI();
+        const ui = new MockUI();
 
         initApp(ui, cells);
         const canvas = ui.findElement('canvas');
