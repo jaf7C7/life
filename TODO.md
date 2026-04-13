@@ -19,7 +19,8 @@
 - [ ] **UI**
   - [x] Clicking a cell on the canvas toggles it live/dead.
   - [ ] **Click-and-drag to pan around the grid.**
-    - [ ] **Refactoring**
+    - [ ] **Remove non-functioning code**
+    - [ ] Refactor to properly separate concerns and make code easily comprehensible
   - [ ] Pinch/mousewheel to zoom in/out.
   - [ ] Play/stop buttons
   - [ ] Presets for interesting patterns.
