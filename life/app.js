@@ -37,7 +37,7 @@ function render(canvas, cells, origin) {
     }
 
     for (const cell of [...cells].map(Cell.fromString)) {
-        renderCell(ctx, origin, cell, Cell.aliveColor, origin.x, origin.y);
+        renderCell(ctx, origin, cell, Cell.aliveColor);
     }
 }
 
