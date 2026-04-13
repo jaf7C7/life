@@ -16,6 +16,14 @@ function toggleCell(cell, cells) {
     }
 }
 
+function createClickHandler(ui, canvas, origin, cells) {
+    return ({ offsetX, offsetY }) => {
+        const cell = cellFromScreen(offsetX, offsetY, origin).toString();
+        toggleCell(cell, cells);
+        render(canvas, cells, origin);
+    };
+}
+
 export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
     const origin = {
@@ -23,11 +31,8 @@ export function initApp(ui, cells) {
         y: canvas.height / 2 - Cell.step / 2
     };
 
-    canvas.addEventListener('click', ({ offsetX, offsetY }) => {
-        const cell = cellFromScreen(offsetX, offsetY, origin).toString();
-        toggleCell(cell, cells);
-        render(canvas, cells, origin);
-    });
+    const handleClick = createClickHandler(ui, canvas, origin, cells);
+    canvas.addEventListener('click', handleClick);
 
     render(canvas, cells, origin);
 }
