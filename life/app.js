@@ -18,7 +18,7 @@ function renderCell(ctx, originX, originY, cell, color) {
     );
 }
 
-function render(canvas, cells, originX, originY) {
+function render(canvas, originX, originY, cells) {
     const ctx = canvas.getContext('2d');
 
     ctx.fillStyle = Cell.borderColor;
@@ -67,7 +67,7 @@ function createClickHandler(ui, canvas, originX, originY, cells) {
 
         toggleCell(cell, cells);
 
-        render(canvas, cells, originX, originY);
+        render(canvas, originX, originY, cells);
     };
 }
 
@@ -75,9 +75,9 @@ export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
     const originX = canvas.width / 2 - Cell.step / 2;
     const originY = canvas.height / 2 - Cell.step / 2;
-
     const handleClick = createClickHandler(ui, canvas, originX, originY, cells);
+
     canvas.addEventListener('click', handleClick);
 
-    render(canvas, cells, originX, originY);
+    render(canvas, originX, originY, cells);
 }
