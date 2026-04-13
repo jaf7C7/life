@@ -135,6 +135,49 @@ class RenderedCell extends Cell {
     }
 }
 
+class Canvas {
+    /**
+     * Creates a new Canvas.
+     *
+     * @param {Number} width
+     * @param {Number} height
+     * @param {Object} locator
+     */
+    constructor(width, height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    get origin() {
+        const posX = this.width / 2 - Cell.step / 2;
+        const posY = this.height / 2 - Cell.step / 2;
+        return [posX, posY];
+    }
+
+    /**
+     * Returns the location on the canvas of the top-left corner of the given
+     * cell, relative to the top-left corner of the canvas.
+     *
+     * The cell co-ords have their origin at the centre of the canvas, and Y
+     * increases in the upwards direction, whereas the canvas drawing co-ords
+     * have their origin at the top left corner of the canvas, and Y increases
+     * in the downwards direction.
+     *
+     * Cell `0,0` is defined to be at the centre of the canvas.
+     *
+     * @param {RenderedCell} cell
+     * @returns {Number[]}
+     */
+    cellPosition(cell) {
+        const [originX, originY] = this.origin;
+
+        const posX = originX + cell.x * Cell.step;
+        const posY = originY - cell.y * Cell.step;
+
+        return [posX, posY];
+    }
+}
+
 /**
  * Represents the canvas of cells where the game state is displayed.
  *
@@ -143,9 +186,14 @@ class RenderedCell extends Cell {
  * @param {Object} locator - The Playwright `Locator` object for the rendered
  *   canvas.
  */
-export class Canvas {
+export class RenderedCanvas extends Canvas {
+    constructor(width, height, locator) {
+        super(width, height);
+        this.locator = locator;
+    }
+
     /**
-     * Alternative constructor to create a Canvas from a rendered page.
+     * Alternative constructor to create a RenderedCanvas from a rendered page.
      *
      * @param {Object} page - A Playwright `Page` object.
      */
@@ -154,27 +202,6 @@ export class Canvas {
         const { width, height } = await locator.boundingBox();
 
         return new this(width, height, locator);
-    }
-
-    /**
-     * Creates a new Canvas.
-     *
-     * @param {Number} width
-     * @param {Number} height
-     * @param {Object} locator
-     */
-    constructor(width, height, locator) {
-        this.width = width;
-        this.height = height;
-        if (locator) {
-            this.locator = locator;
-        }
-    }
-
-    get origin() {
-        const posX = this.width / 2 - Cell.step / 2;
-        const posY = this.height / 2 - Cell.step / 2;
-        return [posX, posY];
     }
 
     /**
@@ -227,29 +254,6 @@ export class Canvas {
         cell.imgData = await this.cellImgData(cell);
 
         return cell;
-    }
-
-    /**
-     * Returns the location on the canvas of the top-left corner of the given
-     * cell, relative to the top-left corner of the canvas.
-     *
-     * The cell co-ords have their origin at the centre of the canvas, and Y
-     * increases in the upwards direction, whereas the canvas drawing co-ords
-     * have their origin at the top left corner of the canvas, and Y increases
-     * in the downwards direction.
-     *
-     * Cell `0,0` is defined to be at the centre of the canvas.
-     *
-     * @param {RenderedCell} cell
-     * @returns {Number[]}
-     */
-    cellPosition(cell) {
-        const [originX, originY] = this.origin;
-
-        const posX = originX + cell.x * Cell.step;
-        const posY = originY - cell.y * Cell.step;
-
-        return [posX, posY];
     }
 
     /**
