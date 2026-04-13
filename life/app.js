@@ -55,12 +55,8 @@ export function initApp(ui, cells) {
         y: canvas.height / 2 - Cell.step / 2
     };
 
-    canvas.addEventListener('click', (event) => {
-        const cell = cellFromScreen(
-            event.offsetX,
-            event.offsetY,
-            origin
-        ).toString();
+    canvas.addEventListener('click', ({ offsetX, offsetY }) => {
+        const cell = cellFromScreen(offsetX, offsetY, origin).toString();
 
         if (cells.has(cell)) {
             cells.delete(cell);
