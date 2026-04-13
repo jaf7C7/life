@@ -1,12 +1,12 @@
 import { Cell } from './cell.js';
 
+const cellStep = Cell.size + Cell.borderWidth;
+
 function cellToScreenX(originX, x) {
-    const cellStep = Cell.size + Cell.borderWidth;
     return originX + x * cellStep + Cell.borderWidth / 2;
 }
 
 function cellToScreenY(originY, y) {
-    const cellStep = Cell.size + Cell.borderWidth;
     return originY - y * cellStep + Cell.borderWidth / 2;
 }
 
@@ -26,7 +26,6 @@ function render(canvas, originX, originY, cells) {
     ctx.fillStyle = Cell.borderColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const cellStep = Cell.size + Cell.borderWidth;
     const minX = Math.floor(-originX / cellStep);
     const maxX = Math.floor((canvas.width - originX) / cellStep);
     const minY = Math.floor(-(canvas.height - originY) / cellStep);
@@ -45,7 +44,6 @@ function render(canvas, originX, originY, cells) {
 }
 
 function cellFromScreen(offsetX, offsetY, originX, originY) {
-    const cellStep = Cell.size + Cell.borderWidth;
     const cellX = Math.floor((offsetX - originX) / cellStep);
     const cellY = -Math.floor((offsetY - originY) / cellStep);
 
@@ -77,7 +75,6 @@ function createClickHandler(ui, canvas, originX, originY, cells) {
 
 export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
-    const cellStep = Cell.size + Cell.borderWidth;
     const originX = canvas.width / 2 - cellStep / 2;
     const originY = canvas.height / 2 - cellStep / 2;
     const handleClick = createClickHandler(ui, canvas, originX, originY, cells);
