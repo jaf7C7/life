@@ -148,10 +148,12 @@ class Canvas {
         this.height = height;
     }
 
-    get origin() {
-        const posX = this.width / 2 - Cell.step / 2;
-        const posY = this.height / 2 - Cell.step / 2;
-        return [posX, posY];
+    get originX() {
+        return this.width / 2 - Cell.step / 2;
+    }
+
+    get originY() {
+        return this.height / 2 - Cell.step / 2;
     }
 
     /**
@@ -169,10 +171,8 @@ class Canvas {
      * @returns {Number[]}
      */
     cellPosition(cell) {
-        const [originX, originY] = this.origin;
-
-        const posX = originX + cell.x * Cell.step;
-        const posY = originY - cell.y * Cell.step;
+        const posX = this.originX + cell.x * Cell.step;
+        const posY = this.originY - cell.y * Cell.step;
 
         return [posX, posY];
     }
@@ -223,15 +223,9 @@ export class RenderedCanvas extends Canvas {
      * @param {Number} cellY - The Y co-ordinate of the cell.
      */
     async clickCell(cellX, cellY) {
-        const [originX, originY] = this.origin;
-
-        const posX = originX + cellX * Cell.step;
-        const posY = originY - cellY * Cell.step;
-
-        await this.click({
-            x: posX,
-            y: posY
-        });
+        const cell = new Cell(cellX, cellY);
+        const [x, y] = this.cellPosition(cell);
+        await this.click({ x, y });
     }
 
     /**
