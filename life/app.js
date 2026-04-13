@@ -18,10 +18,8 @@ function renderCell(ctx, { originX, originY }, cell, color) {
     );
 }
 
-function render(canvas, cells) {
+function render(canvas, cells, { originX, originY }) {
     const ctx = canvas.getContext('2d');
-    const originX = canvas.width / 2 - Cell.step / 2;
-    const originY = canvas.height / 2 - Cell.step / 2;
     const origin = { originX, originY };
 
     ctx.fillStyle = Cell.borderColor;
@@ -35,12 +33,12 @@ function render(canvas, cells) {
     for (let x = minX; x <= maxX; x++) {
         for (let y = minY; y <= maxY; y++) {
             const cell = new Cell(x, y);
-            renderCell(ctx, origin, cell, Cell.deadColor);
+            renderCell(ctx, origin, cell, Cell.deadColor, originX, originY);
         }
     }
 
     for (const cell of [...cells].map(Cell.fromString)) {
-        renderCell(ctx, origin, cell, Cell.aliveColor);
+        renderCell(ctx, origin, cell, Cell.aliveColor, originX, originY);
     }
 }
 
@@ -68,16 +66,20 @@ export function initApp(ui, cells) {
     });
 
     canvas.addEventListener('click', (event) => {
-        const cellX = Math.floor((event.offsetX - originX - panX) / Cell.step);
-        const cellY = -Math.floor((event.offsetY - originY - panY) / Cell.step);
+        const cellX = Math.floor(
+            (event.offsetX - (originX + panX)) / Cell.step
+        );
+        const cellY = -Math.floor(
+            (event.offsetY - (originY + panY)) / Cell.step
+        );
         const cell = new Cell(cellX, cellY).toString();
         if (cells.has(cell)) {
             cells.delete(cell);
         } else {
             cells.add(cell);
         }
-        render(canvas, cells);
+        render(canvas, cells, { originX, originY });
     });
 
-    render(canvas, cells);
+    render(canvas, cells, { originX, originY });
 }
