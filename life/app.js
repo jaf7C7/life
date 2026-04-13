@@ -22,6 +22,7 @@ function render(canvas, cells) {
     const ctx = canvas.getContext('2d');
     const originX = canvas.width / 2 - Cell.step / 2;
     const originY = canvas.height / 2 - Cell.step / 2;
+    const origin = { originX, originY };
 
     ctx.fillStyle = Cell.borderColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -34,13 +35,11 @@ function render(canvas, cells) {
     for (let x = minX; x <= maxX; x++) {
         for (let y = minY; y <= maxY; y++) {
             const cell = new Cell(x, y);
-            const origin = { originX, originY };
             renderCell(ctx, origin, cell, Cell.deadColor);
         }
     }
 
     for (const cell of [...cells].map(Cell.fromString)) {
-        const origin = { originX, originY };
         renderCell(ctx, origin, cell, Cell.aliveColor);
     }
 }
