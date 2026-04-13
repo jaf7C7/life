@@ -1,5 +1,7 @@
 import { Cell } from '../../life/cell.js';
 
+const cellStep = Cell.size + Cell.borderWidth;
+
 /**
  * Converts RGB channel values to a CSS hex color string.
  *
@@ -81,9 +83,8 @@ class RenderedCell extends Cell {
      * @returns {Number[]}
      */
     pixelData(pixel) {
-        const { step } = this.constructor;
         const pixelDataSize = 4;
-        const index = (pixel.x + pixel.y * step) * pixelDataSize;
+        const index = (pixel.x + pixel.y * cellStep) * pixelDataSize;
         return this.imgData.slice(index, index + pixelDataSize);
     }
 
@@ -107,9 +108,9 @@ class RenderedCell extends Cell {
      * @returns {Boolean}
      */
     isAlive() {
-        const { step, borderColor, aliveColor } = this.constructor;
-        return Array.from({ length: step }, (_, x) =>
-            Array.from({ length: step }, (_, y) => {
+        const { borderColor, aliveColor } = this.constructor;
+        return Array.from({ length: cellStep }, (_, x) =>
+            Array.from({ length: cellStep }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
                     ? pixel.color === borderColor
@@ -125,9 +126,9 @@ class RenderedCell extends Cell {
      * @returns {Boolean}
      */
     isDead() {
-        const { step, borderColor, deadColor } = this.constructor;
-        return Array.from({ length: step }, (_, x) =>
-            Array.from({ length: step }, (_, y) => {
+        const { borderColor, deadColor } = this.constructor;
+        return Array.from({ length: cellStep }, (_, x) =>
+            Array.from({ length: cellStep }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
                     ? pixel.color === borderColor
@@ -193,8 +194,8 @@ export class Canvas {
      */
     async clickCell(cellX, cellY) {
         await this.click({
-            x: this.width / 2 + cellX * RenderedCell.step,
-            y: this.height / 2 - cellY * RenderedCell.step
+            x: this.width / 2 + cellX * cellStep,
+            y: this.height / 2 - cellY * cellStep
         });
     }
 
@@ -235,12 +236,8 @@ export class Canvas {
      * @returns {Number[]}
      */
     cellPosition(cell) {
-        const posX =
-            this.width / 2 - RenderedCell.step / 2 + cell.x * RenderedCell.step;
-        const posY =
-            this.height / 2 -
-            RenderedCell.step / 2 -
-            cell.y * RenderedCell.step;
+        const posX = this.width / 2 - cellStep / 2 + cell.x * cellStep;
+        const posY = this.height / 2 - cellStep / 2 - cell.y * cellStep;
 
         return [posX, posY];
     }
@@ -260,7 +257,7 @@ export class Canvas {
                 const ctx = element.getContext('2d');
                 return ctx.getImageData(posX, posY, step, step).data;
             },
-            { posX: cell.posX, posY: cell.posY, step: RenderedCell.step }
+            { posX: cell.posX, posY: cell.posY, step: cellStep }
         );
     }
 }
