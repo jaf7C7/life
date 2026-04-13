@@ -236,8 +236,10 @@ export class Canvas {
      * @returns {Number[]}
      */
     cellPosition(cell) {
-        const posX = this.width / 2 - cellStep / 2 + cell.x * cellStep;
-        const posY = this.height / 2 - cellStep / 2 - cell.y * cellStep;
+        const originX = this.width / 2 - cellStep / 2;
+        const originY = this.height / 2 - cellStep / 2;
+        const posX = originX + cell.x * cellStep;
+        const posY = originY - cell.y * cellStep;
 
         return [posX, posY];
     }

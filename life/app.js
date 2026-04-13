@@ -2,22 +2,17 @@ import { Cell } from './cell.js';
 
 const cellStep = Cell.size + Cell.borderWidth;
 
-function cellToScreenX(originX, x) {
-    return originX + x * cellStep + Cell.borderWidth / 2;
-}
+function cellToScreen(originX, originY, x, y) {
+    const posX = originX + x * cellStep + Cell.borderWidth / 2;
+    const posY = originY - y * cellStep + Cell.borderWidth / 2;
 
-function cellToScreenY(originY, y) {
-    return originY - y * cellStep + Cell.borderWidth / 2;
+    return [posX, posY];
 }
 
 function renderCell(ctx, originX, originY, cell, color) {
     ctx.fillStyle = color;
-    ctx.fillRect(
-        cellToScreenX(originX, cell.x),
-        cellToScreenY(originY, cell.y),
-        Cell.size,
-        Cell.size
-    );
+    const [posX, posY] = cellToScreen(originX, originY, cell.x, cell.y);
+    ctx.fillRect(posX, posY, Cell.size, Cell.size);
 }
 
 function render(canvas, originX, originY, cells) {
