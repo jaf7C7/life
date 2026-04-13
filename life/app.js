@@ -46,6 +46,8 @@ function render(canvas, cells) {
 
 export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
+    const originX = canvas.width / 2 - Cell.step / 2;
+    const originY = canvas.height / 2 - Cell.step / 2;
 
     let panX = 0,
         panY = 0;
@@ -66,14 +68,8 @@ export function initApp(ui, cells) {
     });
 
     canvas.addEventListener('click', (event) => {
-        const cellX = Math.floor(
-            (event.offsetX - (canvas.width / 2 - Cell.step / 2) - panX) /
-                Cell.step
-        );
-        const cellY = -Math.floor(
-            (event.offsetY - (canvas.height / 2 - Cell.step / 2) - panY) /
-                Cell.step
-        );
+        const cellX = Math.floor((event.offsetX - originX - panX) / Cell.step);
+        const cellY = -Math.floor((event.offsetY - originY - panY) / Cell.step);
         const cell = new Cell(cellX, cellY).toString();
         if (cells.has(cell)) {
             cells.delete(cell);
