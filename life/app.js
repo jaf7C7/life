@@ -41,6 +41,13 @@ function render(canvas, cells, origin) {
     }
 }
 
+function cellFromScreen(offsetX, offsetY, origin) {
+    const cellX = Math.floor((offsetX - origin.x) / Cell.step);
+    const cellY = -Math.floor((offsetY - origin.y) / Cell.step);
+
+    return new Cell(cellX, cellY);
+}
+
 export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
     const origin = {
@@ -49,14 +56,18 @@ export function initApp(ui, cells) {
     };
 
     canvas.addEventListener('click', (event) => {
-        const cellX = Math.floor((event.offsetX - origin.x) / Cell.step);
-        const cellY = -Math.floor((event.offsetY - origin.y) / Cell.step);
-        const cell = new Cell(cellX, cellY).toString();
+        const cell = cellFromScreen(
+            event.offsetX,
+            event.offsetY,
+            origin
+        ).toString();
+
         if (cells.has(cell)) {
             cells.delete(cell);
         } else {
             cells.add(cell);
         }
+
         render(canvas, cells, origin);
     });
 
