@@ -21,8 +21,8 @@ function neighbours(cell) {
 }
 
 /**
- * Returns the set of cells which each occur exactly three times in the counter
- * object.
+ * Returns the set of cells which will become alive, due to them each having 3
+ * live neighbours.
  *
  * @param {Object} counter
  * @returns {Set<String>}
