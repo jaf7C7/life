@@ -186,27 +186,6 @@ export class Canvas {
     }
 
     /**
-     * Drags the canvas from one position to another.
-     *
-     * @param {Object} from - The start position.
-     * @param {Number} from.x - The X co-ordinate relative to the canvas
-     *   top-left corner.
-     * @param {Number} from.y - The Y co-ordinate relative to the canvas
-     *   top-left corner.
-     * @param {Object} to - The end position.
-     * @param {Number} to.x - The X co-ordinate relative to the canvas top-left
-     *   corner.
-     * @param {Number} to.y - The Y co-ordinate relative to the canvas top-left
-     *   corner.
-     */
-    async drag({ from, to }) {
-        await this.locator.dragTo(this.locator, {
-            sourcePosition: from,
-            targetPosition: to
-        });
-    }
-
-    /**
      * Clicks the centre of the cell at the given cell co-ordinates.
      *
      * @param {Number} cellX - The X co-ordinate of the cell.

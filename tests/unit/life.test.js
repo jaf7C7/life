@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
 import { initApp } from '../../life/app.js';
-import { Cell } from '../../life/cell.js';
 import { UI } from './helpers.js';
 
 suite('User Interface', () => {
@@ -12,36 +11,6 @@ suite('User Interface', () => {
         initApp(ui, cells);
 
         expect(ui.findElement('canvas')).to.not.be.undefined;
-    });
-
-    test('Dragging down and right by 1 cell then clicking the center toggles cell "-1,1"', () => {
-        const cells = new Set();
-        const ui = new UI();
-
-        initApp(ui, cells);
-        const canvas = ui.findElement('canvas');
-        canvas.drag({
-            from: { x: canvas.width / 2, y: canvas.height / 2 },
-            to: {
-                x: canvas.width / 2 + Cell.step,
-                y: canvas.height / 2 + Cell.step
-            }
-        });
-        canvas.click({ x: canvas.width / 2, y: canvas.height / 2 });
-
-        expect(cells).to.deep.equal(new Set(['-1,1']));
-    });
-
-    test('Clicking on a cell twice leaves it dead', () => {
-        const cells = new Set();
-        const ui = new UI();
-
-        initApp(ui, cells);
-        const canvas = ui.findElement('canvas');
-        canvas.clickCell(1, 1);
-        canvas.clickCell(1, 1);
-
-        expect(cells).to.deep.equal(new Set());
     });
 
     test('Clicking on the center of the canvas adds cell "0,0"', () => {
@@ -56,5 +25,17 @@ suite('User Interface', () => {
         });
 
         expect(cells).to.deep.equal(new Set(['0,0']));
+    });
+
+    test('Clicking on a cell twice leaves it dead', () => {
+        const cells = new Set();
+        const ui = new UI();
+
+        initApp(ui, cells);
+        const canvas = ui.findElement('canvas');
+        canvas.clickCell(1, 1);
+        canvas.clickCell(1, 1);
+
+        expect(cells).to.deep.equal(new Set());
     });
 });

@@ -51,8 +51,8 @@ suite('Basic rules', () => {
     });
 });
 
-suite('Blinker oscillator', () => {
-    test('Has a period of two', () => {
+suite('Well-known patterns', () => {
+    test('Blinker oscillator', () => {
         // The blinker the simplest oscillator in 'Life'. It oscillates between
         // a 3-cell column and a 3-cell row, with a period of 2.
         // See: https://conways-game-of-life.fandom.com/wiki/Blinker

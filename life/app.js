@@ -48,31 +48,9 @@ export function initApp(ui, cells) {
         y: canvas.height / 2 - Cell.step / 2
     };
 
-    let panX = 0,
-        panY = 0;
-    let dragStart = null;
-
-    canvas.addEventListener('mousedown', (e) => {
-        dragStart = { x: e.offsetX, y: e.offsetY };
-    });
-    canvas.addEventListener('mousemove', (e) => {
-        if (dragStart) {
-            panX += e.offsetX - dragStart.x;
-            panY += e.offsetY - dragStart.y;
-            dragStart = { x: e.offsetX, y: e.offsetY };
-        }
-    });
-    canvas.addEventListener('mouseup', () => {
-        dragStart = null;
-    });
-
     canvas.addEventListener('click', (event) => {
-        const cellX = Math.floor(
-            (event.offsetX - (origin.x + panX)) / Cell.step
-        );
-        const cellY = -Math.floor(
-            (event.offsetY - (origin.y + panY)) / Cell.step
-        );
+        const cellX = Math.floor((event.offsetX - origin.x) / Cell.step);
+        const cellY = -Math.floor((event.offsetY - origin.y) / Cell.step);
         const cell = new Cell(cellX, cellY).toString();
         if (cells.has(cell)) {
             cells.delete(cell);

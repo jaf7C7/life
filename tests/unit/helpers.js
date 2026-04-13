@@ -17,14 +17,6 @@ export class UI {
             click({ x, y }) {
                 this._handlers['click']?.({ offsetX: x, offsetY: y });
             },
-            drag({ from, to }) {
-                this._handlers['mousedown']?.({
-                    offsetX: from.x,
-                    offsetY: from.y
-                });
-                this._handlers['mousemove']?.({ offsetX: to.x, offsetY: to.y });
-                this._handlers['mouseup']?.();
-            },
             clickCell(cellX, cellY) {
                 this.click({
                     x: this.width / 2 + cellX * Cell.step,
