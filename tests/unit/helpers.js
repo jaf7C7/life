@@ -1,7 +1,5 @@
 import { Cell } from '../../life/cell.js';
 
-const cellStep = Cell.size + Cell.borderWidth;
-
 export class UI {
     constructor() {
         this.elements = [];
@@ -21,8 +19,8 @@ export class UI {
             },
             clickCell(cellX, cellY) {
                 this.click({
-                    x: this.width / 2 + cellX * cellStep,
-                    y: this.height / 2 - cellY * cellStep
+                    x: this.width / 2 + cellX * Cell.step,
+                    y: this.height / 2 - cellY * Cell.step
                 });
             },
             getContext() {

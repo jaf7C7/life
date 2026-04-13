@@ -1,7 +1,5 @@
 import { Cell } from '../../life/cell.js';
 
-const cellStep = Cell.size + Cell.borderWidth;
-
 /**
  * Converts RGB channel values to a CSS hex color string.
  *
@@ -84,7 +82,7 @@ class RenderedCell extends Cell {
      */
     pixelData(pixel) {
         const pixelDataSize = 4;
-        const index = (pixel.x + pixel.y * cellStep) * pixelDataSize;
+        const index = (pixel.x + pixel.y * Cell.step) * pixelDataSize;
         return this.imgData.slice(index, index + pixelDataSize);
     }
 
@@ -95,9 +93,10 @@ class RenderedCell extends Cell {
      * @returns {Boolean}
      */
     hasBorderPixel(pixel) {
-        const { size, borderWidth } = this.constructor;
         return [pixel.x, pixel.y].some(
-            (e) => e === 0 || e === size + borderWidth / 2
+            (e) =>
+                e === 0 ||
+                e === RenderedCell.size + RenderedCell.borderWidth / 2
         );
     }
 
@@ -108,13 +107,12 @@ class RenderedCell extends Cell {
      * @returns {Boolean}
      */
     isAlive() {
-        const { borderColor, aliveColor } = this.constructor;
-        return Array.from({ length: cellStep }, (_, x) =>
-            Array.from({ length: cellStep }, (_, y) => {
+        return Array.from({ length: Cell.step }, (_, x) =>
+            Array.from({ length: Cell.step }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
-                    ? pixel.color === borderColor
-                    : pixel.color === aliveColor;
+                    ? pixel.color === RenderedCell.borderColor
+                    : pixel.color === RenderedCell.aliveColor;
             })
         ).every((row) => row.every(Boolean));
     }
@@ -126,13 +124,12 @@ class RenderedCell extends Cell {
      * @returns {Boolean}
      */
     isDead() {
-        const { borderColor, deadColor } = this.constructor;
-        return Array.from({ length: cellStep }, (_, x) =>
-            Array.from({ length: cellStep }, (_, y) => {
+        return Array.from({ length: Cell.step }, (_, x) =>
+            Array.from({ length: Cell.step }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
-                    ? pixel.color === borderColor
-                    : pixel.color === deadColor;
+                    ? pixel.color === RenderedCell.borderColor
+                    : pixel.color === RenderedCell.deadColor;
             })
         ).every((row) => row.every(Boolean));
     }
@@ -174,6 +171,12 @@ export class Canvas {
         }
     }
 
+    get origin() {
+        const posX = this.width / 2 - Cell.step / 2;
+        const posY = this.height / 2 - Cell.step / 2;
+        return [posX, posY];
+    }
+
     /**
      * Clicks the canvas at the given position.
      *
@@ -193,9 +196,14 @@ export class Canvas {
      * @param {Number} cellY - The Y co-ordinate of the cell.
      */
     async clickCell(cellX, cellY) {
+        const [originX, originY] = this.origin;
+
+        const posX = originX + cellX * Cell.step;
+        const posY = originY - cellY * Cell.step;
+
         await this.click({
-            x: this.width / 2 + cellX * cellStep,
-            y: this.height / 2 - cellY * cellStep
+            x: posX,
+            y: posY
         });
     }
 
@@ -236,10 +244,10 @@ export class Canvas {
      * @returns {Number[]}
      */
     cellPosition(cell) {
-        const originX = this.width / 2 - cellStep / 2;
-        const originY = this.height / 2 - cellStep / 2;
-        const posX = originX + cell.x * cellStep;
-        const posY = originY - cell.y * cellStep;
+        const [originX, originY] = this.origin;
+
+        const posX = originX + cell.x * Cell.step;
+        const posY = originY - cell.y * Cell.step;
 
         return [posX, posY];
     }
@@ -259,7 +267,7 @@ export class Canvas {
                 const ctx = element.getContext('2d');
                 return ctx.getImageData(posX, posY, step, step).data;
             },
-            { posX: cell.posX, posY: cell.posY, step: cellStep }
+            { posX: cell.posX, posY: cell.posY, step: Cell.step }
         );
     }
 }
