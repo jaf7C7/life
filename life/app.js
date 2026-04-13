@@ -8,6 +8,14 @@ function cellFromScreen(offsetX, offsetY, origin) {
     return new Cell(cellX, cellY);
 }
 
+function toggleCell(cell, cells) {
+    if (cells.has(cell)) {
+        cells.delete(cell);
+    } else {
+        cells.add(cell);
+    }
+}
+
 export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
     const origin = {
@@ -17,15 +25,6 @@ export function initApp(ui, cells) {
 
     canvas.addEventListener('click', ({ offsetX, offsetY }) => {
         const cell = cellFromScreen(offsetX, offsetY, origin).toString();
-
-        function toggleCell(cell, cells) {
-            if (cells.has(cell)) {
-                cells.delete(cell);
-            } else {
-                cells.add(cell);
-            }
-        }
-
         toggleCell(cell, cells);
         render(canvas, cells, origin);
     });
