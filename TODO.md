@@ -30,6 +30,8 @@
       - [ ] Smell 7: Post-construction mutation in `RenderedCanvas.cell()` (`tests/e2e/helpers.js:241`)
       - [ ] Smell 8: `isAlive()` and `isDead()` duplicate their structure (`tests/e2e/helpers.js:109–135`)
       - [ ] Smell 9: Duplicate setup in unit tests (`tests/unit/life.test.js`)
+    - [ ] Implement a real `UI` class
+    - [ ] Extract a `CanvasWrapper` or `GameGrid` class from `MockUI` which can become part of the model code, and keep `MockUI` as simple as possible.
   - [ ] Pinch/mousewheel to zoom in/out.
   - [ ] Play/stop buttons
   - [ ] Presets for interesting patterns.
