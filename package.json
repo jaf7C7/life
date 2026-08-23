@@ -11,8 +11,8 @@
     "test:unit": "f () { eslint && mocha \"${@:-tests/unit}\"; }; f",
     "test:e2e": "eslint && playwright test",
     "watch": "f () { nodemon --no-colors --quiet --watch life/ --watch tests/ --ext '' --exec \"${@:-npm run --silent test --}\"; }; f",
-    "start": "browser-sync start --server life/ --port 3000 --no-open",
-    "start:dev": "browser-sync start --server life/ --watch life/ --port 8080"
+    "start": "vite life --port 3000",
+    "start:dev": "vite life --port 8080"
   },
   "repository": {
     "type": "git",
@@ -29,7 +29,6 @@
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.58.2",
     "@types/node": "^25.5.0",
-    "browser-sync": "^3.0.4",
     "chai": "^6.2.2",
     "eslint": "^10.0.3",
     "globals": "^17.4.0",
@@ -37,6 +36,7 @@
     "nodemon": "^3.1.14",
     "playwright": "^1.58.2",
     "prettier": "^3.8.1",
-    "prettier-plugin-jsdoc": "^1.8.0"
+    "prettier-plugin-jsdoc": "^1.8.0",
+    "vite": "^8.2.2"
   }
 }
