@@ -224,8 +224,12 @@ export class RenderedCanvas extends Canvas {
      */
     async clickCell(cellX, cellY) {
         const cell = new Cell(cellX, cellY);
-        const [x, y] = this.cellPosition(cell);
-        await this.click({ x, y });
+        const [cornerX, cornerY] = this.cellPosition(cell);
+        const [centreX, centreY] = [
+            cornerX + DisplayCell.step / 2,
+            cornerY + DisplayCell.step / 2
+        ];
+        await this.click({ x: centreX, y: centreY });
     }
 
     /**
