@@ -1,351 +1,423 @@
-**The prompts**:
+# Refactoring Notes 2
 
-> /growing-oos
-
-_[...]_
-
-> identify any code smells in this repository, look in particular at _all_ files under life/ and tests/
-> directories.
-
-_[...]_
-
-> /refactoring
-
-_[...]_
-
-> restate the discovered smells, and for each smell: 1. explain in detail _why_
-> each smell is a bad thing, referencing the SOLID principles, the work of
-> Freeman & Pryce, as well as the work of Fowler, assuming little to no prior
-> knowledge of the principles they discuss, 2. describe the refactoring which
-> can be used to fix the smell. finally suggest an order in which to tackle
-> each smell, so as to reduce the total amount of work needed to fix them all.
-> formulate your answer as a markdown document and write it to the file
-> ./refactoring_notes.md
-
----
-
-# Refactoring Notes
-
-This document catalogues the code smells identified in this codebase, explains why each is
-harmful, and describes the refactoring needed to fix it. A suggested order for tackling them
-is given at the end.
+This document is a follow-up to `refactoring_notes.md`. Two of the smells identified there
+("`Cell` mixes domain identity with display constants" and "`rules.js` imports a display
+class") have since been fixed (see commit `f0e4802`). This document re-examines the codebase
+in its current state — `life/app.js`, `life/cell.js`, `life/rules.js`, and everything under
+`tests/` — using the `growing-oos` and `refactoring` skills, and finds one **new defect** that
+the earlier fix introduced, plus several smells that were flagged before but not yet fixed,
+described here in more depth.
 
 ---
 
 ## Background: the principles referenced
 
-Three bodies of work are referenced throughout:
-
 - **Fowler** — Martin Fowler, _Refactoring: Improving the Design of Existing Code_ (2nd ed.,
-  2018). Catalogues "code smells" (patterns that signal design problems) and named
-  refactorings (mechanical steps that fix them without changing behaviour).
+  2018). A catalogue of "code smells" — surface symptoms of a design problem — and named,
+  mechanical "refactorings" that remove them without changing behaviour.
 
 - **Freeman & Pryce** — Steve Freeman & Nat Pryce, _Growing Object-Oriented Software, Guided
-  by Tests_ (2012). Argues that tests are a design tool: if code is hard to test, the design
-  has a problem. Listening to that difficulty leads to better object boundaries.
+  by Tests_ (2012, "GOOS"). Its central claim: tests are a design tool. When a test is hard to
+  write, awkward to read, or requires a wall of setup, that difficulty is _feedback_ about the
+  production design, not just a testing inconvenience.
 
-- **SOLID** — five object-oriented design principles (Robert Martin). Briefly:
-  - **S** — _Single Responsibility_: a class should have only one reason to change.
-  - **O** — _Open/Closed_: open for extension, closed for modification.
-  - **L** — _Liskov Substitution_: a subclass must be safely usable wherever its parent is.
-  - **I** — _Interface Segregation_: don't force a class to depend on things it doesn't use.
-  - **D** — _Dependency Inversion_: high-level logic should depend on abstractions, not on
-    low-level concrete details.
-
----
-
-## Smell 1: `Cell` mixes domain identity with display constants (`life/cell.js`)
-
-### What the smell is
-
-`Cell` holds `x` and `y` coordinates — its _identity_ — alongside `size`, `borderWidth`,
-`aliveColor`, `deadColor`, `borderColor`, and `step` — its _rendering appearance_. These are
-two entirely different concerns living in the same class.
-
-### Why it is a problem
-
-**Fowler — Divergent Change.** A class has a Divergent Change smell when it would need to be
-edited for more than one independent reason. If the designer changes the colour scheme, `Cell`
-must change. If the coordinate representation changes, `Cell` must also change. These are
-unrelated reasons; they should not share a home.
-
-**SOLID — Single Responsibility (S).** The Single Responsibility Principle says a class
-should have one reason to change. "Reason to change" is not about how many methods a class
-has, but about _who_ drives changes to it. The rendering team drives colour and pixel-size
-decisions; the domain logic drives coordinate decisions. Two drivers, one class — a violation.
-
-**Freeman & Pryce — Context Independence.** An object should not know about the system it
-lives in. A `Cell` in Conway's Game of Life is a pure coordinate: it has no inherent colour
-or pixel size. By embedding display constants on `Cell`, we are making the domain object aware
-of the rendering context, breaking its independence. This matters practically: you cannot use
-`Cell` (or anything that imports it) in a non-rendering context without dragging all the
-display constants along as passengers.
-
-This smell is also the root cause of **Smells 2 and 6** below.
-
-### The refactoring
-
-**Extract Class** (Fowler, Ch. 7). Create a new, separate object — for example a
-`CellDisplay` configuration object — that holds the five display constants (`size`,
-`borderWidth`, `aliveColor`, `deadColor`, `borderColor`, `step`). The `Cell` class retains
-only `x`, `y`, `toString()`, and `fromString()`. Update all import sites to reference
-`CellDisplay` for rendering concerns and `Cell` for coordinate concerns.
+- **SOLID** — five principles of object-oriented design (Robert C. Martin):
+  - **S**ingle Responsibility — a class/module should have only one reason to change.
+  - **O**pen/Closed — open for extension, closed for modification.
+  - **L**iskov Substitution — a subtype must be usable wherever its supertype is expected,
+    without surprising the caller.
+  - **I**nterface Segregation — clients shouldn't be forced to depend on methods they don't use.
+  - **D**ependency Inversion — depend on abstractions, not concrete details.
 
 ---
 
-## Smell 2: `rules.js` imports `Cell` — a display class (`life/rules.js`)
+## The smells
 
-### What the smell is
+### Smell 1 (new, urgent): `MockUI.clickCell` references a constant that no longer exists — a live, masked bug
 
-`rules.js` imports `Cell` and uses it for two coordinate operations: constructing cells with
-`new Cell(x, y)` and parsing strings with `Cell.fromString`. It has no interest whatsoever in
-colours or pixel sizes — yet it must import the whole `Cell` class, including all those display
-constants.
+**Where:** `tests/unit/helpers.js:25-26`
 
-### Why it is a problem
+```js
+clickCell(cellX, cellY) {
+    this.click({
+        x: this.width / 2 + cellX * Cell.step,
+        y: this.height / 2 - cellY * Cell.step
+    });
+}
+```
 
-**SOLID — Dependency Inversion (D).** The Dependency Inversion Principle says high-level
-modules (domain logic, like the game rules) should not depend on low-level modules (rendering
-infrastructure). The rules of Conway's Game of Life are conceptually independent of how cells
-are drawn on screen. That independence should be visible in the code. Currently it is not:
-`rules.js` can only be understood or reused alongside rendering concerns.
+`Cell` no longer has a `.step` property — it was moved to `DisplayCell.step` when Smell 1 from
+the previous notes was fixed. `Cell.step` is therefore `undefined`, so `cellX * Cell.step` is
+`NaN` for any non-zero `cellX`, and every call to `clickCell` computes `{ x: NaN, y: NaN }`.
 
-**SOLID — Interface Segregation (I).** A module should not be forced to depend on things it
-does not use. `rules.js` does not use `Cell.aliveColor` or `Cell.size`, yet it is coupled to
-them. If those constants change, `rules.js` is technically affected — even though it does not
-care about them.
+**Why you haven't noticed:** the only test that exercises this path is:
 
-**Fowler — Feature Envy.** Feature Envy is the smell of a function (or module) that uses
-another object's data more than its own. Here the reverse is a kind of forced dependency
-envy: `rules.js` is being made to carry a dependency on rendering data it has no use for.
+```js
+test('Clicking on a cell twice leaves it dead', () => {
+    ...
+    canvas.clickCell(1, 1);
+    canvas.clickCell(1, 1);
+    expect(cells).to.deep.equal(new Set());
+});
+```
 
-### The refactoring
+Both calls compute the _same_ `NaN` coordinates, so `cellFromScreen` produces the same
+(nonsensical) cell both times, and toggling it twice still leaves it out of the set. The test
+passes — not because the behaviour is correct, but because the bug is symmetric. This is
+exactly the trap Freeman & Pryce warn about: a test that only asserts the _final_ state, after
+an even number of state flips, can pass "vacuously" (their term, used for asynchronous tests
+that check a status the system was already in — the same failure mode applies here). The test
+gives you no diagnostic information and would not catch a real regression in the click-to-cell
+mapping.
 
-This smell is resolved as a natural consequence of fixing Smell 1. Once `Cell` is split and
-the display constants move to `CellDisplay`, `rules.js` can import only the pure coordinate
-class. No changes to the logic of `rules.js` are needed — only the import changes.
+**Why it's bad (beyond "it's a bug"):** this is what happens when a **Divergent Change**
+refactor (Smell 1 in the previous notes) is applied to production code but the ripple isn't
+followed into every consumer. `Cell.step` was public API that a test helper depended on;
+removing it silently should have been caught by a _compile-time_ signal, but JavaScript has no
+such thing for property access — `undefined * n` is `NaN`, not a `TypeError`. This is also a
+symptom of **Duplicated Code** (see Smell 2): if there were a single, shared conversion
+function between cell and screen coordinates, there would be nowhere else for a stale constant
+reference to hide.
+
+**The fix:** covered by the refactoring for Smell 2 below — once cell↔screen conversion is
+extracted into one shared module that both `app.js` and the test helpers import, this constant
+reference is replaced by a call to that module, and the stale reference disappears as a
+byproduct. In addition, replace the test's "click twice, assert empty" pattern with something
+that also verifies the middling state (click once, assert the cell is present; click again,
+assert it's gone) — this converts a vacuous round-trip check into two real assertions,
+per GOOS's "**precise assertions**" guidance ("specify precisely what should happen and no
+more" cuts both ways: it also means don't specify _less_ than what should happen).
 
 ---
 
-## Smell 3: Coordinate math duplicated across three files
+### Smell 2: coordinate math duplicated across three files
 
-### What the smell is
-
-The formula for converting between cell coordinates and screen pixel positions appears
-independently in three places:
+**Where:**
 
 - `life/app.js` — `cellToScreen` and `cellFromScreen`
-- `tests/unit/helpers.js` — `clickCell`'s `x: this.width / 2 + cellX * Cell.step, ...`
-- `tests/e2e/helpers.js` — `Canvas.cellPosition`, `Canvas.originX`, `Canvas.originY`
+- `tests/unit/helpers.js` — `MockUI.clickCell` (the buggy line above)
+- `tests/e2e/helpers.js` — `Canvas.originX`, `Canvas.originY`, `Canvas.cellPosition`, and
+  `RenderedCell.hasBorderPixel` (which independently re-derives cell/border geometry)
 
-### Why it is a problem
+All four places encode the same fact: "a cell's screen position is the viewport origin plus/minus
+`cell.coord * DisplayCell.step`, with Y inverted." They were written independently and have
+already drifted (Smell 1 is proof of that).
 
-**Fowler — Duplicated Code.** Duplicated Code is one of the most fundamental smells. If the
-coordinate formula ever needs to change (for instance, when adding the pan offset that
-`CLAUDE.md` mentions as a planned feature), every copy must be found and updated consistently.
-Miss one and the tests will silently use a different formula from the production code, which
-undermines the entire purpose of having tests.
+**Why it's bad:**
 
-**Freeman & Pryce — test helpers that re-derive production logic.** This is the most
-dangerous form of duplication. If the production formula contains a bug, a test helper that
-independently implements the same formula may contain the same bug — and so the test will
-pass even though the production code is wrong. Test helpers should exercise production code,
-not shadow it.
+- **Fowler — Duplicated Code**: "the most important of the smells," because every future
+  change to the coordinate formula (e.g. adding a zoom factor, per the `TODO.md` roadmap) must
+  be made correctly in all three-plus places, or the system and its tests silently disagree
+  about what a "cell" is on screen.
+- **SOLID — Single Responsibility**: three unrelated modules (the app's render loop, a
+  synchronous unit-test double, and an async Playwright helper) have each taken on the
+  responsibility of "know the coordinate system," which should belong to one thing.
+- **GOOS — "the difficulty is telling you something"**: needing to reimplement the same
+  geometry to build a _test double_ is a classic signal that the geometry itself is not yet a
+  proper collaborator/abstraction in the production code — it's implicit knowledge scattered
+  through functions instead of an explicit object.
 
-**SOLID — Single Responsibility (S) / Don't Repeat Yourself.** Knowledge of the coordinate
-system has one owner — it should be expressed once, in one place, from which all consumers
-(production code and test helpers alike) derive it.
+**The refactoring:** **Extract Class**, then **Move Function**, to create a single
+`Viewport` (or `CoordinateSystem`) class living in `life/` (e.g. `life/viewport.js`), owning
+`originX`/`originY` and exposing `toScreen(cell)` and `fromScreen(x, y)`. Steps:
 
-### The refactoring
+1. Create the class with a constructor taking `(originX, originY)`.
+2. Move `cellToScreen`'s body into `toScreen`, `cellFromScreen`'s body into `fromScreen`
+   (Move Function — Fowler notes to move the whole body first, then adjust for the new
+   context).
+3. Update `app.js` to construct one `Viewport` and call its methods instead of the free
+   functions.
+4. Update `tests/e2e/helpers.js`'s `Canvas` to _use_ `Viewport` (composition) rather than
+   reimplementing `cellPosition`/`originX`/`originY` — this is also **Remove Middle Man** in
+   reverse: `Canvas` currently _is_ a hand-rolled viewport; make it delegate to the real one.
+5. Update `tests/unit/helpers.js`'s `clickCell` to use the same `Viewport.toScreen`, which
+   removes the dangling `Cell.step` reference (Smell 1) entirely.
+6. Run the full test suite after each step (Fowler's cardinal rule: small steps, tests green
+   throughout).
 
-**Extract Function** (Fowler, Ch. 6), then **Move Function** (Fowler, Ch. 8). Extract the
-coordinate conversion into a named function (or small module) that lives alongside `app.js`.
-Both the production click-handler and the test helpers then import and call the same function,
-rather than each maintaining their own copy of the formula.
-
----
-
-## Smell 4: `createClickHandler` has an unused parameter (`life/app.js:54`)
-
-### What the smell is
-
-`createClickHandler(ui, canvas, originX, originY, cells)` receives `ui` as its first
-argument but never references it inside the function body.
-
-### Why it is a problem
-
-**Fowler — Speculative Generality.** Speculative Generality is the smell of code that exists
-"just in case" — hooks, parameters, or abstractions added for a hypothetical future need that
-has not yet arrived. Dead parameters force every reader to ask: "Is this doing something
-subtle I'm missing? Why is it here?" That cognitive overhead is paid by every future reader
-for zero benefit.
-
-**SOLID — Interface Segregation (I).** Every caller of `createClickHandler` must pass a `ui`
-argument despite the function not using it. Callers are being burdened with a dependency they
-cannot affect.
-
-### The refactoring
-
-**Change Function Declaration** (Fowler, Ch. 6) — specifically, _remove the parameter_.
-Delete `ui` from the parameter list of `createClickHandler` and update the single call site
-in `initApp`. This is a small, safe, mechanical change.
+This single refactor is worth doing early: it has the highest fan-out of any smell here, and
+several other smells below (the data clump, the `hasBorderPixel` magic formula) shrink to
+almost nothing once it's done.
 
 ---
 
-## Smell 5: `originX` / `originY` are a Data Clump (`life/app.js`)
+### Smell 3: `originX`/`originY` are a Data Clump threaded through every function signature
 
-### What the smell is
+**Where:** `life/app.js` — `cellToScreen(originX, originY, x, y)`, `renderCell(ctx, originX,
+originY, cell, color)`, `render(canvas, originX, originY, cells)`, `cellFromScreen(offsetX,
+offsetY, originX, originY)`, `createClickHandler(ui, canvas, originX, originY, cells)`.
 
-`originX` and `originY` are always calculated together, always passed together, and always
-used together. They appear as a pair in `render(canvas, originX, originY, cells)`,
-`renderCell(ctx, originX, originY, ...)`, `cellFromScreen(offsetX, offsetY, originX, originY)`,
-`cellToScreen(originX, originY, x, y)`, and `createClickHandler(ui, canvas, originX, originY,
-cells)`.
+**Why it's bad:**
 
-### Why it is a problem
+- **Fowler — Data Clump**: "whenever you see the same two or three data items together in lots
+  of places... it's time for [them] to have their own [object]." The tell-tale sign is: if you
+  deleted one of the two parameters from a function's argument list, would the other one still
+  make sense alone? Here, no — `originX` is meaningless without `originY`.
+- **SOLID — Single Responsibility**, again: every function that takes `(originX, originY)` has
+  implicitly taken on responsibility for the viewport's positioning concept, when all it
+  actually wants is "convert this cell to a point" or "draw at this point."
+- **Long Parameter List** compounds this: `render` and `createClickHandler` both have to
+  thread the pair through unchanged just to hand it to a nested call, which is pure noise for a
+  reader trying to understand what each function actually _does_ with its inputs.
 
-**Fowler — Data Clumps.** Fowler observes that when the same two or three data items always
-appear together, they belong in their own object. A useful test: if you removed one of them
-from a parameter list, would the remaining parameters still make sense on their own? If not,
-they are a clump. Here, `originX` alone is meaningless — you always need both.
-
-**SOLID — Single Responsibility (S) / future maintainability.** The `CLAUDE.md` document
-notes that pan support (`panX`/`panY`) is a planned feature. If panning is added as two more
-loose parameters threaded through the same functions, the clump grows to four items and the
-problem worsens. Encapsulating the concept now, while it is two items, is the right moment.
-
-**Fowler — Long Parameter List.** Functions like `renderCell(ctx, originX, originY, cell,
-color)` already have five parameters. Grouping the origin into an object reduces the visual
-noise and makes each call site clearer.
-
-### The refactoring
-
-**Introduce Parameter Object** (Fowler, Ch. 6). Create a small `Viewport` (or `Origin`)
-value object with `x` and `y` properties. Thread a single `viewport` argument through the
-functions that currently take `originX, originY`. The calculation of `originX`/`originY` in
-`initApp` moves into the constructor or factory of this object. When pan is eventually added,
-`panX`/`panY` join the `Viewport` object — no function signatures change.
+**The refactoring:** this is resolved as a side effect of Smell 2's `Viewport` extraction
+(**Introduce Parameter Object**, specialised here to a full class with behaviour rather than a
+plain struct, since the object also needs the `toScreen`/`fromScreen` methods). Once `Viewport`
+exists, `render(canvas, viewport, cells)` and `renderCell(ctx, viewport, cell, color)` take one
+meaningful parameter instead of two coordinates that only make sense as a pair.
 
 ---
 
-## Smell 6: `RenderedCell extends Cell` (`tests/e2e/helpers.js:60`)
+### Smell 4: `createClickHandler` takes an unused parameter
 
-### What the smell is
+**Where:** `life/app.js:102` — `createClickHandler(ui, canvas, originX, originY, cells)`. The
+`ui` parameter is never referenced in the function body.
 
-`RenderedCell` is a test helper class that extends the domain class `Cell`. It does so in
-order to reuse `Cell`'s `x` and `y` constructor parameters and its display constants
-(`aliveColor`, `deadColor`, `borderColor`, `size`, `borderWidth`).
+**Why it's bad:**
 
-### Why it is a problem
+- **Fowler** doesn't name this smell directly, but it is a close cousin of **Speculative
+  Generality**: a parameter that isn't used is either a leftover from a previous design (dead
+  weight) or a hook for something that hasn't been built yet (a guess about future need).
+  Fowler's advice for both is the same: remove it now; add it back — with `Change Function
+Declaration` — when a real caller needs it. YAGNI ("you aren't gonna need it") is one of the
+  book's recurring themes.
+- **SOLID — Interface Segregation** (loosely applied to a function's own parameter list): a
+  caller of `createClickHandler` is forced to know about and supply a `ui` object that the
+  function doesn't actually depend on. That's a tiny but real violation of "don't make clients
+  depend on things they don't use."
+- **GOOS — dead parameters as a readability defect**: a function signature is meant to
+  communicate everything the function needs from its context. An unused parameter actively
+  misleads a reader into thinking `ui` matters to click handling, sending them on a wild goose
+  chase.
 
-**Freeman & Pryce — never subclass concrete classes.** Freeman & Pryce argue that subclassing
-a concrete class (one that was not designed as a base for extension) couples your new class to
-the original's implementation details, not to a deliberate contract. If `Cell`'s constructor
-gains a new parameter, `RenderedCell` breaks — even though the change has nothing to do with
-pixel rendering. The coupling is invisible and fragile.
-
-**SOLID — Liskov Substitution (L).** The Liskov Substitution Principle says that a subclass
-must be safely usable in every context where its parent is used. A `RenderedCell` is not a
-`Cell` in any meaningful domain sense — it is a test probe that reads pixel data from a
-rendered canvas. It does not satisfy the spirit of the relationship `extends` implies.
-
-**Fowler — Refused Bequest.** Refused Bequest is the smell of a subclass that inherits things
-it does not need or want. `RenderedCell` inherits `toString()` and `fromString()` — neither
-of which it uses. It is borrowing coordinate storage and display constants, not genuinely
-specialising the concept of a cell.
-
-Note: this smell is partially caused by Smell 1. Because `Cell` holds both coordinates _and_
-display constants, `RenderedCell` inherits from it to get access to both. Once Smell 1 is
-fixed and display constants live on their own object, the motivation for inheriting from
-`Cell` disappears.
-
-### The refactoring
-
-**Replace Superclass with Delegate** (Fowler, Ch. 12). `RenderedCell` should hold `x` and
-`y` as plain fields (no longer inherited) and import display constants directly from
-`CellDisplay` (the class created when fixing Smell 1). The inheritance link is removed
-entirely.
+**The refactoring:** **Change Function Declaration** to drop the unused parameter, then update
+the one call site (`initApp`) to stop passing it. This is a two-minute, zero-risk fix with no
+dependents — a good "quick win" to do before touching anything else, so it isn't lost in the
+noise of a larger diff later.
 
 ---
 
-## Smell 7: Post-construction mutation in `RenderedCanvas.cell()` (`tests/e2e/helpers.js:241`)
+### Smell 5: live cells are represented as raw strings everywhere (Primitive Obsession / "No String Types")
 
-### What the smell is
+**Where:** pervasive — `rules.js` (`Set<String>` in/out, `Cell.fromString`/`.toString()` calls
+in both `next()` and `neighbours()`'s call sites), `app.js` (`toggleCell`, the two loops in
+`render`, `createClickHandler`), and all three test files, which build cell sets as
+`new Set(['0,0', '0,1', ...])`.
 
-`RenderedCanvas.cell(x, y)` creates a `RenderedCell` and then assigns properties to it after
-construction:
+**Why it's bad:**
+
+- **GOOS — "No String Types"**: Freeman & Pryce are explicit that raw strings standing in for a
+  domain concept are a smell — they give you nowhere to attach behaviour, and every consumer
+  has to know the encoding (`"x,y"`, comma-separated, in that order) instead of asking an
+  object a question. Here the string _is_ the entire public contract for "a live cell," even
+  though a perfectly good `Cell` class already exists.
+- **Fowler — Primitive Obsession**: the fix category is literally named for this: "replace the
+  primitive with an object." The giveaway is the amount of code whose only job is converting
+  between the primitive and the richer type — `Cell.fromString` and `.toString()` are called
+  in `rules.js` twice, `app.js` three times, and are implicit in every test's `Set` literal.
+- **Why `Cell` isn't already used directly**: `Cell` has no value equality — two `new Cell(0,
+0)` instances are `!==` each other, so `Set.prototype.has`/`.delete` (reference equality)
+  can't be used to track live cells if the set held `Cell` objects directly. The string
+  encoding is a workaround for this missing capability, not a deliberate design choice — which
+  is exactly the kind of implicit, load-bearing assumption GOOS warns will surprise the next
+  person who touches the code.
+- **SOLID — Single Responsibility**, inverted: because there's no object responsible for "the
+  set of live cells," that responsibility is smeared across `app.js` and `rules.js`, each of
+  which re-implements bits of it (`toggleCell` in `app.js`; the survive/birth logic in
+  `rules.js`) against the raw `Set<String>`.
+
+A smaller, related smell: `toggleCell(cell, cells)` in `app.js` names its first parameter
+`cell`, but it's actually the _string_ returned by `cellFromScreen(...).toString()` — a
+**Mysterious Name** (Fowler) that misleads a reader into expecting a `Cell` instance.
+
+**The refactoring:**
+
+1. **Extract Class** to introduce a `Board` (or `LiveCells`) class that _encapsulates_ the
+   `Set<String>` internally (this is **Encapsulate Collection**: the raw set is never handed
+   out or manipulated directly by callers again). Give it a small, intention-revealing API:
+   `has(cell)`, `toggle(cell)`, `add(cell)`, and iteration that yields `Cell` objects (not
+   strings) via a generator or `[Symbol.iterator]`.
+2. Inside `Board`, keep the string encoding as a private implementation detail used only for
+   the underlying `Set`'s hashing — `Cell.toString()`/`Cell.fromString()` calls collapse to one
+   place instead of five.
+3. Update `rules.js`'s `next(cells)` to accept and return a `Board`, moving the
+   iterate/count/decide logic to operate on `Cell` objects throughout (no `.toString()` calls
+   needed outside `Board`).
+4. Update `app.js`'s `toggleCell` to become `board.toggle(cell)` (a one-line call, probably
+   inlinable — see **Inline Function** — once the logic lives on `Board`), and rename any
+   remaining string-shaped local variables.
+5. Update tests to construct `Board` instances (potentially via a small **Test Data Builder**,
+   see Smell 8) instead of raw `Set` literals, or keep the literals but pass them through a
+   `Board.from([...])` factory — either way, tests stop needing to know the internal
+   `"x,y"` string format at all, which is exactly GOOS's point: tests should talk about
+   _cells_, not about how cells happen to be serialised today.
+
+This is the largest single refactor in this document, so it's scheduled after the smaller,
+purely-mechanical wins (Smells 1–4) and the `Viewport` extraction — doing coordinate cleanup
+first avoids touching the same lines twice.
+
+---
+
+### Smell 6: `next()` conflates two phases of the algorithm in one loop
+
+**Where:** `life/rules.js:41-67`. The single `for` loop over live cells simultaneously (a)
+counts each live cell's live neighbours to decide survival, and (b) accumulates a counter of
+_dead_ neighbours across all live cells, to later decide births.
+
+**Why it's bad:**
+
+- **Fowler — Split Loop / Split Phase**: "a loop that does two different things" is a
+  smell even when — especially when — it's efficient, because the reader has to hold two
+  unrelated computations in their head simultaneously to understand any one line. Fowler is
+  explicit that combining loops for a performance win should be treated as a deliberate,
+  measured optimisation applied _after_ clarity, not the default way to write the loop the
+  first time.
+- The `counter` object is also a **Primitive Obsession** instance in miniature: a plain
+  `{}` used as a multiset (`counter[key] = key in counter ? counter[key] + 1 : 1`) is exactly
+  the kind of hand-rolled data structure Fowler suggests replacing — here with a `Map`, which
+  removes the `key in counter` ceremony and any theoretical risk of colliding with
+  `Object.prototype` property names.
+- **SOLID — Single Responsibility**: `next()` currently has two reasons to change (a change to
+  the survival rule, and a change to the birth rule), even though the two rules are logically
+  independent per Conway's rules.
+
+**The refactoring:** **Split Phase**. Extract a `survivors(cells)` function (the live cells
+that stay alive) and a `births(cells)` function (the dead neighbours to bring to life), each
+with its own internal loop, and have `next()` become a short composition of the two:
+`new Set([...survivors(cells), ...births(cells)])`. Use a `Map` in `births` instead of a plain
+object. This is deliberately scheduled _after_ Smell 5 (the `Board` extraction), because once
+cells are `Cell` objects wrapped by `Board`, the counting logic naturally operates on that API
+rather than on raw strings, and there is no value in writing the split twice.
+
+---
+
+### Smell 7: `RenderedCell extends Cell` — inheritance used for convenience, not "is-a"
+
+**Where:** `tests/e2e/helpers.js:61` — `class RenderedCell extends Cell { ... }`, adding
+`pixel()`, `pixelData()`, `hasBorderPixel()`, `isAlive()`, `isDead()`.
+
+**Why it's bad:**
+
+- **SOLID — Liskov Substitution**: LSP isn't only about breaking behaviour; it's a prompt to
+  ask "is every `Cell` interchangeable with a `RenderedCell` and vice versa, conceptually?"
+  Here the answer is no — a `RenderedCell` only makes sense in the context of a rendered
+  Playwright page (it needs `imgData`, `posX`, `posY` to do anything useful), while a `Cell` is
+  a pure coordinate pair used throughout the domain. Subclassing a **production, domain**
+  class from a **test-only** class inverts the dependency the wrong way: domain code should
+  never need to know or care that a test-only subtype of one of its classes exists, but the
+  coupling is now baked into the class hierarchy rather than confined to test files.
+- **GOOS — Context Independence**: `Cell` is meant to be usable anywhere without dragging in
+  unrelated context. `RenderedCell` doesn't strengthen that; it just borrows `x`/`y`/`toString`
+  for convenience, which composition would give it just as easily without polluting the
+  inheritance chain.
+- Practically: if `Cell` ever grows a method that doesn't make sense for a `RenderedCell` (or
+  vice versa), the inheritance link will force an awkward override or an "empty" method just to
+  keep the hierarchy consistent — the classic setup for a later **Refused Bequest**.
+
+**The refactoring:** **Replace Superclass with Delegate** (or, since this is new-ish code
+rather than an established hierarchy others depend on, simply stop extending and use
+composition from the start): give `RenderedCell` a `cell` field (a plain `Cell`), forward
+`x`/`y`/`toString()` to it via **Hide Delegate**, and keep `pixel`/`isAlive`/`isDead` as
+`RenderedCell`'s own behaviour. `RenderedCanvas.cell(x, y)` then does
+`new RenderedCell(new Cell(x, y), imgData)` instead of relying on the inherited constructor.
+
+---
+
+### Smell 8: post-construction mutation in `RenderedCanvas.cell()`
+
+**Where:** `tests/e2e/helpers.js:241-251`:
 
 ```js
-const cell = new RenderedCell(x, y);
-cell.posX = posX;      // set after new
-cell.posY = posY;      // set after new
-cell.imgData = await …; // set after new
+async cell(x, y) {
+    const cell = new RenderedCell(x, y);
+    const [posX, posY] = this.cellPosition(cell);
+    cell.posX = posX;
+    cell.posY = posY;
+    cell.imgData = await this.cellImgData(cell);
+    return cell;
+}
 ```
 
-The object is not in a usable state at the moment `new RenderedCell` returns.
+**Why it's bad:**
 
-### Why it is a problem
+- **Fowler — Temporary Field / incomplete object construction**: between `new RenderedCell(x,
+y)` and the final `return cell`, the object exists in a state where `posX`, `posY`, and
+  `imgData` are all `undefined`, yet nothing stops another piece of code from observing or
+  calling a method on it mid-construction (e.g. if this function is later refactored and an
+  `await` is added before the mutations, or an exception is thrown between them). A
+  fully-constructed object should be usable the instant its constructor returns; here, three
+  extra statements are load-bearing for correctness but are not enforced by the language or the
+  class itself.
+- **SOLID — Single Responsibility**, applied to _when_ responsibility is discharged: object
+  construction and object population are two different concerns that have been separated in
+  time without any name or checkpoint marking the boundary, which makes `cell()` do the job
+  that a constructor or factory should be doing.
+- This is also necessary only _because_ `imgData` requires an `async` fetch (`cellImgData`),
+  which a synchronous constructor can't perform — a real constraint, but one that a factory
+  function is the idiomatic way to solve, not ad hoc field assignment on the caller's side.
 
-**Freeman & Pryce — objects should be valid at construction time.** An object that requires
-external code to complete its initialisation is dangerous: any caller who forgets to perform
-the setup steps will get a silently broken object. This makes the class harder to use
-correctly and easier to use wrongly — the opposite of what good design aims for.
-
-**Fowler — Temporary Field.** Temporary Field is the smell of instance variables that are
-only populated in certain circumstances. `posX`, `posY`, and `imgData` are not available
-after `new RenderedCell` — only after the factory method fills them in. That conditionality is
-a signal that the construction process is incomplete.
-
-### The refactoring
-
-**Replace Constructor with Factory Function** (Fowler, Ch. 11), making the existing async
-factory in `RenderedCanvas.cell()` the _only_ way to create a `RenderedCell`. The factory
-computes `posX`, `posY`, and `imgData` before calling `new`, passing them all into the
-constructor at once. The constructor stores them immediately. No `RenderedCell` can exist in a
-partially-initialised state.
-
----
-
-## Smell 8: `isAlive()` and `isDead()` duplicate their structure (`tests/e2e/helpers.js:109–135`)
-
-### What the smell is
-
-Both methods contain an identical nested `Array.from + every` loop. They differ only in which
-colours they compare each pixel against:
+**The refactoring:** **Replace Constructor with Factory Function**. Move the async fetch and
+field assignment into a static async factory on `RenderedCell` itself:
 
 ```js
-// isAlive checks:  borderColor vs aliveColor
-// isDead checks:   borderColor vs deadColor
+static async at(cell, canvas) {
+    const [posX, posY] = canvas.cellPosition(cell);
+    const imgData = await canvas.cellImgData({ posX, posY });
+    return new RenderedCell(cell, posX, posY, imgData);
+}
 ```
 
-The structural skeleton — iterate over a grid, check each pixel, return whether all match —
-is written out twice.
-
-### Why it is a problem
-
-**Fowler — Duplicated Code.** Any change to the pixel-checking logic (for example, to handle
-sub-pixel rendering, to adjust the boundary detection formula, or to improve error messages on
-failure) must be made in two places. Duplicated code accumulates maintenance debt: each copy
-is an independent place where a bug can be introduced or a fix can be forgotten.
-
-**SOLID — Single Responsibility (S).** The responsibility of "iterate over all pixels in a
-cell and verify each one matches an expected colour scheme" is a single, coherent behaviour.
-It should have one implementation.
-
-### The refactoring
-
-**Extract Function** (Fowler, Ch. 6). Extract the shared grid-iteration logic into a private
-helper — something like `allPixelsMatch(expectedBorderColor, expectedBodyColor)` — that both
-`isAlive()` and `isDead()` call with the appropriate colour arguments. Each public method
-becomes a one-liner that names its intent and delegates the mechanics.
+so that `RenderedCell`'s constructor takes all its fields as arguments and the object is
+complete the moment it exists. `RenderedCanvas.cell(x, y)` becomes a one-line delegation to
+`RenderedCell.at(...)`. Do this together with Smell 7, since both touch the same class and
+constructor.
 
 ---
 
-## Smell 9: Duplicate setup in unit tests (`tests/unit/life.test.js`)
+### Smell 9: `isAlive()` and `isDead()` duplicate their entire structure
 
-### What the smell is
+**Where:** `tests/e2e/helpers.js:109-135`. Both methods build the same nested
+`Array.from({length: step}, ...)` grid and call `hasBorderPixel` identically; the only
+difference is which two color constants (`aliveColor`/`deadColor`) are compared against.
 
-All three tests in `tests/unit/life.test.js` begin with the same four lines:
+**Why it's bad:**
+
+- **Fowler — Duplicated Code**, textbook case: two blocks that are identical except for one or
+  two literal values are a direct prompt for **Parameterize Function** — "when you see two
+  functions that differ only in a literal value, you can combine them via a parameter."
+  Duplicated structure like this also means every future change to how a cell's colour is
+  checked (e.g. adding anti-aliasing tolerance) has to be made twice, correctly, in sync.
+- Worth noting as a positive counter-example from GOOS: the book explicitly says test code is
+  allowed _more_ duplication than production code, where duplication aids readability of a
+  single scenario. This case doesn't qualify for that exemption, though — it isn't "a little
+  duplication for clarity," it's two ~15-line methods that are structurally identical, which
+  tips it back into a genuine smell rather than an acceptable readability trade-off.
+
+**The refactoring:** **Parameterize Function**. Replace both with:
+
+```js
+isColor(bodyColor) {
+    return Array.from({ length: DisplayCell.step }, (_, x) =>
+        Array.from({ length: DisplayCell.step }, (_, y) => {
+            const pixel = this.pixel(x, y);
+            return this.hasBorderPixel(pixel)
+                ? pixel.color === DisplayCell.borderColor
+                : pixel.color === bodyColor;
+        })
+    ).every((row) => row.every(Boolean));
+}
+```
+
+and expose `isAlive()`/`isDead()` as one-line callers (`isColor(DisplayCell.aliveColor)` /
+`isColor(DisplayCell.deadColor)`) if the two names are still worth keeping for readability at
+call sites — or **Inline Function** them away entirely if callers are happy to call
+`isColor(...)` directly.
+
+---
+
+### Smell 10: duplicated setup across unit tests
+
+**Where:** `tests/unit/life.test.js` — all three tests open with the same three lines:
 
 ```js
 const cells = new Set();
@@ -354,86 +426,65 @@ initApp(ui, cells);
 const canvas = ui.findElement('canvas');
 ```
 
-### Why it is a problem
+**Why it's bad:**
 
-**Fowler — Duplicated Code.** When setup changes — for example, if `initApp` gains a
-parameter — every test must be updated individually. This is mechanical, error-prone work
-that serves no purpose.
+- **GOOS — "Streamline Test Code"**: setup that doesn't contribute to the description of the
+  specific scenario under test should be moved out of the test body, so the reader's eye goes
+  straight to what's _different_ about this test versus its neighbours. Right now, a reader
+  has to diff four lines across three tests to find out that nothing there is scenario-specific
+  at all — pure noise.
+- **Fowler — Duplicated Code**, applied to test code, still counts once it's this
+  mechanical and appears three-for-three (the "Rule of Three": the third repetition is the
+  trigger to extract).
 
-**Freeman & Pryce — test readability.** Tests should read as a description of the behaviour
-under test. When every test begins with four lines of boilerplate before getting to what it
-actually cares about, the signal is buried in noise. A reader has to scan past the setup each
-time to find the interesting part.
-
-### The refactoring
-
-Move the shared setup into a `beforeEach` block (the Mocha equivalent of Fowler's **Extract
-Function** applied to test setup). Declare `cells`, `ui`, and `canvas` in the suite scope;
-assign them in `beforeEach`. Each test then begins immediately with the action it is
-exercising.
+**The refactoring:** **Extract Function** a small helper — e.g. `createTestApp()` returning
+`{ cells, canvas }` — in `tests/unit/helpers.js`, and have each test call it as its one line of
+setup. This is a low-risk, purely local cleanup with no dependents elsewhere, so it's fine to
+leave until last.
 
 ---
 
-## Suggested order of attack
+## Suggested order of work
 
-The smells are not independent. The right sequence minimises rework: fix the root cause first,
-then fix the things that depended on the root cause, and so on.
+The guiding idea, per Fowler, is to do the smallest, most self-contained refactorings first,
+then tackle the refactorings with the widest "fan-out" (the ones that touch the most other
+code) before the smells that depend on their result — so that no line of code has to be edited
+twice for two different reasons.
 
-### Step 1 — Split `Cell` (fixes Smell 1)
+1. **Smell 4 — remove the unused `ui` parameter.** Zero dependencies, zero risk, two minutes.
+   Do it first purely to get it out of the way before larger diffs land.
 
-This is the structural root cause of the most other smells. Do it first. Extract the display
-constants (`size`, `borderWidth`, `aliveColor`, `deadColor`, `borderColor`, `step`) into a
-new `CellDisplay` object. `Cell` retains only `x`, `y`, `toString()`, and `fromString()`.
+2. **Smell 2 (which also fixes Smell 1) — extract a shared `Viewport` class for cell↔screen
+   conversion**, used by `app.js`, `tests/unit/helpers.js`, and `tests/e2e/helpers.js`'s
+   `Canvas`. This is the highest-leverage refactor in the list: it eliminates the duplicated
+   math, fixes the live `Cell.step` bug as a direct consequence, and — as described in Smell 3
+   — simultaneously resolves the `originX`/`originY` data clump by giving that pair a proper
+   home. Doing this before anything else in `tests/e2e/helpers.js` (Smells 7–9) means those
+   later refactors edit a `Canvas` that's already simplified, instead of duplicating effort.
 
-### Step 2 — Fix the `rules.js` import (fixes Smell 2)
+3. **Smell 5 — encapsulate live cells behind a `Board` class**, removing the pervasive
+   string/`Cell` conversion duplication in `app.js` and `rules.js`. This is the largest single
+   change; doing it after step 2 means the coordinate-conversion code is already stable and
+   won't need touching again as part of this step.
 
-With `Cell` now a pure coordinate class, update the `rules.js` import. No logic changes —
-only the dependency is corrected. This step is trivial once Step 1 is done.
+4. **Smell 6 — split `next()` into `survivors`/`births`.** Deliberately sequenced right after
+   Smell 5, since it operates on the same code and is far simpler to do once `next()` is
+   already working against the new `Board` API rather than raw strings.
 
-### Step 3 — Replace `RenderedCell extends Cell` with delegation (fixes Smell 6)
+5. **Smells 7 + 8 — replace `RenderedCell extends Cell` with composition, and replace
+   post-construction mutation with a factory function.** Grouped together because they touch
+   the same class and constructor in `tests/e2e/helpers.js`; doing them in the same pass avoids
+   re-editing `RenderedCanvas.cell()` twice.
 
-With display constants no longer on `Cell`, `RenderedCell` has no remaining reason to inherit
-from it. Remove the `extends Cell` relationship; hold `x` and `y` directly; import display
-constants from `CellDisplay`. This step is significantly simpler after Step 1.
+6. **Smell 9 — parameterize `isAlive`/`isDead` into `isColor`.** Same file as step 5; cheap
+   enough to fold into the same commit/session once you're already in `RenderedCell`.
 
-### Step 4 — Extract and centralise coordinate math (fixes Smell 3)
+7. **Smell 10 — extract shared unit-test setup.** Purely local, no dependents, safe to do
+   whenever — last, as low-risk polish once everything it sets up (`initApp`, `MockUI`) has
+   settled from the refactors above.
 
-With the class structure now settled, extract the coordinate conversion formula into a shared
-module. Update `app.js`, `tests/unit/helpers.js`, and `tests/e2e/helpers.js` to all import
-and call the same function.
-
-### Step 5 — Introduce Parameter Object for the viewport (fixes Smell 5)
-
-With coordinate math centralised, the `originX`/`originY` pair is now the right target.
-Create a `Viewport` value object; update all function signatures that currently take both as
-separate arguments.
-
-### Step 6 — Remove the unused `ui` parameter (fixes Smell 4)
-
-A quick, isolated, mechanical change. Remove `ui` from `createClickHandler`'s parameter list
-and its single call site.
-
-### Step 7 — Fix post-construction mutation (fixes Smell 7)
-
-Pass `posX`, `posY`, and `imgData` into `RenderedCell`'s constructor. The async factory
-method in `RenderedCanvas.cell()` computes them before calling `new`.
-
-### Step 8 — Extract shared pixel-checking helper (fixes Smell 8)
-
-Extract the `Array.from + every` structure from `isAlive()` and `isDead()` into a private
-`allPixelsMatch` helper.
-
-### Step 9 — Consolidate test setup (fixes Smell 9)
-
-Move the four repeated setup lines in `tests/unit/life.test.js` into a `beforeEach`.
-
----
-
-### Why this order minimises work
-
-Steps 1–3 address the class-boundary problems. Step 1 is the root cause: fixing it makes
-Steps 2 and 3 trivial rather than complex. Step 4 is cleanest after the class structure is
-stable (it involves changes to multiple files and you don't want to do it twice). Step 5
-builds on Step 4 since the coordinate extraction clarifies what the "viewport" concept
-actually is. Steps 6–9 are independent quick wins that can be done in any order; placing them
-last keeps the early steps focused on the structural issues.
+This ordering front-loads the two structural refactors (`Viewport`, `Board`) that everything
+else either depends on or would otherwise duplicate, fixes the one live defect as a side effect
+of the first structural refactor rather than as a bolt-on patch, and leaves the purely
+cosmetic/local cleanups (unused parameter, test setup duplication) for whenever they're
+convenient, since they carry no risk of being redone.
