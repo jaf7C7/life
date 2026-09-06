@@ -1,4 +1,5 @@
 import { Cell } from '../../life/cell.js';
+import { DisplayCell } from '../../life/cell.js';
 
 /**
  * Converts RGB channel values to a CSS hex color string.
@@ -82,7 +83,7 @@ class RenderedCell extends Cell {
      */
     pixelData(pixel) {
         const pixelDataSize = 4;
-        const index = (pixel.x + pixel.y * Cell.step) * pixelDataSize;
+        const index = (pixel.x + pixel.y * DisplayCell.step) * pixelDataSize;
         return this.imgData.slice(index, index + pixelDataSize);
     }
 
@@ -95,8 +96,7 @@ class RenderedCell extends Cell {
     hasBorderPixel(pixel) {
         return [pixel.x, pixel.y].some(
             (e) =>
-                e === 0 ||
-                e === RenderedCell.size + RenderedCell.borderWidth / 2
+                e === 0 || e === DisplayCell.size + DisplayCell.borderWidth / 2
         );
     }
 
@@ -107,12 +107,12 @@ class RenderedCell extends Cell {
      * @returns {Boolean}
      */
     isAlive() {
-        return Array.from({ length: Cell.step }, (_, x) =>
-            Array.from({ length: Cell.step }, (_, y) => {
+        return Array.from({ length: DisplayCell.step }, (_, x) =>
+            Array.from({ length: DisplayCell.step }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
-                    ? pixel.color === RenderedCell.borderColor
-                    : pixel.color === RenderedCell.aliveColor;
+                    ? pixel.color === DisplayCell.borderColor
+                    : pixel.color === DisplayCell.aliveColor;
             })
         ).every((row) => row.every(Boolean));
     }
@@ -124,12 +124,12 @@ class RenderedCell extends Cell {
      * @returns {Boolean}
      */
     isDead() {
-        return Array.from({ length: Cell.step }, (_, x) =>
-            Array.from({ length: Cell.step }, (_, y) => {
+        return Array.from({ length: DisplayCell.step }, (_, x) =>
+            Array.from({ length: DisplayCell.step }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
-                    ? pixel.color === RenderedCell.borderColor
-                    : pixel.color === RenderedCell.deadColor;
+                    ? pixel.color === DisplayCell.borderColor
+                    : pixel.color === DisplayCell.deadColor;
             })
         ).every((row) => row.every(Boolean));
     }
@@ -149,11 +149,11 @@ class Canvas {
     }
 
     get originX() {
-        return this.width / 2 - Cell.step / 2;
+        return this.width / 2 - DisplayCell.step / 2;
     }
 
     get originY() {
-        return this.height / 2 - Cell.step / 2;
+        return this.height / 2 - DisplayCell.step / 2;
     }
 
     /**
@@ -171,8 +171,8 @@ class Canvas {
      * @returns {Number[]}
      */
     cellPosition(cell) {
-        const posX = this.originX + cell.x * Cell.step;
-        const posY = this.originY - cell.y * Cell.step;
+        const posX = this.originX + cell.x * DisplayCell.step;
+        const posY = this.originY - cell.y * DisplayCell.step;
 
         return [posX, posY];
     }
@@ -265,7 +265,7 @@ export class RenderedCanvas extends Canvas {
                 const ctx = element.getContext('2d');
                 return ctx.getImageData(posX, posY, step, step).data;
             },
-            { posX: cell.posX, posY: cell.posY, step: Cell.step }
+            { posX: cell.posX, posY: cell.posY, step: DisplayCell.step }
         );
     }
 }
