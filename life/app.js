@@ -1,4 +1,5 @@
 import { Cell } from './cell.js';
+import { DisplayCell } from './cell.js';
 
 /**
  * Converts from cell co-ords to viewport pixel offset.
@@ -9,8 +10,8 @@ import { Cell } from './cell.js';
  * @param {Number} y - Y co-ord of cell
  */
 function cellToScreen(originX, originY, x, y) {
-    const posX = originX + x * Cell.step + Cell.borderWidth / 2;
-    const posY = originY - y * Cell.step + Cell.borderWidth / 2;
+    const posX = originX + x * DisplayCell.step + DisplayCell.borderWidth / 2;
+    const posY = originY - y * DisplayCell.step + DisplayCell.borderWidth / 2;
 
     return [posX, posY];
 }
@@ -27,7 +28,7 @@ function cellToScreen(originX, originY, x, y) {
 function renderCell(ctx, originX, originY, cell, color) {
     ctx.fillStyle = color;
     const [posX, posY] = cellToScreen(originX, originY, cell.x, cell.y);
-    ctx.fillRect(posX, posY, Cell.size, Cell.size);
+    ctx.fillRect(posX, posY, DisplayCell.size, DisplayCell.size);
 }
 
 /**
@@ -37,17 +38,17 @@ function renderCell(ctx, originX, originY, cell, color) {
 function render(canvas, originX, originY, cells) {
     const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = Cell.borderColor;
+    ctx.fillStyle = DisplayCell.borderColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // `minX`: How many cells does it take to totally fill the space from the
     // centre of the viewport (canvas) to the left edge of the viewport?
     // Negative as viewport centre is the origin of the cell co-ords.
-    const minX = Math.floor(-originX / Cell.step);
+    const minX = Math.floor(-originX / DisplayCell.step);
 
     // `maxX`: How many cells does is take to totally fill the space from the
     // centre of the viewport (canvas) to the right edge of the viewport?
-    const maxX = Math.floor((canvas.width - originX) / Cell.step);
+    const maxX = Math.floor((canvas.width - originX) / DisplayCell.step);
 
     // `minY`, `maxY` analagous to `minX`/`maxX` but in the vertical direction.
     // Note that the Y-axes of the viewport/canvas and of the cell grid are in
@@ -55,25 +56,25 @@ function render(canvas, originX, originY, cells) {
     // corner of the canvas element and Y increases downwards, while the origin
     // of the cell grid is centred in the canvas and Y increases upwards. This
     // is shown in by the `-(...)` expression in the calculation of `minY`.
-    const minY = Math.floor(-(canvas.height - originY) / Cell.step);
-    const maxY = Math.ceil(originY / Cell.step);
+    const minY = Math.floor(-(canvas.height - originY) / DisplayCell.step);
+    const maxY = Math.ceil(originY / DisplayCell.step);
 
     for (let x = minX; x <= maxX; x++) {
         for (let y = minY; y <= maxY; y++) {
             const cell = new Cell(x, y);
-            renderCell(ctx, originX, originY, cell, Cell.deadColor);
+            renderCell(ctx, originX, originY, cell, DisplayCell.deadColor);
         }
     }
 
     for (const cell of [...cells].map(Cell.fromString)) {
-        renderCell(ctx, originX, originY, cell, Cell.aliveColor);
+        renderCell(ctx, originX, originY, cell, DisplayCell.aliveColor);
     }
 }
 
 /** Converts from viewport/canvas co-ordinates to cell co-ordinates. */
 function cellFromScreen(offsetX, offsetY, originX, originY) {
-    const cellX = Math.floor((offsetX - originX) / Cell.step);
-    const cellY = -Math.floor((offsetY - originY) / Cell.step);
+    const cellX = Math.floor((offsetX - originX) / DisplayCell.step);
+    const cellY = -Math.floor((offsetY - originY) / DisplayCell.step);
 
     return new Cell(cellX, cellY);
 }
@@ -115,8 +116,8 @@ function createClickHandler(ui, canvas, originX, originY, cells) {
 
 export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
-    const originX = canvas.width / 2 - Cell.step / 2;
-    const originY = canvas.height / 2 - Cell.step / 2;
+    const originX = canvas.width / 2 - DisplayCell.step / 2;
+    const originY = canvas.height / 2 - DisplayCell.step / 2;
     const handleClick = createClickHandler(ui, canvas, originX, originY, cells);
 
     canvas.addEventListener('click', handleClick);

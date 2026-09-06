@@ -1,4 +1,4 @@
-import { Cell } from '../../life/cell.js';
+import { DisplayCell } from '../../life/cell.js';
 
 export class MockUI {
     constructor() {
@@ -22,8 +22,8 @@ export class MockUI {
 
             clickCell(cellX, cellY) {
                 this.click({
-                    x: this.width / 2 + cellX * Cell.step,
-                    y: this.height / 2 - cellY * Cell.step
+                    x: this.width / 2 + cellX * DisplayCell.step,
+                    y: this.height / 2 - cellY * DisplayCell.step
                 });
             },
 
