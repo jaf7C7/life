@@ -16,6 +16,14 @@ function cellToScreen(originX, originY, x, y) {
     return [posX, posY];
 }
 
+/** Converts from viewport/canvas co-ordinates to cell co-ordinates. */
+function cellFromScreen(offsetX, offsetY, originX, originY) {
+    const cellX = Math.floor((offsetX - originX) / DisplayCell.step);
+    const cellY = -Math.floor((offsetY - originY) / DisplayCell.step);
+
+    return new Cell(cellX, cellY);
+}
+
 /**
  * Draws a cell in the viewport.
  *
@@ -69,14 +77,6 @@ function render(canvas, originX, originY, cells) {
     for (const cell of [...cells].map(Cell.fromString)) {
         renderCell(ctx, originX, originY, cell, DisplayCell.aliveColor);
     }
-}
-
-/** Converts from viewport/canvas co-ordinates to cell co-ordinates. */
-function cellFromScreen(offsetX, offsetY, originX, originY) {
-    const cellX = Math.floor((offsetX - originX) / DisplayCell.step);
-    const cellY = -Math.floor((offsetY - originY) / DisplayCell.step);
-
-    return new Cell(cellX, cellY);
 }
 
 /**
