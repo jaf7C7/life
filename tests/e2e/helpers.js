@@ -148,14 +148,6 @@ class Canvas {
         this.height = height;
     }
 
-    get originX() {
-        return this.width / 2 - DisplayCell.step / 2;
-    }
-
-    get originY() {
-        return this.height / 2 - DisplayCell.step / 2;
-    }
-
     /**
      * Returns the location on the canvas of the top-left corner of the given
      * cell, relative to the top-left corner of the canvas.
@@ -171,8 +163,10 @@ class Canvas {
      * @returns {Number[]}
      */
     cellPosition(cell) {
-        const posX = this.originX + cell.x * DisplayCell.step;
-        const posY = this.originY - cell.y * DisplayCell.step;
+        const originX = this.width / 2 - DisplayCell.step / 2;
+        const originY = this.height / 2 - DisplayCell.step / 2;
+        const posX = originX + cell.x * DisplayCell.step;
+        const posY = originY - cell.y * DisplayCell.step;
 
         return [posX, posY];
     }

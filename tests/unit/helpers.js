@@ -20,6 +20,7 @@ export class MockUI {
                 this._handlers['click']?.({ offsetX: x, offsetY: y });
             },
 
+            // This clicks the *centre* of cell `cellX,cellY`.
             clickCell(cellX, cellY) {
                 this.click({
                     x: this.width / 2 + cellX * DisplayCell.step,
