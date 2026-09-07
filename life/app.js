@@ -15,10 +15,18 @@ import { DisplayCell } from './cell.js';
  *   by `ctx.fillRect` to draw the cell.
  */
 function cellToScreen(originX, originY, x, y) {
-    const posX = originX + x * DisplayCell.step + DisplayCell.borderWidth / 2;
-    const posY = originY - y * DisplayCell.step + DisplayCell.borderWidth / 2;
+    const posX = originX + x * DisplayCell.step;
+    const posY = originY - y * DisplayCell.step;
 
-    return [posX, posY];
+    // `posX` and `posY` are the canvas pixel co-ords for the top left corner
+    // `of the cell inclusive of its border. DisplayCell.borderWidth / 2` is
+    // `added to each co-ord to give the position of the *body* of the cell,
+    // `which is needed by `ctx.fillRect` to paint the cell. the background is
+    // `painted first then each cell painted onto the background (see `render()`).
+    return [
+        posX + DisplayCell.borderWidth / 2,
+        posY + DisplayCell.borderWidth / 2
+    ];
 }
 
 /**
@@ -126,8 +134,11 @@ function createClickHandler(ui, canvas, originX, originY, cells) {
 
 export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
+
+    // This sets the centre of cell 0,0 at the centre of the canvas.
     const originX = canvas.width / 2 - DisplayCell.step / 2;
     const originY = canvas.height / 2 - DisplayCell.step / 2;
+
     const handleClick = createClickHandler(ui, canvas, originX, originY, cells);
 
     canvas.addEventListener('click', handleClick);
