@@ -4,10 +4,15 @@ import { DisplayCell } from './cell.js';
 /**
  * Converts from cell co-ords to viewport pixel offset.
  *
- * @param {Number} originX - Horizontal offset of viewport origin
- * @param {Number} originY - Vertical offset of viewport origin
+ * @param {Number} originX - Horizontal distance in canvas pixels of the centre
+ *   of the canvas from the top left corner
+ * @param {Number} originY - Vertical distance in canvas pixels of the centre of
+ *   the canvas from the top left corner
  * @param {Number} x - X co-ord of cell
  * @param {Number} y - Y co-ord of cell
+ * @returns {Number[]} The co-ordinates in canvas pixels of the top-left corner
+ *   of the cell body (not the cell's border). This is intended to be consumed
+ *   by `ctx.fillRect` to draw the cell.
  */
 function cellToScreen(originX, originY, x, y) {
     const posX = originX + x * DisplayCell.step + DisplayCell.borderWidth / 2;
@@ -16,7 +21,10 @@ function cellToScreen(originX, originY, x, y) {
     return [posX, posY];
 }
 
-/** Converts from viewport/canvas co-ordinates to cell co-ordinates. */
+/**
+ * Converts from viewport/canvas co-ordinates to cell co-ordinates (see
+ * documentation for `cellToScreen`).
+ */
 function cellFromScreen(offsetX, offsetY, originX, originY) {
     const cellX = Math.floor((offsetX - originX) / DisplayCell.step);
     const cellY = -Math.floor((offsetY - originY) / DisplayCell.step);
@@ -28,8 +36,10 @@ function cellFromScreen(offsetX, offsetY, originX, originY) {
  * Draws a cell in the viewport.
  *
  * @param {CanvasRenderingContext2D} ctx
- * @param {Number} originX - Horizontal offset of viewport origin
- * @param {Number} originY - Vertical offset of viewport origin
+ * @param {Number} originX - Horizontal distance in canvas pixels of the centre
+ *   of the canvas from the top left corner
+ * @param {Number} originY - Vertical distance in canvas pixels of the centre of
+ *   the canvas from the top left corner
  * @param {Cell} cell
  * @param {String} color - The color to fill the cell with in '#xxxxxx' format
  */
