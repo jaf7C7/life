@@ -29,7 +29,12 @@ export class MockUI {
 
             // This clicks the *centre* of cell `cellX,cellY`.
             clickCell(cellX, cellY) {
-                const [x, y] = getCellCentre(this.width, this.height, cellX, cellY);
+                const [x, y] = getCellCentre(
+                    this.width,
+                    this.height,
+                    cellX,
+                    cellY
+                );
                 this.click({ x, y });
             },
 

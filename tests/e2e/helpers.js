@@ -15,8 +15,7 @@ function rgbToHex(r, g, b) {
 
 function isBorderPixel(pixel) {
     return [pixel.x, pixel.y].some(
-        (e) =>
-            e === 0 || e === DisplayCell.size + DisplayCell.borderWidth / 2
+        (e) => e === 0 || e === DisplayCell.size + DisplayCell.borderWidth / 2
     );
 }
 
