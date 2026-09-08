@@ -1,6 +1,13 @@
 import { Cell } from './cell.js';
 import { DisplayCell } from './cell.js';
 
+function getOrigin(canvas) {
+    // This sets the centre of cell 0,0 at the centre of the canvas.
+    const originX = canvas.width / 2 - DisplayCell.step / 2;
+    const originY = canvas.height / 2 - DisplayCell.step / 2;
+    return [originX, originY];
+}
+
 /**
  * Converts from cell co-ords to viewport pixel offset.
  *
@@ -147,10 +154,7 @@ function createClickHandler(ui, canvas, originX, originY, cells) {
 export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
 
-    // This sets the centre of cell 0,0 at the centre of the canvas.
-    const originX = canvas.width / 2 - DisplayCell.step / 2;
-    const originY = canvas.height / 2 - DisplayCell.step / 2;
-
+    const [originX, originY] = getOrigin(canvas);
     const handleClick = createClickHandler(ui, canvas, originX, originY, cells);
 
     canvas.addEventListener('click', handleClick);
