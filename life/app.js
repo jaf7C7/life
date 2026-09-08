@@ -20,9 +20,10 @@ function cellToScreen(originX, originY, x, y) {
 
     // `posX` and `posY` are the canvas pixel co-ords for the top left corner
     // `of the cell inclusive of its border. DisplayCell.borderWidth / 2` is
-    // `added to each co-ord to give the position of the *body* of the cell,
-    // `which is needed by `ctx.fillRect` to paint the cell. the background is
-    // `painted first then each cell painted onto the background (see `render()`).
+    // `added to each co-ord to give the position of the top-left corner of the
+    // `*body* of the cell, which is needed by `ctx.fillRect` to paint the
+    // `cell. the background is painted first then each cell painted onto the
+    // `background (see `render()`).
     return [
         posX + DisplayCell.borderWidth / 2,
         posY + DisplayCell.borderWidth / 2
@@ -31,7 +32,18 @@ function cellToScreen(originX, originY, x, y) {
 
 /**
  * Converts from viewport/canvas co-ordinates to cell co-ordinates (see
- * documentation for `cellToScreen`).
+ * documentation for `cellToScreen`). **NOTE**: This gives the co-ords of the
+ * _top-left_ corner of the _body_ of the cell, excluding the cell border)
+ *
+ * @param {Number} offsetX - The distance in canvas pixels of the click location
+ *   from the left edge of the canvas
+ * @param {Number} offsetY - The distance in canvas pixels of the click location
+ *   from the top edge of the canvas
+ * @param {Number} originX - Horizontal distance in canvas pixels of the centre
+ *   of the canvas from the top left corner
+ * @param {Number} originY - Vertical distance in canvas pixels of the centre of
+ *   the canvas from the top left corner
+ * @returns {Cell}
  */
 function cellFromScreen(offsetX, offsetY, originX, originY) {
     const cellX = Math.floor((offsetX - originX) / DisplayCell.step);

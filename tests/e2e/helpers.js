@@ -83,6 +83,12 @@ class RenderedCell extends Cell {
      */
     pixelData(pixel) {
         const pixelDataSize = 4;
+        // imgData is a 1D array of the form [r, g, b, a, r, g, b, a, ...]
+        // containing the color information of each pixel going in rows from
+        // top left to bottom right. I can't understand this calculation any
+        // more but it finds the [r, g, b, a] slice of the pixel we want to
+        // target.
+        // TODO: Work out what's going on here
         const index = (pixel.x + pixel.y * DisplayCell.step) * pixelDataSize;
         return this.imgData.slice(index, index + pixelDataSize);
     }
