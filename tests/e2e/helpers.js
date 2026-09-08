@@ -13,6 +13,13 @@ function rgbToHex(r, g, b) {
     return '#' + [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('');
 }
 
+function isBorderPixel(pixel) {
+    return [pixel.x, pixel.y].some(
+        (e) =>
+            e === 0 || e === DisplayCell.size + DisplayCell.borderWidth / 2
+    );
+}
+
 /**
  * Represents a pixel with position and color information.
  *
@@ -100,10 +107,7 @@ class RenderedCell extends Cell {
      * @returns {Boolean}
      */
     hasBorderPixel(pixel) {
-        return [pixel.x, pixel.y].some(
-            (e) =>
-                e === 0 || e === DisplayCell.size + DisplayCell.borderWidth / 2
-        );
+        return isBorderPixel(pixel);
     }
 
     /**
