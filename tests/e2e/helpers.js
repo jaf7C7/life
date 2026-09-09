@@ -1,6 +1,10 @@
 import { Cell } from '../../life/cell.js';
 import { DisplayCell } from '../../life/cell.js';
-import { cellPosition, isBorderPixel, cellCentre } from '../../life/viewport.js';
+import {
+    cellPosition,
+    isBorderPixel,
+    cellCentre
+} from '../../life/viewport.js';
 
 /**
  * Converts RGB channel values to a CSS hex color string.
@@ -109,6 +113,17 @@ class RenderedCell {
         return isBorderPixel(pixel);
     }
 
+    cellIsColor(color) {
+        return Array.from({ length: DisplayCell.step }, (_, x) =>
+            Array.from({ length: DisplayCell.step }, (_, y) => {
+                const pixel = this.pixel(x, y);
+                return this.hasBorderPixel(pixel)
+                    ? pixel.color === DisplayCell.borderColor
+                    : pixel.color === color;
+            })
+        ).every((row) => row.every(Boolean));
+    }
+
     /**
      * Returns true if the cell's border pixels are black and its body pixels
      * are the alive color, else false.
@@ -116,14 +131,7 @@ class RenderedCell {
      * @returns {Boolean}
      */
     isAlive() {
-        return Array.from({ length: DisplayCell.step }, (_, x) =>
-            Array.from({ length: DisplayCell.step }, (_, y) => {
-                const pixel = this.pixel(x, y);
-                return this.hasBorderPixel(pixel)
-                    ? pixel.color === DisplayCell.borderColor
-                    : pixel.color === DisplayCell.aliveColor;
-            })
-        ).every((row) => row.every(Boolean));
+        return this.cellIsColor(DisplayCell.aliveColor);
     }
 
     /**
@@ -133,14 +141,7 @@ class RenderedCell {
      * @returns {Boolean}
      */
     isDead() {
-        return Array.from({ length: DisplayCell.step }, (_, x) =>
-            Array.from({ length: DisplayCell.step }, (_, y) => {
-                const pixel = this.pixel(x, y);
-                return this.hasBorderPixel(pixel)
-                    ? pixel.color === DisplayCell.borderColor
-                    : pixel.color === DisplayCell.deadColor;
-            })
-        ).every((row) => row.every(Boolean));
+        return this.cellIsColor(DisplayCell.deadColor);
     }
 }
 
