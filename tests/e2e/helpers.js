@@ -1,6 +1,6 @@
 import { Cell } from '../../life/cell.js';
 import { DisplayCell } from '../../life/cell.js';
-import { cellPosition, isBorderPixel } from '../../life/viewport.js';
+import { cellPosition, isBorderPixel, cellCentre } from '../../life/viewport.js';
 
 /**
  * Converts RGB channel values to a CSS hex color string.
@@ -191,11 +191,7 @@ export class RenderedCanvas {
      */
     async clickCell(cellX, cellY) {
         const cell = new Cell(cellX, cellY);
-        const [cornerX, cornerY] = cellPosition(this, cell);
-        const [centreX, centreY] = [
-            cornerX + DisplayCell.step / 2,
-            cornerY + DisplayCell.step / 2
-        ];
+        const [centreX, centreY] = cellCentre(this, cell);
         await this.click({ x: centreX, y: centreY });
     }
 

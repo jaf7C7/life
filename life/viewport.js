@@ -1,5 +1,14 @@
 import { Cell, DisplayCell } from './cell.js';
 
+export function cellCentre(canvas, cell) {
+    const [cornerX, cornerY] = cellPosition(canvas, cell);
+    const [centreX, centreY] = [
+        cornerX + DisplayCell.step / 2,
+        cornerY + DisplayCell.step / 2
+    ];
+    return [centreX, centreY];
+}
+
 export function getOrigin(canvas) {
     // This sets the centre of cell 0,0 at the centre of the canvas.
     const originX = canvas.width / 2 - DisplayCell.step / 2;
