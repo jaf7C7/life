@@ -1,5 +1,6 @@
 import { Cell } from '../../life/cell.js';
 import { DisplayCell } from '../../life/cell.js';
+import { cellPosition, isBorderPixel } from '../../life/viewport.js';
 
 /**
  * Converts RGB channel values to a CSS hex color string.
@@ -11,12 +12,6 @@ import { DisplayCell } from '../../life/cell.js';
  */
 function rgbToHex(r, g, b) {
     return '#' + [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('');
-}
-
-function isBorderPixel(pixel) {
-    return [pixel.x, pixel.y].some(
-        (e) => e === 0 || e === DisplayCell.size + DisplayCell.borderWidth / 2
-    );
 }
 
 /**
@@ -64,7 +59,12 @@ class Pixel {
  * @param {Number} y - The Y co-ordinate of the cell relative to the centre of
  *   the canvas.
  */
-class RenderedCell extends Cell {
+class RenderedCell {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
     /**
      * Fetches information about a specific pixel of the rendered cell.
      *
@@ -144,43 +144,6 @@ class RenderedCell extends Cell {
     }
 }
 
-class Canvas {
-    /**
-     * Creates a new Canvas.
-     *
-     * @param {Number} width
-     * @param {Number} height
-     * @param {Object} locator
-     */
-    constructor(width, height) {
-        this.width = width;
-        this.height = height;
-    }
-
-    /**
-     * Returns the location on the canvas of the top-left corner of the given
-     * cell, relative to the top-left corner of the canvas.
-     *
-     * The cell co-ords have their origin at the centre of the canvas, and Y
-     * increases in the upwards direction, whereas the canvas drawing co-ords
-     * have their origin at the top left corner of the canvas, and Y increases
-     * in the downwards direction.
-     *
-     * Cell `0,0` is defined to be at the centre of the canvas.
-     *
-     * @param {RenderedCell} cell
-     * @returns {Number[]}
-     */
-    cellPosition(cell) {
-        const originX = this.width / 2 - DisplayCell.step / 2;
-        const originY = this.height / 2 - DisplayCell.step / 2;
-        const posX = originX + cell.x * DisplayCell.step;
-        const posY = originY - cell.y * DisplayCell.step;
-
-        return [posX, posY];
-    }
-}
-
 /**
  * Represents the canvas of cells where the game state is displayed.
  *
@@ -189,9 +152,10 @@ class Canvas {
  * @param {Object} locator - The Playwright `Locator` object for the rendered
  *   canvas.
  */
-export class RenderedCanvas extends Canvas {
+export class RenderedCanvas {
     constructor(width, height, locator) {
-        super(width, height);
+        this.width = width;
+        this.height = height;
         this.locator = locator;
     }
 
@@ -227,7 +191,7 @@ export class RenderedCanvas extends Canvas {
      */
     async clickCell(cellX, cellY) {
         const cell = new Cell(cellX, cellY);
-        const [cornerX, cornerY] = this.cellPosition(cell);
+        const [cornerX, cornerY] = cellPosition(this, cell);
         const [centreX, centreY] = [
             cornerX + DisplayCell.step / 2,
             cornerY + DisplayCell.step / 2
@@ -248,7 +212,7 @@ export class RenderedCanvas extends Canvas {
     async cell(x, y) {
         const cell = new RenderedCell(x, y);
 
-        const [posX, posY] = this.cellPosition(cell);
+        const [posX, posY] = cellPosition(this, cell);
         cell.posX = posX;
         cell.posY = posY;
 
