@@ -1,11 +1,5 @@
-import { DisplayCell } from '../../life/cell.js';
-
-function getCellCentre(width, height, cellX, cellY) {
-    return [
-        width / 2 + cellX * DisplayCell.step,
-        height / 2 - cellY * DisplayCell.step
-    ];
-}
+import { Cell } from '../../life/cell.js';
+import { cellCentre } from '../../life/viewport.js';
 
 export class MockUI {
     constructor() {
@@ -29,12 +23,8 @@ export class MockUI {
 
             // This clicks the *centre* of cell `cellX,cellY`.
             clickCell(cellX, cellY) {
-                const [x, y] = getCellCentre(
-                    this.width,
-                    this.height,
-                    cellX,
-                    cellY
-                );
+                const cell = new Cell(cellX, cellY);
+                const [x, y] = cellCentre(this, cell);
                 this.click({ x, y });
             },
 
