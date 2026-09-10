@@ -5,20 +5,29 @@ This is a full smell audit of `life/` (production code) and `tests/` (`tests/uni
 skill: read every file, run the `growing-oos` and `refactoring` skills over them, synthesise and
 verify the findings, then explain each smell and propose a fix order.
 
-This supersedes the audit written earlier in this session, which reviewed a tree where a commit
-had moved `tests/e2e/helpers.js`'s Playwright-coupled classes (`Canvas`, `RenderedCell`,
-`RenderedCanvas`, `Pixel`) into `life/canvas.js` (production code) and flagged that as the
-standout new smell. That commit has since been rolled back: `git log` no longer contains it,
-`life/canvas.js` no longer exists, and `tests/e2e/helpers.js` is back — verified by `grep -rn
-"canvas.js" life/ tests/` returning no hits. That finding is therefore withdrawn below, not
-restated. `npm test` (`eslint && mocha tests/unit && playwright test`) passes 22/22 on the
-current tree — none of the smells below are live bugs, all are design/maintenance risk.
+This supersedes the previous `smell_audit.md`. Four commits have landed since that audit
+(`612bc41 move viewport logic to separate module`, `b921149 extract function`, `06907dc delete
+redundant function`, `734d90b extract method`), and several of its findings are now fixed —
+verified below rather than silently dropped. The refactor also introduced a small new smell of
+its own. `npm test` (`eslint && mocha tests/unit && playwright test`) passes 22/22 on the current
+tree (10 unit, 12 e2e across three browsers) — none of the smells below are live bugs, all are
+design/maintenance risk.
 
-One other claim from the withdrawn audit didn't hold up on reverification either: it had flagged
-`RenderedCanvas.clickCell` as clicking the cell's top-left corner while its docstring claimed it
-clicks the centre. Reading the current `tests/e2e/helpers.js:228-236` shows `clickCell` already
-computes `cornerX + DisplayCell.step / 2` / `cornerY + DisplayCell.step / 2` — i.e. it does click
-the centre, matching its docstring. That claim is not repeated below either.
+## Fixes verified from the previous audit
+
+- **Duplicated coordinate math / origin data clump (old Smells 1 & 2)** — `life/viewport.js` now
+  exists as a single shared module (`getOrigin`, `cellPosition`, `cellCentre`,
+  `cellBodyPosition`, `cellAtPosition`, `isBorderPixel`), and `life/app.js`,
+  `tests/unit/helpers.js`, and `tests/e2e/helpers.js` all import from it instead of
+  reimplementing the geometry independently. The originX/originY pair is no longer threaded
+  through every function signature as a raw parameter pair.
+- **`RenderedCell extends Cell` (old Smell 6)** — `tests/e2e/helpers.js`'s `RenderedCell` is now a
+  plain class with its own `x`/`y` fields; it no longer subclasses the domain `Cell`.
+- **`isAlive`/`isDead` duplicated structure (old Smell 8)** — both now delegate to a shared
+  `cellIsColor(color)` method.
+
+These are genuine structural fixes, not just renames — worth calling out since they addressed the
+two highest-leverage items the previous audit flagged.
 
 ---
 
@@ -45,81 +54,9 @@ the centre, matching its docstring. That claim is not repeated below either.
 
 ## The smells
 
-### Smell 1: coordinate math duplicated across three files
+### Smell A: `createClickHandler` takes an unused parameter
 
-**Where:**
-
-- `life/app.js` — `getOrigin`, `cellToScreen`, `cellFromScreen`
-- `tests/e2e/helpers.js` — `Canvas.cellPosition`, and `RenderedCanvas.clickCell`'s centring
-  arithmetic
-- `tests/unit/helpers.js` — `getCellCentre`
-
-All three independently encode "a cell's screen position is the viewport origin plus/minus
-`cell.coord * DisplayCell.step`, with Y inverted, and the origin itself is
-`canvas.width/height / 2 - DisplayCell.step / 2`." They were written separately.
-
-**Verified:** worked the algebra by hand for all three call sites — they currently agree (e.g.
-`getCellCentre`'s `width/2 + cellX*step` is algebraically identical to `Canvas.cellPosition`'s
-corner plus a half-step offset). This isn't a live bug today, but it's three independent,
-easy-to-desync derivations of one fact, verified to currently agree only by coincidence of
-careful arithmetic, not by any shared source of truth.
-
-**Why it's bad:**
-
-- **Fowler — Duplicated Code**: "the most important of the smells" — any future change to the
-  formula (e.g. adding a zoom factor) has to be made correctly in three-plus places or the
-  system, its unit-test double, and its e2e assertions silently disagree about what a "cell" is
-  on screen.
-- **SOLID — Single Responsibility**: three unrelated modules (the render loop, a synchronous
-  unit-test double, and a Playwright-driving e2e helper) have each taken on the responsibility of
-  "know the coordinate system," which belongs to one thing.
-- **GOOS — "the difficulty is telling you something"**: needing to reimplement the same geometry
-  to build a _test double_ is a signal that the geometry isn't yet a proper collaborator in
-  production code — it's implicit knowledge scattered through functions instead of an explicit
-  object.
-
-**The refactoring:** **Extract Class**, then **Move Function**, to create a single `Viewport`
-class (e.g. `life/viewport.js`) owning `originX`/`originY` and exposing `toScreen(cell)` and
-`fromScreen(x, y)`.
-
-1. Create the class with a constructor taking `(originX, originY)` or `(canvas)`.
-2. Move `cellToScreen`'s body into `toScreen`, `cellFromScreen`'s body into `fromScreen`.
-3. Update `app.js` to construct one `Viewport` and call its methods.
-4. Update `tests/e2e/helpers.js`'s `Canvas` to delegate to `Viewport` instead of reimplementing
-   `cellPosition`.
-5. Update `tests/unit/helpers.js`'s `getCellCentre` to use the same `Viewport.toScreen`.
-6. Run the full suite after each step.
-
----
-
-### Smell 2: `originX`/`originY` are a Data Clump threaded through every function signature
-
-**Where:** `life/app.js` — `cellToScreen(originX, originY, x, y)`, `renderCell(ctx, originX,
-originY, cell, color)`, `render(canvas, originX, originY, cells)`, `cellFromScreen(offsetX,
-offsetY, originX, originY)`, `createClickHandler(ui, canvas, originX, originY, cells)`.
-
-**Why it's bad:**
-
-- **Fowler — Data Clump**: "whenever you see the same two or three data items together in lots
-  of places... it's time for [them] to have their own [object]." Delete one of the pair and the
-  other stops making sense alone.
-- **SOLID — Single Responsibility**: every function taking `(originX, originY)` has implicitly
-  taken on responsibility for the viewport's positioning concept, when all it wants is "convert
-  this cell to a point."
-- **Long Parameter List** compounds this: `render` and `createClickHandler` thread the pair
-  through unchanged purely to hand it to a nested call — noise for a reader trying to understand
-  what each function actually does.
-
-**The refactoring:** resolved as a side effect of Smell 1's `Viewport` extraction — a
-specialised **Introduce Parameter Object**, since the object also carries behaviour, not just
-data. Once `Viewport` exists, `render(canvas, viewport, cells)` and `renderCell(ctx, viewport,
-cell, color)` each take one meaningful parameter instead of a coordinate pair.
-
----
-
-### Smell 3: `createClickHandler` takes an unused parameter
-
-**Where:** `life/app.js:139` — `createClickHandler(ui, canvas, originX, originY, cells)`.
+**Where:** `life/app.js:84` — `createClickHandler(ui, canvas, cells)`.
 
 **Verified:** read the full function body — `ui` is never referenced, either in the outer
 function or the returned click-handling closure.
@@ -139,7 +76,7 @@ site (`initApp`). Zero risk, no dependents — a good first move before larger d
 
 ---
 
-### Smell 4: live cells are represented as raw strings everywhere (Primitive Obsession / "No String Types")
+### Smell B: live cells are represented as raw strings everywhere (Primitive Obsession / "No String Types")
 
 **Where:** pervasive — `rules.js` (`Set<String>` in/out, `Cell.fromString`/`.toString()` calls
 in `next()`), `app.js` (`toggleCell`, both loops in `render`, `createClickHandler`), and all
@@ -149,13 +86,13 @@ three test files, which build cell sets as `new Set(['0,0', '0,1', ...])`.
 
 ```js
 /**
- * @param {Cell} cell - The cell to toggle
  * @param {Set<Cell>} cells - The set of living cells, ...
+ * @param {Cell} cell - The cell to toggle
  */
-function toggleCell(cell, cells) { ... }
+function toggleCell(cells, cell) { ... }
 ```
 
-but `cell` is actually the _string_ produced by `cellFromScreen(...).toString()`, and `cells` is
+but `cell` is actually the _string_ produced by `cellAtPosition(...).toString()`, and `cells` is
 a `Set<String>`, not `Set<Cell>` — the documentation describes the design the code _should_ have,
 which is a strong signal the string encoding is an accidental workaround rather than an
 intentional choice, and it's actively dangerous: a maintainer trusting the JSDoc could reasonably
@@ -177,9 +114,6 @@ reference equality; no two `Cell` instances are `===`).
 - **SOLID — Single Responsibility**, inverted: with no object responsible for "the set of live
   cells," that responsibility is smeared across `app.js` and `rules.js`.
 
-A related, smaller smell: `toggleCell(cell, cells)` names its first parameter `cell` when it's
-actually a string — a **Mysterious Name** independent of the JSDoc issue.
-
 **The refactoring:**
 
 1. **Extract Class** to introduce a `Board` (or `LiveCells`) class that **encapsulates** the
@@ -196,7 +130,7 @@ actually a string — a **Mysterious Name** independent of the JSDoc issue.
 
 ---
 
-### Smell 5: `next()` conflates two phases of the algorithm in one loop
+### Smell C: `next()` conflates two phases of the algorithm in one loop
 
 **Where:** `life/rules.js:41-67`. The single loop over live cells simultaneously (a) counts each
 live cell's live neighbours to decide survival, and (b) accumulates a counter of _dead_
@@ -216,46 +150,19 @@ neighbours across all live cells, to later decide births.
 
 **The refactoring:** **Split Phase** — extract `survivors(cells)` and `births(cells)`, each with
 its own loop; `next()` becomes `new Set([...survivors(cells), ...births(cells)])`. Use a `Map` in
-`births` instead of a plain object. Sequence this _after_ Smell 4's `Board` extraction, since the
+`births` instead of a plain object. Sequence this _after_ Smell B's `Board` extraction, since the
 counting logic should operate on the new API rather than raw strings.
 
 ---
 
-### Smell 6: `RenderedCell extends Cell` — inheritance used for convenience, not "is-a"
+### Smell D: post-construction mutation in `RenderedCanvas.cell()`
 
-**Where:** `tests/e2e/helpers.js:67` — `class RenderedCell extends Cell { ... }`, adding
-`pixel()`, `pixelData()`, `hasBorderPixel()`, `isAlive()`, `isDead()`.
-
-**Why it's bad:**
-
-- **SOLID — Liskov Substitution**: is every `Cell` conceptually interchangeable with a
-  `RenderedCell`? No — a `RenderedCell` only makes sense against a rendered Playwright page (it
-  needs `imgData`/`posX`/`posY`), while `Cell` is a pure coordinate pair used throughout the
-  domain. Subclassing a production, domain class from a test-only class inverts the dependency
-  the wrong way: domain code shouldn't need to care that a test-only subtype exists, but that
-  coupling is now baked into the class hierarchy rather than confined to test files.
-- **GOOS — Context Independence**: `Cell` should be usable anywhere without dragging in unrelated
-  context. `RenderedCell` just borrows `x`/`y`/`toString` for convenience — composition would
-  give it the same thing without polluting the inheritance chain.
-- Practically: if `Cell` ever grows a method that doesn't make sense for a `RenderedCell` (or
-  vice versa), the link forces an awkward override or an empty method — a classic setup for
-  **Refused Bequest**.
-
-**The refactoring:** stop extending; use composition. Give `RenderedCell` a `cell` field, use
-**Hide Delegate** to forward `x`/`y`/`toString()`, and keep `pixel`/`isAlive`/`isDead` as
-`RenderedCell`'s own behaviour. `RenderedCanvas.cell(x, y)` then does
-`new RenderedCell(new Cell(x, y), imgData)`.
-
----
-
-### Smell 7: post-construction mutation in `RenderedCanvas.cell()`
-
-**Where:** `tests/e2e/helpers.js:248-258`:
+**Where:** `tests/e2e/helpers.js:209-219`:
 
 ```js
 async cell(x, y) {
     const cell = new RenderedCell(x, y);
-    const [posX, posY] = this.cellPosition(cell);
+    const [posX, posY] = cellPosition(this, cell);
     cell.posX = posX;
     cell.posY = posY;
     cell.imgData = await this.cellImgData(cell);
@@ -280,7 +187,7 @@ async cell(x, y) {
 **The refactoring:** **Replace Constructor with Factory Function** — move the fetch and field
 assignment into a static async factory (`RenderedCell.at(cell, canvas)`) whose constructor takes
 all fields as arguments, so the object is complete the moment it exists. `RenderedCanvas.cell(x,
-y)` becomes a one-line delegation. Pair with Smell 6 — both touch the same class and constructor.
+y)` becomes a one-line delegation.
 
 Also worth folding into this pass, since it touches the same test's intent:
 `tests/unit/life.test.js`'s `'Clicking on a cell twice leaves it dead'` (and its e2e equivalent)
@@ -290,45 +197,17 @@ actually exercises and verifies both transitions, not just their net effect.
 
 ---
 
-### Smell 8: `isAlive()` and `isDead()` duplicate their entire structure
+### Smell E: duplicated setup across unit tests
 
-**Where:** `tests/e2e/helpers.js:118-144`. Both methods build the identical nested
-`Array.from({length: step}, ...)` grid and call `hasBorderPixel` identically; the only difference
-is which two colour constants (`aliveColor`/`deadColor`) are compared against.
-
-**Why it's bad:**
-
-- **Fowler — Duplicated Code**, textbook case for **Parameterize Function**: "when you see two
-  functions that differ only in a literal value, combine them via a parameter." Every future
-  change to how a cell's colour is checked has to be made twice, correctly, in sync.
-- GOOS explicitly allows test code _more_ duplication than production code where it aids
-  readability of a single scenario — but two ~15-line, structurally identical methods isn't "a
-  little duplication for clarity," so it doesn't qualify for that exemption.
-
-**The refactoring:** **Parameterize Function** — replace both with a single `isColor(bodyColor)`
-method (comparing border pixels to `DisplayCell.borderColor` and body pixels to `bodyColor`), and
-make `isAlive()`/`isDead()` one-line callers (`isColor(DisplayCell.aliveColor)` /
-`isColor(DisplayCell.deadColor)`).
-
----
-
-### Smell 9: duplicated setup across unit tests
-
-**Where:** `tests/unit/life.test.js` — all three tests open with:
-
-```js
-const cells = new Set();
-const ui = new MockUI();
-initApp(ui, cells);
-const canvas = ui.findElement('canvas');
-```
+**Where:** `tests/unit/life.test.js` — all three tests open with the same two or three lines
+(`const cells = new Set(); const ui = new MockUI(); initApp(ui, cells);`, with two of the three
+also fetching `const canvas = ui.findElement('canvas');`).
 
 **Why it's bad:**
 
 - **GOOS — "Streamline Test Code"**: setup that doesn't contribute to the description of the
   specific scenario should be moved out of the test body, so the reader's eye goes straight to
-  what's _different_ about this test. Right now a reader must diff four identical lines across
-  three tests to confirm none of it is scenario-specific.
+  what's _different_ about this test.
 - **Fowler — Duplicated Code**, the "Rule of Three": three-for-three repetition is the trigger to
   extract.
 
@@ -338,41 +217,136 @@ Low-risk, purely local, no dependents.
 
 ---
 
+### Smell F: stale JSDoc left behind by the viewport-extraction refactor
+
+**Where:** three functions, all touched by `612bc41 move viewport logic to separate module`:
+
+- `life/app.js:1-20` — `renderCell`'s docstring documents `@param {Number} originX` and
+  `@param {Number} originY`, neither of which exist in the actual signature
+  `renderCell(ctx, canvas, cell, color)`; `canvas` itself is undocumented.
+- `life/viewport.js:41-54` — `cellBodyPosition`'s docstring documents `originX`/`originY` as
+  parameters; the actual signature is `cellBodyPosition(canvas, x, y)`.
+- `life/viewport.js:70-84` — `cellAtPosition`'s docstring documents `offsetX`/`offsetY` **and**
+  `originX`/`originY`; the actual signature is `cellAtPosition(canvas, offsetX, offsetY)` — two
+  of the four documented parameters don't exist.
+
+**Verified:** read each function's current signature against its docstring directly; all three
+mismatches are exact — the docs describe the pre-refactor call convention (raw `originX`/`originY`
+parameters) that the refactor replaced with a `canvas` argument internally computing the origin
+via `getOrigin`.
+
+**Why it's bad:**
+
+- **Fowler — Comments** (the smell): a comment (here, a JSDoc block) that describes something
+  other than what the code does is worse than no comment — it actively misleads. Fowler's fix for
+  comments describing _behaviour_ is usually to name it in code instead, but here the JSDoc is
+  simply wrong and needs correcting to match the refactored signature.
+- **GOOS — tests/docs as a contract**: a signature's documentation is part of how a caller learns
+  to use it without reading the body. Three call sites now lie about their own parameter list.
+- Notably ironic: the previous audit's Smell 1 warned that scattering the coordinate geometry
+  across independent implementations "verified to agree only by coincidence" was a desync risk.
+  The refactor that fixed that smell has, in the same commit, introduced a smaller instance of
+  the same underlying failure mode — code changed, documentation didn't follow.
+
+**The refactoring:** **Change Function Declaration** is not needed (signatures are already
+correct) — this is a straight documentation fix: rewrite each JSDoc block's `@param` list to match
+the actual parameters (`canvas`, plus whichever of `cell`/`x`/`y`/`offsetX`/`offsetY` apply).
+Mechanical, zero behavioural risk, but should happen before anyone reads these docs to understand
+the module.
+
+---
+
+### Smell G: same-module imports split across two statements
+
+**Where:** `life/app.js:1-2` and `tests/e2e/helpers.js:1-2`, both:
+
+```js
+import { Cell } from './cell.js';
+import { DisplayCell } from './cell.js';
+```
+
+`life/viewport.js:1` shows the alternative already used correctly elsewhere in the codebase:
+`import { Cell, DisplayCell } from './cell.js';`.
+
+**Why it's bad:**
+
+- **Fowler — Duplicated Code** in miniature: two statements doing the job of one, and an
+  inconsistency between files importing from the exact same module.
+- Minor, but it's a one-line fix with zero risk, worth folding into whichever pass next touches
+  these files.
+
+**The refactoring:** combine into a single `import { Cell, DisplayCell } from './cell.js';` in
+each file.
+
+---
+
+### Smell H: `render()` still computes visible bounds via raw origin arithmetic
+
+**Where:** `life/app.js:26-57`. `render()` calls `getOrigin(canvas)` and then directly computes
+`minX`, `maxX`, `minY`, `maxY` using `originX`/`originY`/`canvas.width`/`canvas.height` and
+`DisplayCell.step` — the same kind of raw coordinate-system knowledge that `viewport.js` was
+extracted specifically to centralise.
+
+**Why it's bad:**
+
+- **Fowler — Feature Envy**: `render()` is more interested in `viewport.js`'s concept of "origin"
+  and "step" than in its own job of painting cells; it reaches past the module boundary to derive
+  a viewport-level fact (which cells are visible) using low-level primitives instead of asking for
+  it directly.
+- **SOLID — Single Responsibility**: `viewport.js` was given ownership of "how canvas pixels map
+  to cell coordinates" by the recent refactor, but this one usage still bypasses that ownership,
+  leaving a residual second copy of viewport-adjacent knowledge that the extraction didn't fully
+  capture.
+- Practically, this is exactly the kind of leftover the previous audit's Smell 1 was originally
+  worried about: coordinate-system logic that continues to exist in more than one place, just now
+  one fewer place than before.
+
+**The refactoring:** **Extract Function** + **Move Function** — add a `visibleCellBounds(canvas)`
+function to `life/viewport.js` that returns `{ minX, maxX, minY, maxY }`, moving the existing
+`Math.floor`/`Math.ceil` arithmetic there verbatim; `render()` then calls it and destructures the
+result instead of computing it inline. Low risk, self-contained to `render()` and `viewport.js`.
+
+---
+
 ## Suggested order of work
 
 Do the smallest, most self-contained refactorings first, then the refactorings with the widest
 fan-out (the ones other fixes would otherwise duplicate) before anything that depends on their
 result — so no line of code is edited twice for two different reasons.
 
-1. **Smell 3 — remove the unused `ui` parameter.** Zero dependencies, zero risk, two minutes.
-   Get it out of the way before larger diffs land.
+1. **Smell A — remove the unused `ui` parameter.** Zero dependencies, zero risk, two minutes. Get
+   it out of the way before larger diffs land.
 
-2. **Smell 1 and 2 together — extract a shared `Viewport` class**, used by `app.js`,
-   `tests/unit/helpers.js`, and `tests/e2e/helpers.js`'s `Canvas`. This is the highest-leverage
-   refactor here: it eliminates the duplicated coordinate math and resolves the
-   `originX`/`originY` data clump by giving the pair a proper home, in the one place that will
-   need to compute "screen position for a cell" going forward.
+2. **Smell G — merge the split `cell.js` imports** in `life/app.js` and `tests/e2e/helpers.js`.
+   Trivial, independent, no reason to defer.
 
-3. **Smell 4 — encapsulate live cells behind a `Board` class**, removing the pervasive
-   string/`Cell` conversion duplication in `app.js` and `rules.js`, and fixing the stale JSDoc as
-   part of introducing the real type. The largest single change; doing it after step 2 means the
-   coordinate-conversion code is already stable and won't need touching again here.
+3. **Smell F — fix the three stale JSDoc blocks** (`renderCell`, `cellBodyPosition`,
+   `cellAtPosition`). Purely documentation, no code risk, and worth doing before Smell H touches
+   `app.js`/`viewport.js` again so the docs aren't stale a second time when that lands.
 
-4. **Smell 5 — split `next()` into `survivors`/`births`.** Right after Smell 4, since it's far
+4. **Smell H — extract `visibleCellBounds` into `viewport.js`.** Same two files as step 3
+   (`app.js`, `viewport.js`), so doing it immediately after means those files are only reopened
+   once. This also finishes the job the original viewport extraction started, ahead of the larger
+   `Board` work below which will also touch `app.js`'s `render()`.
+
+5. **Smell B — encapsulate live cells behind a `Board` class**, removing the pervasive
+   string/`Cell` conversion duplication in `app.js` and `rules.js`, and fixing the stale
+   `toggleCell` JSDoc as part of introducing the real type. The largest single change; doing it
+   after steps 1-4 means `app.js` is otherwise stable and won't need touching again for unrelated
+   reasons while this lands.
+
+6. **Smell C — split `next()` into `survivors`/`births`.** Right after Smell B, since it's far
    simpler once `next()` already works against the new `Board` API rather than raw strings.
 
-5. **Smells 6 + 7 — replace `RenderedCell extends Cell` with composition, replace
-   post-construction mutation with a factory function, and add the missing intermediate
-   assertion to the toggle-twice tests.** Grouped together because they touch the same class,
-   constructor, and test intent in the same file (`tests/e2e/helpers.js`).
+7. **Smell D — replace post-construction mutation in `RenderedCanvas.cell()` with a factory
+   function, and add the missing intermediate assertion to the toggle-twice tests.**
+   Self-contained to `tests/e2e/helpers.js` and the toggle tests; independent of the production
+   changes above, so it can land in parallel with steps 5-6 if convenient.
 
-6. **Smell 8 — parameterize `isAlive`/`isDead` into `isColor`.** Same file as step 5; fold into
-   the same pass.
+8. **Smell E — extract shared unit-test setup.** Purely local, no dependents, safe to do whenever
+   — last, as low-risk polish once `initApp`/`MockUI` have settled from the refactors above.
 
-7. **Smell 9 — extract shared unit-test setup.** Purely local, no dependents, safe to do
-   whenever — last, as low-risk polish once `initApp`/`MockUI` have settled from the refactors
-   above.
-
-This front-loads the two structural refactors (`Viewport`, `Board`) that everything else either
-depends on or would otherwise duplicate, and leaves purely local cleanups (unused parameter, test
-setup duplication) for whenever convenient, since they carry no risk of being redone.
+This clears every trivial, dependency-free fix (A, G, F) before anything structural, finishes the
+viewport module's job (H) before the next structural refactor touches the same file (B), and
+leaves the two purely-local test cleanups (D, E) for whenever convenient since neither is a
+dependency of anything else.
