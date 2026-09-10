@@ -81,7 +81,7 @@ function toggleCell(cells, cell) {
  * translates the click co-ords into cell co-ords, toggles the corresponding
  * cell and repaints the canvas.
  */
-function createClickHandler(ui, canvas, cells) {
+function createClickHandler(canvas, cells) {
     return ({ offsetX, offsetY }) => {
         const cell = cellAtPosition(canvas, offsetX, offsetY).toString();
 
@@ -93,7 +93,7 @@ function createClickHandler(ui, canvas, cells) {
 
 export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
-    const handleClick = createClickHandler(ui, canvas, cells);
+    const handleClick = createClickHandler(canvas, cells);
 
     canvas.addEventListener('click', handleClick);
 
