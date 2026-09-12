@@ -56,9 +56,13 @@ function render(canvas, cells) {
         }
     }
 
-    for (const cell of [...cells].map(Cell.fromString)) {
+    for (const cell of liveCells(cells)) {
         renderCell(ctx, canvas, cell, DisplayCell.aliveColor);
     }
+}
+
+function liveCells(cells) {
+    return [...cells].map(Cell.fromString);
 }
 
 /**
