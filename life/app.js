@@ -15,7 +15,7 @@ import { getOrigin, cellBodyPosition, cellAtPosition } from './viewport.js';
  */
 function renderCell(ctx, canvas, cell, color) {
     ctx.fillStyle = color;
-    const [posX, posY] = cellBodyPosition(canvas, cell.x, cell.y);
+    const [posX, posY] = cellBodyPosition(canvas, cell);
     ctx.fillRect(posX, posY, DisplayCell.size, DisplayCell.size);
 }
 
