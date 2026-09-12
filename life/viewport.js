@@ -51,8 +51,7 @@ export function cellPosition(canvas, cell) {
  *   of the cell body (not the cell's border). This is intended to be consumed
  *   by `ctx.fillRect` to draw the cell.
  */
-export function cellBodyPosition(canvas, x, y) {
-    const cell = new Cell(x, y);
+export function cellBodyPosition(canvas, cell) {
     const [posX, posY] = cellPosition(canvas, cell);
 
     // `posX` and `posY` are the canvas pixel co-ords for the top left corner
