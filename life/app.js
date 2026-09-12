@@ -49,11 +49,16 @@ function render(canvas, cells) {
     const minY = Math.floor(-(canvas.height - originY) / DisplayCell.step);
     const maxY = Math.ceil(originY / DisplayCell.step);
 
+    const visibleCells = [];
     for (let x = minX; x <= maxX; x++) {
         for (let y = minY; y <= maxY; y++) {
             const cell = new Cell(x, y);
-            renderCell(ctx, canvas, cell, DisplayCell.deadColor);
+            visibleCells.push(cell);
         }
+    }
+
+    for (const cell of visibleCells) {
+        renderCell(ctx, canvas, cell, DisplayCell.deadColor);
     }
 
     for (const cell of liveCells(cells)) {
