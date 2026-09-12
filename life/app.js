@@ -1,6 +1,6 @@
 import { Cell } from './cell.js';
 import { DisplayCell } from './cell.js';
-import { getOrigin, cellBodyPosition, cellAtPosition } from './viewport.js';
+import { cellBodyPosition, cellAtPosition, visibleCells } from './viewport.js';
 
 /**
  * Draws a cell in the viewport.
@@ -29,35 +29,7 @@ function render(canvas, cells) {
     ctx.fillStyle = DisplayCell.borderColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    const [originX, originY] = getOrigin(canvas);
-
-    // `minX`: How many cells does it take to totally fill the space from the
-    // centre of the viewport (canvas) to the left edge of the viewport?
-    // Negative as viewport centre is the origin of the cell co-ords.
-    const minX = Math.floor(-originX / DisplayCell.step);
-
-    // `maxX`: How many cells does is take to totally fill the space from the
-    // centre of the viewport (canvas) to the right edge of the viewport?
-    const maxX = Math.floor((canvas.width - originX) / DisplayCell.step);
-
-    // `minY`, `maxY` analagous to `minX`/`maxX` but in the vertical direction.
-    // Note that the Y-axes of the viewport/canvas and of the cell grid are in
-    // opposite directions -- The viewport/canvas origin is in the top-left
-    // corner of the canvas element and Y increases downwards, while the origin
-    // of the cell grid is centred in the canvas and Y increases upwards. This
-    // is shown in by the `-(...)` expression in the calculation of `minY`.
-    const minY = Math.floor(-(canvas.height - originY) / DisplayCell.step);
-    const maxY = Math.ceil(originY / DisplayCell.step);
-
-    const visibleCells = [];
-    for (let x = minX; x <= maxX; x++) {
-        for (let y = minY; y <= maxY; y++) {
-            const cell = new Cell(x, y);
-            visibleCells.push(cell);
-        }
-    }
-
-    for (const cell of visibleCells) {
+    for (const cell of visibleCells(canvas)) {
         renderCell(ctx, canvas, cell, DisplayCell.deadColor);
     }
 
