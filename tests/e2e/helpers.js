@@ -3,7 +3,8 @@ import { DisplayCell } from '../../life/cell.js';
 import {
     cellPosition,
     isBorderPixel,
-    cellCentre
+    cellCentre,
+    cellStep
 } from '../../life/viewport.js';
 
 /**
@@ -99,7 +100,7 @@ class RenderedCell {
         // more but it finds the [r, g, b, a] slice of the pixel we want to
         // target.
         // TODO: Work out what's going on here
-        const index = (pixel.x + pixel.y * DisplayCell.step) * pixelDataSize;
+        const index = (pixel.x + pixel.y * cellStep) * pixelDataSize;
         return this.imgData.slice(index, index + pixelDataSize);
     }
 
@@ -114,8 +115,8 @@ class RenderedCell {
     }
 
     cellIsColor(color) {
-        return Array.from({ length: DisplayCell.step }, (_, x) =>
-            Array.from({ length: DisplayCell.step }, (_, y) => {
+        return Array.from({ length: cellStep }, (_, x) =>
+            Array.from({ length: cellStep }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
                     ? pixel.color === DisplayCell.borderColor
@@ -233,7 +234,7 @@ export class RenderedCanvas {
                 const ctx = element.getContext('2d');
                 return ctx.getImageData(posX, posY, step, step).data;
             },
-            { posX: cell.posX, posY: cell.posY, step: DisplayCell.step }
+            { posX: cell.posX, posY: cell.posY, step: cellStep }
         );
     }
 }
