@@ -4,7 +4,6 @@ export class DisplayCell {
     static aliveColor = '#ff0000';
     static deadColor = '#ffffff';
     static borderColor = '#000000';
-    static step = this.size + this.borderWidth;
 }
 
 export class Cell {

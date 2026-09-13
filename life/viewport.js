@@ -1,16 +1,18 @@
 import { Cell, DisplayCell } from './cell.js';
 
+export const cellStep = DisplayCell.size + DisplayCell.borderWidth;
+
 export function visibleCells(canvas) {
     const [originX, originY] = getOrigin(canvas);
 
     // `minX`: How many cells does it take to totally fill the space from the
     // centre of the viewport (canvas) to the left edge of the viewport?
     // Negative as viewport centre is the origin of the cell co-ords.
-    const minX = Math.floor(-originX / DisplayCell.step);
+    const minX = Math.floor(-originX / cellStep);
 
     // `maxX`: How many cells does is take to totally fill the space from the
     // centre of the viewport (canvas) to the right edge of the viewport?
-    const maxX = Math.floor((canvas.width - originX) / DisplayCell.step);
+    const maxX = Math.floor((canvas.width - originX) / cellStep);
 
     // `minY`, `maxY` analagous to `minX`/`maxX` but in the vertical direction.
     // Note that the Y-axes of the viewport/canvas and of the cell grid are in
@@ -18,8 +20,8 @@ export function visibleCells(canvas) {
     // corner of the canvas element and Y increases downwards, while the origin
     // of the cell grid is centred in the canvas and Y increases upwards. This
     // is shown in by the `-(...)` expression in the calculation of `minY`.
-    const minY = Math.floor(-(canvas.height - originY) / DisplayCell.step);
-    const maxY = Math.ceil(originY / DisplayCell.step);
+    const minY = Math.floor(-(canvas.height - originY) / cellStep);
+    const maxY = Math.ceil(originY / cellStep);
 
     const result = [];
     for (let x = minX; x <= maxX; x++) {
@@ -34,17 +36,14 @@ export function visibleCells(canvas) {
 
 export function cellCentre(canvas, cell) {
     const [cornerX, cornerY] = cellPosition(canvas, cell);
-    const [centreX, centreY] = [
-        cornerX + DisplayCell.step / 2,
-        cornerY + DisplayCell.step / 2
-    ];
+    const [centreX, centreY] = [cornerX + cellStep / 2, cornerY + cellStep / 2];
     return [centreX, centreY];
 }
 
 export function getOrigin(canvas) {
     // This sets the centre of cell 0,0 at the centre of the canvas.
-    const originX = canvas.width / 2 - DisplayCell.step / 2;
-    const originY = canvas.height / 2 - DisplayCell.step / 2;
+    const originX = canvas.width / 2 - cellStep / 2;
+    const originY = canvas.height / 2 - cellStep / 2;
     return [originX, originY];
 }
 
@@ -64,8 +63,8 @@ export function getOrigin(canvas) {
  */
 export function cellPosition(canvas, cell) {
     const [originX, originY] = getOrigin(canvas);
-    const posX = originX + cell.x * DisplayCell.step;
-    const posY = originY - cell.y * DisplayCell.step;
+    const posX = originX + cell.x * cellStep;
+    const posY = originY - cell.y * cellStep;
 
     return [posX, posY];
 }
@@ -115,8 +114,8 @@ export function cellBodyPosition(canvas, cell) {
 export function cellAtPosition(canvas, offsetX, offsetY) {
     const [originX, originY] = getOrigin(canvas);
 
-    const cellX = Math.floor((offsetX - originX) / DisplayCell.step);
-    const cellY = -Math.floor((offsetY - originY) / DisplayCell.step);
+    const cellX = Math.floor((offsetX - originX) / cellStep);
+    const cellY = -Math.floor((offsetY - originY) / cellStep);
 
     return new Cell(cellX, cellY);
 }
