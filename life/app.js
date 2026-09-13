@@ -1,6 +1,11 @@
 import { Cell } from './cell.js';
 import { DisplayCell } from './cell.js';
-import { cellBodyPosition, cellAtPosition, visibleCells } from './viewport.js';
+import {
+    cellBodyPosition,
+    cellAtPosition,
+    visibleCells,
+    cellSize
+} from './viewport.js';
 
 /**
  * Draws a cell in the viewport.
@@ -16,7 +21,7 @@ import { cellBodyPosition, cellAtPosition, visibleCells } from './viewport.js';
 function renderCell(ctx, canvas, cell, color) {
     ctx.fillStyle = color;
     const [posX, posY] = cellBodyPosition(canvas, cell);
-    ctx.fillRect(posX, posY, DisplayCell.size, DisplayCell.size);
+    ctx.fillRect(posX, posY, cellSize, cellSize);
 }
 
 /**

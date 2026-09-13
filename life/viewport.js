@@ -1,6 +1,7 @@
 import { Cell, DisplayCell } from './cell.js';
 
-export const cellStep = DisplayCell.size + DisplayCell.borderWidth;
+export const cellSize = 20;
+export const cellStep = cellSize + DisplayCell.borderWidth;
 
 export function visibleCells(canvas) {
     const [originX, originY] = getOrigin(canvas);
@@ -122,6 +123,6 @@ export function cellAtPosition(canvas, offsetX, offsetY) {
 
 export function isBorderPixel(pixel) {
     return [pixel.x, pixel.y].some(
-        (e) => e === 0 || e === DisplayCell.size + DisplayCell.borderWidth / 2
+        (e) => e === 0 || e === cellSize + DisplayCell.borderWidth / 2
     );
 }
