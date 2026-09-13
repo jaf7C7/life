@@ -1,5 +1,9 @@
 import { Cell } from '../../life/cell.js';
-import { DisplayCell } from '../../life/cell.js';
+import {
+    livingCellColor,
+    deadCellColor,
+    cellBorderColor
+} from '../../life/app.js';
 import {
     cellPosition,
     isBorderPixel,
@@ -119,7 +123,7 @@ class RenderedCell {
             Array.from({ length: cellStep }, (_, y) => {
                 const pixel = this.pixel(x, y);
                 return this.hasBorderPixel(pixel)
-                    ? pixel.color === DisplayCell.borderColor
+                    ? pixel.color === cellBorderColor
                     : pixel.color === color;
             })
         ).every((row) => row.every(Boolean));
@@ -132,7 +136,7 @@ class RenderedCell {
      * @returns {Boolean}
      */
     isAlive() {
-        return this.cellIsColor(DisplayCell.aliveColor);
+        return this.cellIsColor(livingCellColor);
     }
 
     /**
@@ -142,7 +146,7 @@ class RenderedCell {
      * @returns {Boolean}
      */
     isDead() {
-        return this.cellIsColor(DisplayCell.deadColor);
+        return this.cellIsColor(deadCellColor);
     }
 }
 

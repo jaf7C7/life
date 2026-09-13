@@ -1,9 +1,3 @@
-export class DisplayCell {
-    static aliveColor = '#ff0000';
-    static deadColor = '#ffffff';
-    static borderColor = '#000000';
-}
-
 export class Cell {
     constructor(x, y) {
         this.x = x;
