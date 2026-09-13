@@ -1,5 +1,4 @@
 export class DisplayCell {
-    static borderWidth = 2;
     static aliveColor = '#ff0000';
     static deadColor = '#ffffff';
     static borderColor = '#000000';
