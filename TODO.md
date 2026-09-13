@@ -20,7 +20,10 @@
   - [x] Clicking a cell on the canvas toggles it live/dead.
   - [ ] **Click-and-drag to pan around the grid.**
     - [x] Remove non-functioning code
-    - [ ] **Refactor to eliminate code smells (see 'refactoring_notes.md')**
+    - [ ] Refactor to eliminate code smells (see 'smell_audit.md')
+    - [ ] **Move `DisplayCell.size` to `viewport.js`**
+    - [ ] Move `DisplayCell.{alive,dead}color` to `app.js`
+    - [ ] Move everything to do with rendering (mostly in `app.js` to `render.js`
     - [ ] Implement a real `UI` class
     - [ ] Extract a `CanvasWrapper` or `GameGrid` class from `MockUI` which can become part of the model code, and keep `MockUI` as simple as possible.
   - [ ] Pinch/mousewheel to zoom in/out.
