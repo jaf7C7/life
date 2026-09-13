@@ -1,7 +1,8 @@
-import { Cell, DisplayCell } from './cell.js';
+import { Cell } from './cell.js';
 
 export const cellSize = 20;
-export const cellStep = cellSize + DisplayCell.borderWidth;
+const cellBorderWidth = 2;
+export const cellStep = cellSize + cellBorderWidth;
 
 export function visibleCells(canvas) {
     const [originX, originY] = getOrigin(canvas);
@@ -87,15 +88,12 @@ export function cellBodyPosition(canvas, cell) {
     const [posX, posY] = cellPosition(canvas, cell);
 
     // `posX` and `posY` are the canvas pixel co-ords for the top left corner
-    // `of the cell inclusive of its border. DisplayCell.borderWidth / 2` is
+    // `of the cell inclusive of its border. cellBorderWidth / 2` is
     // `added to each co-ord to give the position of the top-left corner of the
     // `*body* of the cell, which is needed by `ctx.fillRect` to paint the
     // `cell. the background is painted first then each cell painted onto the
     // `background (see `render()`).
-    return [
-        posX + DisplayCell.borderWidth / 2,
-        posY + DisplayCell.borderWidth / 2
-    ];
+    return [posX + cellBorderWidth / 2, posY + cellBorderWidth / 2];
 }
 
 /**
@@ -123,6 +121,6 @@ export function cellAtPosition(canvas, offsetX, offsetY) {
 
 export function isBorderPixel(pixel) {
     return [pixel.x, pixel.y].some(
-        (e) => e === 0 || e === cellSize + DisplayCell.borderWidth / 2
+        (e) => e === 0 || e === cellSize + cellBorderWidth / 2
     );
 }
