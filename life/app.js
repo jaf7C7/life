@@ -1,11 +1,14 @@
 import { Cell } from './cell.js';
-import { DisplayCell } from './cell.js';
 import {
     cellBodyPosition,
     cellAtPosition,
     visibleCells,
     cellSize
 } from './viewport.js';
+
+export const livingCellColor = '#ff0000';
+export const deadCellColor = '#ffffff';
+export const cellBorderColor = '#000000';
 
 /**
  * Draws a cell in the viewport.
@@ -31,15 +34,15 @@ function renderCell(ctx, canvas, cell, color) {
 function render(canvas, cells) {
     const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = DisplayCell.borderColor;
+    ctx.fillStyle = cellBorderColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     for (const cell of visibleCells(canvas)) {
-        renderCell(ctx, canvas, cell, DisplayCell.deadColor);
+        renderCell(ctx, canvas, cell, deadCellColor);
     }
 
     for (const cell of liveCells(cells)) {
-        renderCell(ctx, canvas, cell, DisplayCell.aliveColor);
+        renderCell(ctx, canvas, cell, livingCellColor);
     }
 }
 
