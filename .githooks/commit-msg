@@ -11,4 +11,4 @@
 #
 # See: https://github.com/jaf7C7/cfg/tree/main/.config/git/hooks
 
-~/.config/git/hooks/commit-msg "$@"
+"${GIT_HOOKS_DIR}"/commit-msg "$@"

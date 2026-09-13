@@ -4,7 +4,7 @@
 #
 # See: https://github.com/jaf7C7/cfg/tree/main/.config/git/hooks
 
-~/.config/git/hooks/pre-commit \
+"${GIT_HOOKS_DIR}"/pre-commit \
 	--list-different-cmd='npm run --silent format:list-different' \
 	--format-cmd='npm run --silent format' \
 	--test-cmd='npm run --silent test'
