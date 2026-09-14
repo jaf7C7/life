@@ -14,12 +14,9 @@ export const cellBorderColor = '#000000';
  * Draws a cell in the viewport.
  *
  * @param {CanvasRenderingContext2D} ctx
- * @param {Number} originX - Horizontal distance in canvas pixels of the centre
- *   of the canvas from the top left corner
- * @param {Number} originY - Vertical distance in canvas pixels of the centre of
- *   the canvas from the top left corner
+ * @param {object} canvas - A canvas object
  * @param {Cell} cell
- * @param {String} color - The color to fill the cell with in '#xxxxxx' format
+ * @param {string} color - The color to fill the cell with in '#xxxxxx' format
  */
 function renderCell(ctx, canvas, cell, color) {
     ctx.fillStyle = color;
@@ -30,6 +27,9 @@ function renderCell(ctx, canvas, cell, color) {
 /**
  * Renders a grid of dead cells, then paints the live cells over the top in a
  * different color.
+ *
+ * @param {object} canvas
+ * @param {Set<string>} cells
  */
 function render(canvas, cells) {
     const ctx = canvas.getContext('2d');
@@ -46,16 +46,24 @@ function render(canvas, cells) {
     }
 }
 
+// SMELL: primitive obsession
+/**
+ * Returns the collection of living cells.
+ *
+ * @param {Set<string>} cells
+ * @returns {Cell[]}
+ */
 function liveCells(cells) {
     return [...cells].map(Cell.fromString);
 }
 
+// SMELL: primitive obsession
 /**
  * Toggles a given cell between alive/dead state.
  *
  * @param {Set<Cell>} cells - The set of living cells, necessary to check the
  *   current status of the target cell
- * @param {Cell} cell - The cell to toggle
+ * @param {string} cell - The cell to toggle
  */
 function toggleCell(cells, cell) {
     if (cells.has(cell)) {
@@ -65,6 +73,7 @@ function toggleCell(cells, cell) {
     }
 }
 
+// SMELL: primitive obsession
 /**
  * Returns a callback function to handle clicks on the canvas. The function
  * translates the click co-ords into cell co-ords, toggles the corresponding

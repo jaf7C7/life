@@ -60,8 +60,9 @@ export function getOrigin(canvas) {
  *
  * Cell `0,0` is defined to be at the centre of the canvas.
  *
- * @param {RenderedCell} cell
- * @returns {Number[]}
+ * @param {object} canvas
+ * @param {Cell} cell
+ * @returns {number[]}
  */
 export function cellPosition(canvas, cell) {
     const [originX, originY] = getOrigin(canvas);
@@ -74,13 +75,9 @@ export function cellPosition(canvas, cell) {
 /**
  * Converts from cell co-ords to viewport pixel offset.
  *
- * @param {Number} originX - Horizontal distance in canvas pixels of the centre
- *   of the canvas from the top left corner
- * @param {Number} originY - Vertical distance in canvas pixels of the centre of
- *   the canvas from the top left corner
- * @param {Number} x - X co-ord of cell
- * @param {Number} y - Y co-ord of cell
- * @returns {Number[]} The co-ordinates in canvas pixels of the top-left corner
+ * @param {object} canvas
+ * @param {Cell} cell
+ * @returns {number[]} The co-ordinates in canvas pixels of the top-left corner
  *   of the cell body (not the cell's border). This is intended to be consumed
  *   by `ctx.fillRect` to draw the cell.
  */
@@ -100,14 +97,11 @@ export function cellBodyPosition(canvas, cell) {
  * Converts from viewport/canvas co-ordinates to cell co-ordinates (see
  * documentation for `cellBodyPosition`).
  *
- * @param {Number} offsetX - The distance in canvas pixels of the click location
+ * @param {object} canvas
+ * @param {number} offsetX - The distance in canvas pixels of the click location
  *   from the left edge of the canvas
- * @param {Number} offsetY - The distance in canvas pixels of the click location
+ * @param {number} offsetY - The distance in canvas pixels of the click location
  *   from the top edge of the canvas
- * @param {Number} originX - Horizontal distance in canvas pixels of the centre
- *   of the canvas from the top left corner
- * @param {Number} originY - Vertical distance in canvas pixels of the centre of
- *   the canvas from the top left corner
  * @returns {Cell}
  */
 export function cellAtPosition(canvas, offsetX, offsetY) {

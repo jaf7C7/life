@@ -14,10 +14,10 @@ import {
 /**
  * Converts RGB channel values to a CSS hex color string.
  *
- * @param {Number} r - Red channel (0-255).
- * @param {Number} g - Green channel (0-255).
- * @param {Number} b - Blue channel (0-255).
- * @returns {String}
+ * @param {number} r - Red channel (0-255).
+ * @param {number} g - Green channel (0-255).
+ * @param {number} b - Blue channel (0-255).
+ * @returns {string}
  */
 function rgbToHex(r, g, b) {
     return '#' + [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('');
@@ -26,11 +26,11 @@ function rgbToHex(r, g, b) {
 /**
  * Represents a pixel with position and color information.
  *
- * @property {Number} x - The X co-ordinate relative to the cell's top left
+ * @property {number} x - The X co-ordinate relative to the cell's top left
  *   corner.
- * @property {Number} y - The Y co-ordinate relative to the cell's top left
+ * @property {number} y - The Y co-ordinate relative to the cell's top left
  *   corner.
- * @property {Number[]} data - An array containing the pixel's RGBA color
+ * @property {number[]} data - An array containing the pixel's RGBA color
  *   information.
  */
 class Pixel {
@@ -39,8 +39,8 @@ class Pixel {
     /**
      * Creates a new pixel.
      *
-     * @param {Number} x
-     * @param {Number} y
+     * @param {number} x
+     * @param {number} y
      * @returns {Pixel}
      */
     constructor(x, y) {
@@ -51,7 +51,7 @@ class Pixel {
     /**
      * Returns the pixel's color as a CSS hex color string.
      *
-     * @returns {String}
+     * @returns {string}
      */
     get color() {
         const [r, g, b] = this.data;
@@ -63,9 +63,9 @@ class Pixel {
  * Represents a cell on the canvas, with methods for asserting on its rendered
  * pixel data.
  *
- * @param {Number} x - The X co-ordinate of the cell relative to the centre of
+ * @param {number} x - The X co-ordinate of the cell relative to the centre of
  *   the canvas.
- * @param {Number} y - The Y co-ordinate of the cell relative to the centre of
+ * @param {number} y - The Y co-ordinate of the cell relative to the centre of
  *   the canvas.
  */
 class RenderedCell {
@@ -77,9 +77,9 @@ class RenderedCell {
     /**
      * Fetches information about a specific pixel of the rendered cell.
      *
-     * @param {Number} x - The X co-ordinate of the pixel relative to the cell's
+     * @param {number} x - The X co-ordinate of the pixel relative to the cell's
      *   top left corner.
-     * @param {Number} y - The Y co-ordinate of the pixel relative to the cell's
+     * @param {number} y - The Y co-ordinate of the pixel relative to the cell's
      *   top left corner.
      * @returns {Pixel}
      */
@@ -94,7 +94,7 @@ class RenderedCell {
      * information for the specified pixel.
      *
      * @param {Pixel} pixel
-     * @returns {Number[]}
+     * @returns {number[]}
      */
     pixelData(pixel) {
         const pixelDataSize = 4;
@@ -112,7 +112,7 @@ class RenderedCell {
      * Returns true if the pixel is at the edge of the cell.
      *
      * @param {Pixel} pixel
-     * @returns {Boolean}
+     * @returns {boolean}
      */
     hasBorderPixel(pixel) {
         return isBorderPixel(pixel);
@@ -133,7 +133,7 @@ class RenderedCell {
      * Returns true if the cell's border pixels are black and its body pixels
      * are the alive color, else false.
      *
-     * @returns {Boolean}
+     * @returns {boolean}
      */
     isAlive() {
         return this.cellIsColor(livingCellColor);
@@ -143,7 +143,7 @@ class RenderedCell {
      * Returns true if all pixels in the cell match the dead cell color, else
      * false.
      *
-     * @returns {Boolean}
+     * @returns {boolean}
      */
     isDead() {
         return this.cellIsColor(deadCellColor);
@@ -153,9 +153,9 @@ class RenderedCell {
 /**
  * Represents the canvas of cells where the game state is displayed.
  *
- * @param {Number} width - The width of the rendered canvas in pixels.
- * @param {Number} height - The height of the rendered canvas in pixels.
- * @param {Object} locator - The Playwright `Locator` object for the rendered
+ * @param {number} width - The width of the rendered canvas in pixels.
+ * @param {number} height - The height of the rendered canvas in pixels.
+ * @param {object} locator - The Playwright `Locator` object for the rendered
  *   canvas.
  */
 export class RenderedCanvas {
@@ -168,7 +168,7 @@ export class RenderedCanvas {
     /**
      * Alternative constructor to create a RenderedCanvas from a rendered page.
      *
-     * @param {Object} page - A Playwright `Page` object.
+     * @param {object} page - A Playwright `Page` object.
      */
     static async fromPage(page) {
         const locator = await page.getByTestId('canvas');
@@ -180,9 +180,9 @@ export class RenderedCanvas {
     /**
      * Clicks the canvas at the given position.
      *
-     * @param {Number} x - The X co-ordinate relative to the canvas top-left
+     * @param {number} x - The X co-ordinate relative to the canvas top-left
      *   corner.
-     * @param {Number} y - The Y co-ordinate relative to the canvas top-left
+     * @param {number} y - The Y co-ordinate relative to the canvas top-left
      *   corner.
      */
     async click({ x, y }) {
@@ -192,8 +192,8 @@ export class RenderedCanvas {
     /**
      * Clicks the centre of the cell at the given cell co-ordinates.
      *
-     * @param {Number} cellX - The X co-ordinate of the cell.
-     * @param {Number} cellY - The Y co-ordinate of the cell.
+     * @param {number} cellX - The X co-ordinate of the cell.
+     * @param {number} cellY - The Y co-ordinate of the cell.
      */
     async clickCell(cellX, cellY) {
         const cell = new Cell(cellX, cellY);
@@ -205,9 +205,9 @@ export class RenderedCanvas {
      * Returns a new RenderedCell object containing position and image data
      * about a particular cell on the rendered canvas.
      *
-     * @param {Number} x - The X co-ordinate of the cell relative to the centre
+     * @param {number} x - The X co-ordinate of the cell relative to the centre
      *   of the canvas.
-     * @param {Number} y - The Y co-ordinate of the cell relative to the centre
+     * @param {number} y - The Y co-ordinate of the cell relative to the centre
      *   of the canvas.
      * @returns {RenderedCell}
      */
@@ -230,7 +230,7 @@ export class RenderedCanvas {
      * single pixel.
      *
      * @param {RenderedCell} cell
-     * @returns {Number[]}
+     * @returns {number[]}
      */
     async cellImgData(cell) {
         return await this.locator.evaluate(
