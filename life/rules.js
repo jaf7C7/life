@@ -24,7 +24,7 @@ function neighbours(cell) {
  * Returns the set of cells which will become alive, due to them each having 3
  * live neighbours.
  *
- * @param {object} counter
+ * @param {{ [key: string]: number }} counter
  * @returns {Set<string>}
  */
 function newCells(counter) {

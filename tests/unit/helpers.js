@@ -1,11 +1,16 @@
 import { Cell } from '../../life/cell.js';
 import { cellCentre } from '../../life/viewport.js';
 
+/** A minimal fake of the DOM `document` object, for use in unit tests. */
 export class MockUI {
     constructor() {
         this.elements = [];
     }
 
+    /**
+     * @param {string} type
+     * @returns {object}
+     */
     createElement(type) {
         const element = {
             type,
@@ -38,6 +43,10 @@ export class MockUI {
         return element;
     }
 
+    /**
+     * @param {string} type
+     * @returns {object}
+     */
     findElement(type) {
         return this.elements.find((e) => e.type === type);
     }
