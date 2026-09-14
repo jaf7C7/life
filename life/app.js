@@ -61,7 +61,7 @@ function liveCells(cells) {
 /**
  * Toggles a given cell between alive/dead state.
  *
- * @param {Set<Cell>} cells - The set of living cells, necessary to check the
+ * @param {Set<string>} cells - The set of living cells, necessary to check the
  *   current status of the target cell
  * @param {string} cell - The cell to toggle
  */
@@ -78,6 +78,10 @@ function toggleCell(cells, cell) {
  * Returns a callback function to handle clicks on the canvas. The function
  * translates the click co-ords into cell co-ords, toggles the corresponding
  * cell and repaints the canvas.
+ *
+ * @param {object} canvas
+ * @param {Set<string>} cells
+ * @returns {(event: MouseEvent) => void}
  */
 function createClickHandler(canvas, cells) {
     return ({ offsetX, offsetY }) => {
@@ -89,6 +93,18 @@ function createClickHandler(canvas, cells) {
     };
 }
 
+/**
+ * @typedef {object} UI
+ * @property {(tag: string) => object} createElement
+ */
+
+/**
+ * Initializes the app: creates a canvas, wires up click handling, and renders
+ * the initial state.
+ *
+ * @param {UI} ui
+ * @param {Set<string>} cells
+ */
 export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
     const handleClick = createClickHandler(canvas, cells);

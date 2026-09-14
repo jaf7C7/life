@@ -4,6 +4,12 @@ export const cellSize = 20;
 const cellBorderWidth = 2;
 export const cellStep = cellSize + cellBorderWidth;
 
+/**
+ * Returns every cell currently visible within the canvas viewport.
+ *
+ * @param {object} canvas
+ * @returns {Cell[]}
+ */
 export function visibleCells(canvas) {
     const [originX, originY] = getOrigin(canvas);
 
@@ -36,12 +42,26 @@ export function visibleCells(canvas) {
     return result;
 }
 
+/**
+ * Returns the canvas pixel co-ords of the centre of the given cell.
+ *
+ * @param {object} canvas
+ * @param {Cell} cell
+ * @returns {number[]}
+ */
 export function cellCentre(canvas, cell) {
     const [cornerX, cornerY] = cellPosition(canvas, cell);
     const [centreX, centreY] = [cornerX + cellStep / 2, cornerY + cellStep / 2];
     return [centreX, centreY];
 }
 
+/**
+ * Returns the canvas pixel co-ords of the cell grid's origin (the centre of
+ * cell `0,0`), relative to the top-left corner of the canvas.
+ *
+ * @param {object} canvas
+ * @returns {number[]}
+ */
 export function getOrigin(canvas) {
     // This sets the centre of cell 0,0 at the centre of the canvas.
     const originX = canvas.width / 2 - cellStep / 2;
@@ -113,6 +133,13 @@ export function cellAtPosition(canvas, offsetX, offsetY) {
     return new Cell(cellX, cellY);
 }
 
+/**
+ * Returns true if the given pixel lies on a cell's border.
+ *
+ * @param {{ x: number; y: number }} pixel - Position of the pixel relative to
+ *   the cell's top-left corner.
+ * @returns {boolean}
+ */
 export function isBorderPixel(pixel) {
     return [pixel.x, pixel.y].some(
         (e) => e === 0 || e === cellSize + cellBorderWidth / 2

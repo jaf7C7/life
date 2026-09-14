@@ -37,11 +37,8 @@ class Pixel {
     data;
 
     /**
-     * Creates a new pixel.
-     *
      * @param {number} x
      * @param {number} y
-     * @returns {Pixel}
      */
     constructor(x, y) {
         this.x = x;
@@ -63,12 +60,18 @@ class Pixel {
  * Represents a cell on the canvas, with methods for asserting on its rendered
  * pixel data.
  *
- * @param {number} x - The X co-ordinate of the cell relative to the centre of
- *   the canvas.
- * @param {number} y - The Y co-ordinate of the cell relative to the centre of
- *   the canvas.
+ * @property {number} x - The X co-ordinate of the cell relative to the centre
+ *   of the canvas.
+ * @property {number} y - The Y co-ordinate of the cell relative to the centre
+ *   of the canvas.
  */
 class RenderedCell {
+    /**
+     * @param {number} x - The X co-ordinate of the cell relative to the centre
+     *   of the canvas.
+     * @param {number} y - The Y co-ordinate of the cell relative to the centre
+     *   of the canvas.
+     */
     constructor(x, y) {
         this.x = x;
         this.y = y;
@@ -118,6 +121,13 @@ class RenderedCell {
         return isBorderPixel(pixel);
     }
 
+    /**
+     * Returns true if every pixel in the cell matches the expected color for
+     * its position (border color for border pixels, `color` otherwise).
+     *
+     * @param {string} color
+     * @returns {boolean}
+     */
     cellIsColor(color) {
         return Array.from({ length: cellStep }, (_, x) =>
             Array.from({ length: cellStep }, (_, y) => {
@@ -153,12 +163,18 @@ class RenderedCell {
 /**
  * Represents the canvas of cells where the game state is displayed.
  *
- * @param {number} width - The width of the rendered canvas in pixels.
- * @param {number} height - The height of the rendered canvas in pixels.
- * @param {object} locator - The Playwright `Locator` object for the rendered
+ * @property {number} width - The width of the rendered canvas in pixels.
+ * @property {number} height - The height of the rendered canvas in pixels.
+ * @property {object} locator - The Playwright `Locator` object for the rendered
  *   canvas.
  */
 export class RenderedCanvas {
+    /**
+     * @param {number} width - The width of the rendered canvas in pixels.
+     * @param {number} height - The height of the rendered canvas in pixels.
+     * @param {object} locator - The Playwright `Locator` object for the
+     *   rendered canvas.
+     */
     constructor(width, height, locator) {
         this.width = width;
         this.height = height;
