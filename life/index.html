@@ -16,16 +16,16 @@
 
       const cells = new Set();
 
-      const ui = {
+      class UI {
         createElement() {
           const canvas = document.createElement('canvas');
           canvas.setAttribute('data-testid', 'canvas');
           document.body.appendChild(canvas);
           return canvas;
         }
-      };
+      }
 
-      initApp(ui, cells);
+      initApp(new UI(), cells);
     </script>
   </body>
 </html>
