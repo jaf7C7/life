@@ -11,12 +11,13 @@
     </style>
   </head>
   <body>
-    <canvas data-testid="canvas"></canvas>
     <script type="module">
       import { initApp } from './app.js';
 
       const cells = new Set();
-      const canvas = document.querySelector('canvas');
+      const canvas = document.createElement('canvas');
+      canvas.setAttribute('data-testid', 'canvas');
+      document.body.appendChild(canvas);
 
       initApp({ createElement: () => canvas }, cells);
     </script>
