@@ -15,11 +15,14 @@
       import { initApp } from './app.js';
 
       const cells = new Set();
+
       const canvas = document.createElement('canvas');
       canvas.setAttribute('data-testid', 'canvas');
       document.body.appendChild(canvas);
 
-      initApp({ createElement: () => canvas }, cells);
+      const ui = { createElement: () => canvas };
+
+      initApp(ui, cells);
     </script>
   </body>
 </html>
