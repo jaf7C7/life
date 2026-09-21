@@ -13,17 +13,9 @@
   <body>
     <script type="module">
       import { initApp } from './app.js';
+      import { UI } from './ui.js';
 
       const cells = new Set();
-
-      class UI {
-        createElement() {
-          const canvas = document.createElement('canvas');
-          canvas.setAttribute('data-testid', 'canvas');
-          document.body.appendChild(canvas);
-          return canvas;
-        }
-      }
 
       initApp(new UI(), cells);
     </script>
