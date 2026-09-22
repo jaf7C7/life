@@ -20,7 +20,7 @@ export function visibleCells(canvas) {
 
     // `maxX`: How many cells does is take to totally fill the space from the
     // centre of the viewport (canvas) to the right edge of the viewport?
-    const maxX = Math.floor((canvas.width - originX) / cellStep);
+    const maxX = Math.ceil((canvas.width - originX) / cellStep);
 
     // `minY`, `maxY` analagous to `minX`/`maxX` but in the vertical direction.
     // Note that the Y-axes of the viewport/canvas and of the cell grid are in
