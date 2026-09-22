@@ -62,7 +62,7 @@ export function cellCentre(canvas, cell) {
  * @param {object} canvas
  * @returns {number[]}
  */
-export function getOrigin(canvas) {
+function getOrigin(canvas) {
     // This sets the centre of cell 0,0 at the centre of the canvas.
     const originX = canvas.width / 2 - cellStep / 2;
     const originY = canvas.height / 2 - cellStep / 2;
