@@ -33,9 +33,11 @@ suite('User Interface', () => {
 
         initApp(ui, cells);
         const canvas = ui.findElement('canvas');
-        canvas.clickCell(1, 1);
-        canvas.clickCell(1, 1);
 
+        canvas.clickCell(1, 1);
+        expect(cells).not.to.deep.equal(new Set());
+
+        canvas.clickCell(1, 1);
         expect(cells).to.deep.equal(new Set());
     });
 });
