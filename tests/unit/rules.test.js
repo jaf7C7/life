@@ -34,6 +34,14 @@ suite('Basic rules', () => {
         expect(next(cells)).to.include(deadCell);
     });
 
+    test('A dead cell with more than three live neighbours stays dead', () => {
+        const deadCell = '0,0';
+        const liveNeighbours = ['-1,0', '-1,-1', '0,-1', '1,0'];
+        const cells = new Set(liveNeighbours);
+
+        expect(next(cells)).not.to.include(deadCell);
+    });
+
     test('A live cell with more than three live neighbours dies', () => {
         const cell = '0,0';
         const neighbours = ['-1,-1', '-1,1', '1,1', '1,-1'];
