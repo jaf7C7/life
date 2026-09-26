@@ -196,10 +196,11 @@ export class RenderedCanvas {
     /**
      * Clicks the canvas at the given position.
      *
-     * @param {number} x - The X co-ordinate relative to the canvas top-left
-     *   corner.
-     * @param {number} y - The Y co-ordinate relative to the canvas top-left
-     *   corner.
+     * @param {object} position - The position to click.
+     * @param {number} position.x - The X co-ordinate relative to the canvas
+     *   top-left corner.
+     * @param {number} position.y - The Y co-ordinate relative to the canvas
+     *   top-left corner.
      */
     async click({ x, y }) {
         await this.locator.click({ position: { x, y } });

@@ -10,6 +10,7 @@ export default defineConfig([
         extends: ['js/recommended'],
         languageOptions: { globals: globals.browser },
         rules: {
+            'jsdoc/check-param-names': 'error',
             'jsdoc/check-types': 'error'
         }
     }
