@@ -44,8 +44,8 @@ export function cellCentre(canvas, cell) {
 }
 
 /**
- * Returns the canvas pixel co-ords of the cell grid's origin (the centre of
- * cell `0,0`), relative to the top-left corner of the canvas.
+ * Returns the canvas pixel co-ords of the cell grid's origin (the top-left
+ * corner of cell `0,0`), relative to the top-left corner of the canvas.
  *
  * @param {object} canvas
  * @returns {number[]}
