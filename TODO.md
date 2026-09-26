@@ -30,16 +30,16 @@
         - fix: assert `to.deep.equal(new Set(['1,1']))` in "Clicking on a cell twice leaves it dead"; the weak assertion allowed this mutation to survive
       - [ ] `visibleCells` needs looking at again
         - there is no need for `visibleCells` to use `ceil` instead of `floor`
-          - you aren't calculating the total number of cells to paint, but calculating how many cell width-or-heights you want to move right or up before painting a new cell *from the top-left corner*
+          - you aren't calculating the total number of cells to paint, but calculating how many cell width-or-heights you want to move right or up before painting a new cell _from the top-left corner_
           - example:
             - (300 − 139) / 22 = 7.32, so floor gives 7 and ceil gives 8.
             - Cell 7 spans x 293–315, so it's partly visible and needed.
             - Cell 8 starts at x 315, entirely past the right edge at 300.
             - The loop is inclusive (x <= maxX), so floor already covers the partly visible cell 7. ceil adds cell 8, which is always off-canvas.
         - does `visibleCells` need to paint a margin at all? remove the margin, and if the tests pass then try to write a test which will fail.
-        - M11 - if `visibleCells` does not paint the leftmost visible column then *all* the e2e tests still pass
+        - M11 - if `visibleCells` does not paint the leftmost visible column then _all_ the e2e tests still pass
       - [ ] We need a new test in `tests/unit/rules.js`: "A dead cell with less than three live neighbours stays dead"
-      - [ ] JSDoc for `getOrigin` says it returns the co-ords of the centre of cell `0,0` but *it actually returns the cell's top left corner*
+      - [ ] JSDoc for `getOrigin` says it returns the co-ords of the centre of cell `0,0` but _it actually returns the cell's top left corner_
 
   - [ ] Make sure all tests fail with an informative error message
   - [ ] Add acceptance tests
