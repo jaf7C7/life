@@ -16,6 +16,18 @@ function canvasToCssY(canvas, yCanvas) {
     return yCss;
 }
 
+/**
+ * Converts from canvas pixels to CSS pixels in the horizontal direction
+ *
+ * @param {object} canvas - The canvas object
+ * @param {number} xCanvas - Horizontal length in canvas pixels
+ * @returns {number} XCss - The equivalent length in CSS pixels
+ */
+function canvasToCssX(canvas, xCanvas) {
+    const xCss = (canvas.clientWidth / canvas.width) * xCanvas;
+    return xCss;
+}
+
 suite('User Interface', () => {
     test('A canvas element is created', () => {
         const cells = new Set();
@@ -72,6 +84,27 @@ suite('User Interface', () => {
         canvas.click({ x: canvasCentre.x, y: canvasCentre.y - cellSizeY });
 
         expect(cells).to.deep.equal(new Set(['0,1']));
+    });
+
+    test('The cell grid has a x axis that increases rightwards', () => {
+        const cells = new Set();
+        const ui = new MockUI();
+
+        initApp(ui, cells);
+        const canvas = ui.findElement('canvas');
+        const canvasCentre = {
+            x: canvas.clientWidth / 2,
+            y: canvas.clientHeight / 2
+        };
+
+        // `cellSize` has canvas pixel units, but `click` requires CSS pixel
+        // units, so we need to scale cellSize to the CSS pixel equivalent,
+        // with each axis having its own transform.
+        const cellSizeX = canvasToCssX(canvas, cellSize);
+
+        canvas.click({ x: canvasCentre.x + cellSizeX, y: canvasCentre.y });
+
+        expect(cells).to.deep.equal(new Set(['1,0']));
     });
 
     test('Clicking on a cell twice leaves it dead', () => {
