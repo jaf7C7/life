@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
 import { initApp } from '../../life/app.js';
-import { cellSize } from '../../life/viewport.js';
+import { cellStep } from '../../life/viewport.js';
 import { MockUI } from './helpers.js';
 
 /**
@@ -73,15 +73,15 @@ suite('User Interface', () => {
             y: canvas.clientHeight / 2
         };
 
-        // `cellSize` has canvas pixel units, but `click` requires CSS pixel
-        // units, so we need to scale cellSize to the CSS pixel equivalent,
+        // `cellStep` has canvas pixel units, but `click` requires CSS pixel
+        // units, so we need to scale cellStep to the CSS pixel equivalent,
         // with each axis having its own transform.
-        const cellSizeY = canvasToCssY(canvas, cellSize);
+        const cellStepY = canvasToCssY(canvas, cellStep);
 
         // `click`'s `y` position increases *downwards* from the top edge of
         // the canvas. if we expect the cell co-ords to increase in the opposite
         // direction we have to *subtract* one vertical cell-size.
-        canvas.click({ x: canvasCentre.x, y: canvasCentre.y - cellSizeY });
+        canvas.click({ x: canvasCentre.x, y: canvasCentre.y - cellStepY });
 
         expect(cells).to.deep.equal(new Set(['0,1']));
     });
@@ -97,12 +97,12 @@ suite('User Interface', () => {
             y: canvas.clientHeight / 2
         };
 
-        // `cellSize` has canvas pixel units, but `click` requires CSS pixel
-        // units, so we need to scale cellSize to the CSS pixel equivalent,
+        // `cellStep` has canvas pixel units, but `click` requires CSS pixel
+        // units, so we need to scale cellStep to the CSS pixel equivalent,
         // with each axis having its own transform.
-        const cellSizeX = canvasToCssX(canvas, cellSize);
+        const cellStepX = canvasToCssX(canvas, cellStep);
 
-        canvas.click({ x: canvasCentre.x + cellSizeX, y: canvasCentre.y });
+        canvas.click({ x: canvasCentre.x + cellStepX, y: canvasCentre.y });
 
         expect(cells).to.deep.equal(new Set(['1,0']));
     });
