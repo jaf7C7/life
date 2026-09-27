@@ -88,7 +88,13 @@ function createClickHandler(canvas, cells) {
     // canvas pixels before passing the values on.
     // ------------------------------------------------------------------
     return ({ offsetX, offsetY }) => {
-        const cell = cellAtPosition(canvas, offsetX, offsetY).toString();
+        function cssToCanvas(canvas, xCSS, yCSS) {
+            const xCanvas = (canvas.width / canvas.clientWidth) * xCSS;
+            const yCanvas = (canvas.height / canvas.clientHeight) * yCSS;
+            return [xCanvas, yCanvas];
+        }
+        const [xCanvas, yCanvas] = cssToCanvas(canvas, offsetX, offsetY);
+        const cell = cellAtPosition(canvas, xCanvas, yCanvas).toString();
 
         toggleCell(cells, cell);
 

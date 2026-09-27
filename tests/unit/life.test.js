@@ -29,8 +29,8 @@ suite('User Interface', () => {
         // get the **rendered** dimensions.
         // ------------------------------------------------------------------
         canvas.click({
-            x: canvas.width / 2,
-            y: canvas.height / 2
+            x: canvas.clientWidth / 2,
+            y: canvas.clientHeight / 2
         });
 
         expect(cells).to.deep.equal(new Set(['0,0']));

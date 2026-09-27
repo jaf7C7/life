@@ -14,8 +14,10 @@ export class MockUI {
     createElement(type) {
         const element = {
             type,
-            width: 100,
             height: 100,
+            width: 100,
+            clientWidth: 50,
+            clientHeight: 50,
             _handlers: {},
 
             addEventListener(event, handler) {
