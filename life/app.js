@@ -73,6 +73,22 @@ function toggleCell(cells, cell) {
     }
 }
 
+/**
+ * Converts from CSS pixels (the CSS dimensions of a rendered element) to canvas
+ * pixels (the logical pixels used for drawing on the canvas).
+ *
+ * @param {object} canvas - The canvas object
+ * @param {number} xCSS - The x co-ord in CSS pixels
+ * @param {number} yCSS - The y co-ord in CSS pixels
+ * @returns {number[] | undefined} XCanvas, yCanvas - The co-ordinate pair in
+ *   canvas co-ords
+ */
+function cssToCanvas(canvas, xCSS, yCSS) {
+    const xCanvas = (canvas.width / canvas.clientWidth) * xCSS;
+    const yCanvas = (canvas.height / canvas.clientHeight) * yCSS;
+    return [xCanvas, yCanvas];
+}
+
 // SMELL: primitive obsession
 /**
  * Returns a callback function to handle clicks on the canvas.
@@ -82,17 +98,7 @@ function toggleCell(cells, cell) {
  * @returns {(event: MouseEvent) => void}
  */
 function createClickHandler(canvas, cells) {
-    // ------------------------------------------------------------------
-    // DANGER!! `offsetX` and `offsetY` are in **CSS pixels**, but
-    // `cellAtPosition` requires **canvas pixels**. We need to convert to
-    // canvas pixels before passing the values on.
-    // ------------------------------------------------------------------
     return ({ offsetX, offsetY }) => {
-        function cssToCanvas(canvas, xCSS, yCSS) {
-            const xCanvas = (canvas.width / canvas.clientWidth) * xCSS;
-            const yCanvas = (canvas.height / canvas.clientHeight) * yCSS;
-            return [xCanvas, yCanvas];
-        }
         const [xCanvas, yCanvas] = cssToCanvas(canvas, offsetX, offsetY);
         const cell = cellAtPosition(canvas, xCanvas, yCanvas).toString();
 
