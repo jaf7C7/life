@@ -107,6 +107,31 @@ suite('User Interface', () => {
         expect(cells).to.deep.equal(new Set(['1,0']));
     });
 
+    test('Clicking cells at negative co-ords toggles them correctly', () => {
+        const cells = new Set();
+        const ui = new MockUI();
+
+        initApp(ui, cells);
+
+        const canvas = ui.findElement('canvas');
+        const canvasCentre = {
+            x: canvas.clientWidth / 2,
+            y: canvas.clientHeight / 2
+        };
+        const cellStepX = canvasToCssX(canvas, cellStep);
+        const cellStepY = canvasToCssY(canvas, cellStep);
+        const cellPosition = {
+            x: canvasCentre.x - cellStepX,
+            y: canvasCentre.y + cellStepY
+        };
+
+        canvas.click(cellPosition);
+        expect(cells).to.deep.equal(new Set(['-1,-1']));
+
+        canvas.click(cellPosition);
+        expect(cells).to.deep.equal(new Set());
+    });
+
     test('Clicking on a cell twice leaves it dead', () => {
         const cells = new Set();
         const ui = new MockUI();
