@@ -106,17 +106,17 @@ export function cellBodyPosition(canvas, cell) {
  * documentation for `cellBodyPosition`).
  *
  * @param {object} canvas
- * @param {number} offsetX - The distance in canvas pixels of the click location
- *   from the left edge of the canvas
- * @param {number} offsetY - The distance in canvas pixels of the click location
- *   from the top edge of the canvas
+ * @param {number} x - The distance in canvas pixels of the click location from
+ *   the left edge of the canvas
+ * @param {number} y - The distance in canvas pixels of the click location from
+ *   the top edge of the canvas
  * @returns {Cell}
  */
-export function cellAtPosition(canvas, offsetX, offsetY) {
+export function cellAtPosition(canvas, x, y) {
     const [originX, originY] = getOrigin(canvas);
 
-    const cellX = Math.floor((offsetX - originX) / cellStep);
-    const cellY = -Math.floor((offsetY - originY) / cellStep);
+    const cellX = Math.floor((x - originX) / cellStep);
+    const cellY = -Math.floor((y - originY) / cellStep);
 
     return new Cell(cellX, cellY);
 }

@@ -19,6 +19,15 @@ suite('User Interface', () => {
 
         initApp(ui, cells);
         const canvas = ui.findElement('canvas');
+        // ------------------------------------------------------------------
+        // NOTE: The `width` and `height` properties of the `canvas` element
+        // refer to **logical pixels**, rather than **display pixels**. Using
+        // `width/2` and `height/2` does give the centre of the canvas, but it
+        // won't work if we're trying to click an aribtrary cell, and the
+        // **logical** size of the canvas differs from its **rendered** size.
+        // We need to use `Element.clientWidth` and `Element.clientHeight` to
+        // get the **rendered** dimensions.
+        // ------------------------------------------------------------------
         canvas.click({
             x: canvas.width / 2,
             y: canvas.height / 2

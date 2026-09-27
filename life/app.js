@@ -75,15 +75,18 @@ function toggleCell(cells, cell) {
 
 // SMELL: primitive obsession
 /**
- * Returns a callback function to handle clicks on the canvas. The function
- * translates the click co-ords into cell co-ords, toggles the corresponding
- * cell and repaints the canvas.
+ * Returns a callback function to handle clicks on the canvas.
  *
  * @param {object} canvas
  * @param {Set<string>} cells
  * @returns {(event: MouseEvent) => void}
  */
 function createClickHandler(canvas, cells) {
+    // ------------------------------------------------------------------
+    // DANGER!! `offsetX` and `offsetY` are in **CSS pixels**, but
+    // `cellAtPosition` requires **canvas pixels**. We need to convert to
+    // canvas pixels before passing the values on.
+    // ------------------------------------------------------------------
     return ({ offsetX, offsetY }) => {
         const cell = cellAtPosition(canvas, offsetX, offsetY).toString();
 
