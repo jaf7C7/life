@@ -20,26 +20,21 @@
   - [x] Clicking a cell on the canvas toggles it live/dead.
   - [ ] **Click-and-drag to pan around the grid.**
     - [ ] **Refactor to eliminate code smells (see 'smell_audit.md')**
-      - [ ] M3 - if `initApp` calls `ui.createElement('div')` instead of `'canvas'`, then 3 unit tests fail, and all e2e tests pass. this should break something.
-      - [ ] M5 - if `cellBorderWidth` is changed to a higher value than `2`, then 3/4 e2e tests fail erroneously. `isBorderPixel` quietly assumes a 2-pixel border.
-        - changing the border width like this should arguably cause an acceptance test to fail, as we are changing the appearance of the app and that needs approval
-        - `isBorderPixel` is production code but it's only used in the e2e test helpers, it probably needs to be split, and some code returned to the helpers
-        - the e2e tests fail without giving informative error messages, this should be remedied as per GOOS
-      - [ ] `pixelData` needs refactoring to make it exactly clear what is happening (Extract Variable/Function).
-      - [ ] M9 - if `cellAtPosition` doesn't invert the `y` co-ord then all the unit tests still pass.
-        - fix: assert `to.deep.equal(new Set(['1,1']))` in "Clicking on a cell twice leaves it dead"; the weak assertion allowed this mutation to survive
-      - [ ] `visibleCells` needs looking at again
-        - there is no need for `visibleCells` to use `ceil` instead of `floor`
-          - you aren't calculating the total number of cells to paint, but calculating how many cell width-or-heights you want to move right or up before painting a new cell _from the top-left corner_
-          - example:
-            - (300 − 139) / 22 = 7.32, so floor gives 7 and ceil gives 8.
-            - Cell 7 spans x 293–315, so it's partly visible and needed.
-            - Cell 8 starts at x 315, entirely past the right edge at 300.
-            - The loop is inclusive (x <= maxX), so floor already covers the partly visible cell 7. ceil adds cell 8, which is always off-canvas.
-        - does `visibleCells` need to paint a margin at all? remove the margin, and if the tests pass then try to write a test which will fail.
-        - M11 - if `visibleCells` does not paint the leftmost visible column then _all_ the e2e tests still pass
-      - [ ] We need a new test in `tests/unit/rules.js`: "A dead cell with less than three live neighbours stays dead"
-      - [ ] JSDoc for `getOrigin` says it returns the co-ords of the centre of cell `0,0` but _it actually returns the cell's top left corner_
+      - [x] `canvas.{width,height}` and `offset{X,Y}` are quietly using different units.
+        - [x] use comments or renaming to make the different units explicit and obvious
+        - [x] Write a (failing) unit test which will expose the lack of conversion between units
+        - [x] make the test pass and extract a conversion function
+      - [x] specify that right is +x and up is +y
+        - [x] **write a test specifying that the grid's y-axis increases upwards instead of downwards**
+        - [x] ensure the test passes and fails correctly
+      - [ ] **`visibleCells` returns more cells than it should, and should be using `cellAtPosition` instead of calculating things itself**
+        - [ ] **write a (unit? e2e?) test to ensure `visibleCells` returns exactly as many cells as needed to fill the canvas (use a tiny canvas?)**
+        - [ ] rewrite `visibleCells` to use `cellAtPosition` to return just the cells visible in the viewport, without a margin
+      - [ ] `getOrigin` has a misleading name, as it actually returns the top-left corner of the cell `0,0`.
+        - [ ] rename this function to `cell00TopLeft`
+        - [ ] inline this function when extracting the `Viewport` class
+      - [ ] to draw a cell you need a corner position and and a cell size, but they are imported separately and `renderCell` puts them together. if cell size changes (e.g. from zooming) then `cellSize` will cease to be a constant and should be encapsulated in `viewport.js`
+      - [ ] extract a `cellBodyRect` function which returns `{x, y, width, height}` and then `cellSize` can be encapsulated in this function and doens't need exporting any more
 
   - [ ] Make sure all tests fail with an informative error message
   - [ ] Add acceptance tests
