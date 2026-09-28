@@ -14,9 +14,9 @@ export function visibleCells(canvas) {
     const [originX, originY] = getOrigin(canvas);
 
     const minX = Math.floor(-originX / cellStep);
-    const maxX = Math.ceil((canvas.width - originX) / cellStep);
+    const maxX = Math.floor((canvas.width - originX) / cellStep);
 
-    const minY = Math.floor(-(canvas.height - originY) / cellStep);
+    const minY = Math.ceil(-(canvas.height - originY) / cellStep);
     const maxY = Math.ceil(originY / cellStep);
 
     const result = [];
