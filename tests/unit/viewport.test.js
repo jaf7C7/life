@@ -19,15 +19,22 @@ suite('visibleCells()', () => {
 
     test('Should return 9 cells if the canvas is larger than a single cell', () => {
         const canvas = { width: cellStep + 1, height: cellStep + 1 };
-        const result = new Set(visibleCells(canvas).map((c) => c.toString()));
+        const result = visibleCells(canvas)
+            .map((c) => c.toString())
+            .sort();
 
-        // prettier-ignore
         expect(result).to.deep.equal(
-            new Set([
-                '-1,1', '0,1', '1,1',
-                '-1,0', '0,0', '1,0',
-                '-1,-1', '0,-1', '1,-1'
-            ])
+            [
+                '-1,1',
+                '0,1',
+                '1,1',
+                '-1,0',
+                '0,0',
+                '1,0',
+                '-1,-1',
+                '0,-1',
+                '1,-1'
+            ].sort()
         );
     });
 });
