@@ -11,16 +11,12 @@ export const cellStep = cellSize + cellBorderWidth;
  * @returns {Cell[]}
  */
 export function visibleCells(canvas) {
-    if (canvas.height === cellStep && canvas.width === cellStep) {
-        return [new Cell(0, 0)];
-    }
-
     const [originX, originY] = getOrigin(canvas);
 
     const minX = Math.floor(-originX / cellStep);
-    const maxX = Math.floor((canvas.width - originX) / cellStep);
+    const maxX = Math.ceil((canvas.width - originX) / cellStep) - 1;
 
-    const minY = Math.ceil(-(canvas.height - originY) / cellStep);
+    const minY = Math.floor(-(canvas.height - originY) / cellStep) + 1;
     const maxY = Math.ceil(originY / cellStep);
 
     const result = [];
