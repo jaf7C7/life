@@ -3,7 +3,9 @@
 - [x] Automated test scripts.
 - [x] Add docstrings (and `prettier-jsdoc` plugin).
 - [x] Make order of cells unimportant (use `Set` instead of `Array`)
+- [ ] Use `Array.sort()` instead of `Set`?
 - [x] Clearer assertions: `expect(next(cells)).not.toContain(cell)`
+- [ ] Refactor tests for readability
 
 - [x] Basic Rules
   - [x] Any live cell with fewer than two live neighbours dies, as if by underpopulation.
@@ -27,9 +29,10 @@
       - [x] specify that right is +x and up is +y
         - [x] **write a test specifying that the grid's y-axis increases upwards instead of downwards**
         - [x] ensure the test passes and fails correctly
-      - [ ] **`visibleCells` returns more cells than it should, and should be using `cellAtPosition` instead of calculating things itself**
-        - [ ] **write a (unit? e2e?) test to ensure `visibleCells` returns exactly as many cells as needed to fill the canvas (use a tiny canvas?)**
-        - [ ] rewrite `visibleCells` to use `cellAtPosition` to return just the cells visible in the viewport, without a margin
+      - [x] `visibleCells` returns more cells than it should
+        - [x] write a (unit? e2e?) test to ensure `visibleCells` returns exactly as many cells as needed to fill the canvas (use a tiny canvas?)
+      - [ ] **`visibleCells` should be using `cellAtPosition` instead of calculating things itself**
+        - [ ] **rewrite `visibleCells` to use `cellAtPosition` to return just the cells visible in the viewport, without a margin**
       - [ ] `getOrigin` has a misleading name, as it actually returns the top-left corner of the cell `0,0`.
         - [ ] rename this function to `cell00TopLeft`
         - [ ] inline this function when extracting the `Viewport` class
