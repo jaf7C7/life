@@ -80,8 +80,7 @@ function toggleCell(cells, cell) {
  * @param {object} canvas - The canvas object
  * @param {number} xCSS - The x co-ord in CSS pixels
  * @param {number} yCSS - The y co-ord in CSS pixels
- * @returns {number[] | undefined} XCanvas, yCanvas - The co-ordinate pair in
- *   canvas co-ords
+ * @returns {number[]} The co-ordinate pair in canvas co-ords
  */
 function cssToCanvas(canvas, xCSS, yCSS) {
     const xCanvas = (canvas.width / canvas.clientWidth) * xCSS;

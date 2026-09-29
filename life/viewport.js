@@ -93,11 +93,11 @@ export function cellBodyPosition(canvas, cell) {
     const [posX, posY] = cellPosition(canvas, cell);
 
     // `posX` and `posY` are the canvas pixel co-ords for the top left corner
-    // `of the cell inclusive of its border. cellBorderWidth / 2` is
-    // `added to each co-ord to give the position of the top-left corner of the
-    // `*body* of the cell, which is needed by `ctx.fillRect` to paint the
-    // `cell. the background is painted first then each cell painted onto the
-    // `background (see `render()`).
+    // of the cell inclusive of its border. `cellBorderWidth / 2` is added to
+    // each co-ord to give the position of the top-left corner of the *body* of
+    // the cell, which is needed by `ctx.fillRect` to paint the cell. the
+    // background is painted first then each cell painted onto the background
+    // (see `render`).
     return [posX + cellBorderWidth / 2, posY + cellBorderWidth / 2];
 }
 

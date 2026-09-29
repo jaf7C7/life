@@ -9,7 +9,7 @@ import { MockUI } from './helpers.js';
  *
  * @param {object} canvas - The canvas object
  * @param {number} yCanvas - Vertical length in canvas pixels
- * @returns {number} YCss - The equivalent length in CSS pixels
+ * @returns {number} The equivalent length in CSS pixels
  */
 function canvasToCssY(canvas, yCanvas) {
     const yCss = (canvas.clientHeight / canvas.height) * yCanvas;
@@ -21,7 +21,7 @@ function canvasToCssY(canvas, yCanvas) {
  *
  * @param {object} canvas - The canvas object
  * @param {number} xCanvas - Horizontal length in canvas pixels
- * @returns {number} XCss - The equivalent length in CSS pixels
+ * @returns {number} The equivalent length in CSS pixels
  */
 function canvasToCssX(canvas, xCanvas) {
     const xCss = (canvas.clientWidth / canvas.width) * xCanvas;
