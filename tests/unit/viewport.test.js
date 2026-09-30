@@ -1,24 +1,33 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
-import { visibleCells, cellStep } from '../../life/viewport.js';
+import { Viewport, visibleCells } from '../../life/viewport.js';
 
 suite('visibleCells()', () => {
     test('Should return just the origin cell if the canvas is smaller than a single cell', () => {
-        const canvas = { width: cellStep - 1, height: cellStep - 1 };
+        const canvas = {
+            width: new Viewport('FIXME', 'FIXME').cellStep - 1,
+            height: new Viewport('FIXME', 'FIXME').cellStep - 1
+        };
         const result = visibleCells(canvas).map((c) => c.toString());
 
         expect(result).to.deep.equal(['0,0']);
     });
 
     test('Should return just the origin cell if the canvas is exactly equal to a single cell', () => {
-        const canvas = { width: cellStep, height: cellStep };
+        const canvas = {
+            width: new Viewport('FIXME', 'FIXME').cellStep,
+            height: new Viewport('FIXME', 'FIXME').cellStep
+        };
         const result = visibleCells(canvas).map((c) => c.toString());
 
         expect(result).to.deep.equal(['0,0']);
     });
 
     test('Should return 9 cells if a square canvas is larger than a single cell', () => {
-        const canvas = { width: cellStep + 1, height: cellStep + 1 };
+        const canvas = {
+            width: new Viewport('FIXME', 'FIXME').cellStep + 1,
+            height: new Viewport('FIXME', 'FIXME').cellStep + 1
+        };
         const result = visibleCells(canvas)
             .map((c) => c.toString())
             .sort();
@@ -41,35 +50,35 @@ suite('visibleCells()', () => {
     test('Should handle non-square canvases', () => {
         const testData = [
             {
-                width: cellStep,
-                height: 2 * cellStep,
+                width: new Viewport('FIXME', 'FIXME').cellStep,
+                height: 2 * new Viewport('FIXME', 'FIXME').cellStep,
                 expectedResult: ['0,1', '0,0', '0,-1']
             },
             {
-                width: 2 * cellStep,
-                height: cellStep,
+                width: 2 * new Viewport('FIXME', 'FIXME').cellStep,
+                height: new Viewport('FIXME', 'FIXME').cellStep,
                 expectedResult: ['-1,0', '0,0', '1,0']
             },
 
             {
-                width: cellStep,
-                height: cellStep + 1,
+                width: new Viewport('FIXME', 'FIXME').cellStep,
+                height: new Viewport('FIXME', 'FIXME').cellStep + 1,
                 expectedResult: ['0,1', '0,0', '0,-1']
             },
             {
-                width: cellStep + 1,
-                height: cellStep,
+                width: new Viewport('FIXME', 'FIXME').cellStep + 1,
+                height: new Viewport('FIXME', 'FIXME').cellStep,
                 expectedResult: ['-1,0', '0,0', '1,0']
             },
 
             {
-                width: cellStep - 1,
-                height: cellStep + 1,
+                width: new Viewport('FIXME', 'FIXME').cellStep - 1,
+                height: new Viewport('FIXME', 'FIXME').cellStep + 1,
                 expectedResult: ['0,1', '0,0', '0,-1']
             },
             {
-                width: cellStep + 1,
-                height: cellStep - 1,
+                width: new Viewport('FIXME', 'FIXME').cellStep + 1,
+                height: new Viewport('FIXME', 'FIXME').cellStep - 1,
                 expectedResult: ['-1,0', '0,0', '1,0']
             }
         ];

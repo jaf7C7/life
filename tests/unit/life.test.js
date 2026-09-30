@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
 import { initApp } from '../../life/app.js';
-import { cellStep } from '../../life/viewport.js';
+import { Viewport } from '../../life/viewport.js';
 import { MockUI, canvasToCssX, canvasToCssY } from './helpers.js';
 
 suite('User Interface', () => {
@@ -52,7 +52,10 @@ suite('User Interface', () => {
         // `cellStep` has canvas pixel units, but `click` requires CSS pixel
         // units, so we need to scale cellStep to the CSS pixel equivalent,
         // with each axis having its own transform.
-        const cellStepY = canvasToCssY(canvas, cellStep);
+        const cellStepY = canvasToCssY(
+            canvas,
+            new Viewport('FIXME', 'FIXME').cellStep
+        );
 
         // `click`'s `y` position increases *downwards* from the top edge of
         // the canvas. if we expect the cell co-ords to increase in the opposite
@@ -76,7 +79,10 @@ suite('User Interface', () => {
         // `cellStep` has canvas pixel units, but `click` requires CSS pixel
         // units, so we need to scale cellStep to the CSS pixel equivalent,
         // with each axis having its own transform.
-        const cellStepX = canvasToCssX(canvas, cellStep);
+        const cellStepX = canvasToCssX(
+            canvas,
+            new Viewport('FIXME', 'FIXME').cellStep
+        );
 
         canvas.click({ x: canvasCentre.x + cellStepX, y: canvasCentre.y });
 
@@ -94,8 +100,14 @@ suite('User Interface', () => {
             x: canvas.clientWidth / 2,
             y: canvas.clientHeight / 2
         };
-        const cellStepX = canvasToCssX(canvas, cellStep);
-        const cellStepY = canvasToCssY(canvas, cellStep);
+        const cellStepX = canvasToCssX(
+            canvas,
+            new Viewport('FIXME', 'FIXME').cellStep
+        );
+        const cellStepY = canvasToCssY(
+            canvas,
+            new Viewport('FIXME', 'FIXME').cellStep
+        );
         const cellPosition = {
             x: canvasCentre.x - cellStepX,
             y: canvasCentre.y + cellStepY

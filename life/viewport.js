@@ -13,6 +13,7 @@ export class Viewport {
         this.height = height;
         this.cellSize = 20;
         this.cellBorderWidth = 2;
+        this.cellStep = this.cellSize + this.cellBorderWidth;
     }
 
     /**
@@ -23,8 +24,8 @@ export class Viewport {
      */
     get origin() {
         // This sets the centre of cell 0,0 at the centre of the canvas.
-        const originX = this.width / 2 - cellStep / 2;
-        const originY = this.height / 2 - cellStep / 2;
+        const originX = this.width / 2 - this.cellStep / 2;
+        const originY = this.height / 2 - this.cellStep / 2;
         return [originX, originY];
     }
 
@@ -54,8 +55,8 @@ export class Viewport {
     cellAtPosition(x, y) {
         const [originX, originY] = this.origin;
 
-        const cellX = Math.floor((x - originX) / cellStep);
-        const cellY = -Math.floor((y - originY) / cellStep);
+        const cellX = Math.floor((x - originX) / this.cellStep);
+        const cellY = -Math.floor((y - originY) / this.cellStep);
 
         return new Cell(cellX, cellY);
     }
@@ -76,8 +77,8 @@ export class Viewport {
      */
     cellPosition(cell) {
         const [originX, originY] = this.origin;
-        const posX = originX + cell.x * cellStep;
-        const posY = originY - cell.y * cellStep;
+        const posX = originX + cell.x * this.cellStep;
+        const posY = originY - cell.y * this.cellStep;
 
         return [posX, posY];
     }
@@ -115,17 +116,12 @@ export class Viewport {
     cellCentre(cell) {
         const [cornerX, cornerY] = this.cellPosition(cell);
         const [centreX, centreY] = [
-            cornerX + cellStep / 2,
-            cornerY + cellStep / 2
+            cornerX + this.cellStep / 2,
+            cornerY + this.cellStep / 2
         ];
         return [centreX, centreY];
     }
 }
-
-export const cellStep =
-    new Viewport('FIXME: any old width', 'FIXME: any old height').cellSize +
-    new Viewport('FIXME: any old width', 'FIXME: any old height')
-        .cellBorderWidth;
 
 /**
  * Returns every cell currently visible within the canvas viewport.
@@ -136,11 +132,23 @@ export const cellStep =
 export function visibleCells(canvas) {
     const [originX, originY] = new Viewport(canvas.width, canvas.height).origin;
 
-    const minX = Math.floor(-originX / cellStep);
-    const maxX = Math.ceil((canvas.width - originX) / cellStep) - 1;
+    const minX = Math.floor(
+        -originX / new Viewport(canvas.width, canvas.height).cellStep
+    );
+    const maxX =
+        Math.ceil(
+            (canvas.width - originX) /
+                new Viewport(canvas.width, canvas.height).cellStep
+        ) - 1;
 
-    const minY = Math.floor(-(canvas.height - originY) / cellStep) + 1;
-    const maxY = Math.ceil(originY / cellStep);
+    const minY =
+        Math.floor(
+            -(canvas.height - originY) /
+                new Viewport(canvas.width, canvas.height).cellStep
+        ) + 1;
+    const maxY = Math.ceil(
+        originY / new Viewport(canvas.width, canvas.height).cellStep
+    );
 
     const result = [];
     for (let x = minX; x <= maxX; x++) {
