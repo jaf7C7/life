@@ -1,7 +1,7 @@
 import { Cell } from './cell.js';
 import {
+    Viewport,
     cellBodyPosition,
-    cellAtPosition,
     visibleCells,
     cellSize
 } from './viewport.js';
@@ -99,7 +99,9 @@ function cssToCanvas(canvas, xCSS, yCSS) {
 function createClickHandler(canvas, cells) {
     return ({ offsetX, offsetY }) => {
         const [xCanvas, yCanvas] = cssToCanvas(canvas, offsetX, offsetY);
-        const cell = cellAtPosition(canvas, xCanvas, yCanvas).toString();
+        const cell = new Viewport(canvas.width, canvas.height)
+            .cellAtPosition(xCanvas, yCanvas)
+            .toString();
 
         toggleCell(cells, cell);
 

@@ -38,6 +38,10 @@ export class Viewport {
             (e) => e === 0 || e === cellSize + cellBorderWidth / 2
         );
     }
+
+    cellAtPosition(x, y) {
+        return cellAtPosition(this, x, y);
+    }
 }
 
 export const cellSize = 20;
