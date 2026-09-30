@@ -12,6 +12,7 @@ export class Viewport {
         this.width = width;
         this.height = height;
         this.cellSize = 20;
+        this.cellBorderWidth = 2;
     }
 
     /**
@@ -36,7 +37,7 @@ export class Viewport {
      */
     isBorderPixel(pixel) {
         return [pixel.x, pixel.y].some(
-            (e) => e === 0 || e === this.cellSize + cellBorderWidth / 2
+            (e) => e === 0 || e === this.cellSize + this.cellBorderWidth / 2
         );
     }
 
@@ -98,7 +99,10 @@ export class Viewport {
         // the cell, which is needed by `ctx.fillRect` to paint the cell. the
         // background is painted first then each cell painted onto the background
         // (see `render`).
-        return [posX + cellBorderWidth / 2, posY + cellBorderWidth / 2];
+        return [
+            posX + this.cellBorderWidth / 2,
+            posY + this.cellBorderWidth / 2
+        ];
     }
 
     /**
@@ -118,10 +122,10 @@ export class Viewport {
     }
 }
 
-const cellBorderWidth = 2;
 export const cellStep =
     new Viewport('FIXME: any old width', 'FIXME: any old height').cellSize +
-    cellBorderWidth;
+    new Viewport('FIXME: any old width', 'FIXME: any old height')
+        .cellBorderWidth;
 
 /**
  * Returns every cell currently visible within the canvas viewport.
