@@ -4,12 +4,7 @@ import {
     deadCellColor,
     cellBorderColor
 } from '../../life/app.js';
-import {
-    Viewport,
-    cellPosition,
-    cellCentre,
-    cellStep
-} from '../../life/viewport.js';
+import { Viewport, cellCentre, cellStep } from '../../life/viewport.js';
 
 /**
  * Converts RGB channel values to a CSS hex color string.
@@ -234,7 +229,9 @@ export class RenderedCanvas {
     async cell(x, y) {
         const cell = new RenderedCell(x, y);
 
-        const [posX, posY] = cellPosition(this, cell);
+        const [posX, posY] = new Viewport(this.width, this.height).cellPosition(
+            cell
+        );
         cell.posX = posX;
         cell.posY = posY;
 

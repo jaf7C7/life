@@ -57,6 +57,28 @@ export class Viewport {
 
         return new Cell(cellX, cellY);
     }
+
+    /**
+     * Returns the location in the viewport of the top-left corner of the given
+     * cell, relative to the top-left corner of the viewport.
+     *
+     * The cell co-ords have their origin at the centre of the viewport, and Y
+     * increases in the upwards direction, whereas the canvas drawing co-ords
+     * have their origin at the top left corner of the viewport, and Y increases
+     * in the downwards direction.
+     *
+     * Cell `0,0` is defined to be at the centre of the viewport.
+     *
+     * @param {Cell} cell
+     * @returns {number[]}
+     */
+    cellPosition(cell) {
+        const [originX, originY] = this.origin;
+        const posX = originX + cell.x * cellStep;
+        const posY = originY - cell.y * cellStep;
+
+        return [posX, posY];
+    }
 }
 
 export const cellSize = 20;
@@ -98,32 +120,12 @@ export function visibleCells(canvas) {
  *   pixels**
  */
 export function cellCentre(canvas, cell) {
-    const [cornerX, cornerY] = cellPosition(canvas, cell);
+    const [cornerX, cornerY] = new Viewport(
+        canvas.width,
+        canvas.height
+    ).cellPosition(cell);
     const [centreX, centreY] = [cornerX + cellStep / 2, cornerY + cellStep / 2];
     return [centreX, centreY];
-}
-
-/**
- * Returns the location on the canvas of the top-left corner of the given cell,
- * relative to the top-left corner of the canvas.
- *
- * The cell co-ords have their origin at the centre of the canvas, and Y
- * increases in the upwards direction, whereas the canvas drawing co-ords have
- * their origin at the top left corner of the canvas, and Y increases in the
- * downwards direction.
- *
- * Cell `0,0` is defined to be at the centre of the canvas.
- *
- * @param {object} canvas
- * @param {Cell} cell
- * @returns {number[]}
- */
-export function cellPosition(canvas, cell) {
-    const [originX, originY] = new Viewport(canvas.width, canvas.height).origin;
-    const posX = originX + cell.x * cellStep;
-    const posY = originY - cell.y * cellStep;
-
-    return [posX, posY];
 }
 
 /**
@@ -136,7 +138,9 @@ export function cellPosition(canvas, cell) {
  *   by `ctx.fillRect` to draw the cell.
  */
 export function cellBodyPosition(canvas, cell) {
-    const [posX, posY] = cellPosition(canvas, cell);
+    const [posX, posY] = new Viewport(canvas.width, canvas.height).cellPosition(
+        cell
+    );
 
     // `posX` and `posY` are the canvas pixel co-ords for the top left corner
     // of the cell inclusive of its border. `cellBorderWidth / 2` is added to
