@@ -2,31 +2,7 @@ import { expect } from 'chai';
 import { suite, test } from 'mocha';
 import { initApp } from '../../life/app.js';
 import { cellStep } from '../../life/viewport.js';
-import { MockUI } from './helpers.js';
-
-/**
- * Converts from canvas pixels to CSS pixels in the vertical direction
- *
- * @param {object} canvas - The canvas object
- * @param {number} yCanvas - Vertical length in canvas pixels
- * @returns {number} The equivalent length in CSS pixels
- */
-function canvasToCssY(canvas, yCanvas) {
-    const yCss = (canvas.clientHeight / canvas.height) * yCanvas;
-    return yCss;
-}
-
-/**
- * Converts from canvas pixels to CSS pixels in the horizontal direction
- *
- * @param {object} canvas - The canvas object
- * @param {number} xCanvas - Horizontal length in canvas pixels
- * @returns {number} The equivalent length in CSS pixels
- */
-function canvasToCssX(canvas, xCanvas) {
-    const xCss = (canvas.clientWidth / canvas.width) * xCanvas;
-    return xCss;
-}
+import { MockUI, canvasToCssX, canvasToCssY } from './helpers.js';
 
 suite('User Interface', () => {
     test('A canvas element is created', () => {
@@ -140,7 +116,7 @@ suite('User Interface', () => {
         const canvas = ui.findElement('canvas');
 
         canvas.clickCell(1, 1);
-        expect(cells).not.to.deep.equal(new Set());
+        expect(cells).to.deep.equal(new Set(['1,1']));
 
         canvas.clickCell(1, 1);
         expect(cells).to.deep.equal(new Set());
