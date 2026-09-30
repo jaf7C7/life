@@ -27,17 +27,19 @@
         - [x] Write a (failing) unit test which will expose the lack of conversion between units
         - [x] make the test pass and extract a conversion function
       - [x] specify that right is +x and up is +y
-        - [x] **write a test specifying that the grid's y-axis increases upwards instead of downwards**
+        - [x] write a test specifying that the grid's y-axis increases upwards instead of downwards
         - [x] ensure the test passes and fails correctly
       - [x] `visibleCells` returns more cells than it should
         - [x] write a (unit? e2e?) test to ensure `visibleCells` returns exactly as many cells as needed to fill the canvas (use a tiny canvas?)
-      - [ ] **`visibleCells` should be using `cellAtPosition` instead of calculating things itself**
-        - [ ] **rewrite `visibleCells` to use `cellAtPosition` to return just the cells visible in the viewport, without a margin**
+      - [ ] `visibleCells` should be using `cellAtPosition` instead of calculating things itself
+        - [ ] rewrite `visibleCells` to use `cellAtPosition` to return just the cells visible in the viewport, without a margin
       - [ ] `getOrigin` has a misleading name, as it actually returns the top-left corner of the cell `0,0`.
         - [ ] rename this function to `cell00TopLeft`
         - [ ] inline this function when extracting the `Viewport` class
-      - [ ] to draw a cell you need a corner position and and a cell size, but they are imported separately and `renderCell` puts them together. if cell size changes (e.g. from zooming) then `cellSize` will cease to be a constant and should be encapsulated in `viewport.js`
-      - [ ] extract a `cellBodyRect` function which returns `{x, y, width, height}` and then `cellSize` can be encapsulated in this function and doens't need exporting any more
+      - [ ] to draw a cell you need a corner position and and a cell size, but they are imported separately and `renderCell` puts them together. if cell size changes (e.g. from zooming) then `cellSize` will cease to be a constant and should be encapsulated in `viewport.js`. extract a `cellBodyRect` function which returns `{x, y, width, height}` and then `cellSize` can be encapsulated in this function and doens't need exporting any more
+      - [ ] define `CanvasPixel` and `CssPixel` types so jsdoc can help catch unit errors
+      - [ ] `RenderedCanvas` has `width` and `height` properties which are in _CSS pixels_, but this should be in _Canvas pixels_ to be consistent with `Canvas` (which doesn't exist as a class yet). Maybe use `Locator.getAttribute` in the constructor to get `height`, `width`, `clientHeight` and `clientWidth`.
+      - [ ] Move unit conversion into `cellCentre` as it's always used to generate CSS pixel co-ords to be passed to `click`, but make the change to `RenderedCanvas` first or this will break the e2e tests.
 
   - [ ] Make sure all tests fail with an informative error message
   - [ ] Add acceptance tests
