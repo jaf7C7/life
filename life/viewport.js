@@ -35,7 +35,8 @@ export function visibleCells(canvas) {
  *
  * @param {object} canvas
  * @param {Cell} cell
- * @returns {number[]}
+ * @returns {number[]} The co-ordinates of the cell's centre **in canvas
+ *   pixels**
  */
 export function cellCentre(canvas, cell) {
     const [cornerX, cornerY] = cellPosition(canvas, cell);

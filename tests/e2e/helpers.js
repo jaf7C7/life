@@ -170,8 +170,8 @@ class RenderedCell {
  */
 export class RenderedCanvas {
     /**
-     * @param {number} width - The width of the rendered canvas in pixels.
-     * @param {number} height - The height of the rendered canvas in pixels.
+     * @param {number} width - The width of the rendered canvas in CSS pixels.
+     * @param {number} height - The height of the rendered canvas in CSS pixels.
      * @param {object} locator - The Playwright `Locator` object for the
      *   rendered canvas.
      */
