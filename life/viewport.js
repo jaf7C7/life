@@ -1,5 +1,16 @@
 import { Cell } from './cell.js';
 
+class Viewport {
+    constructor(width, height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    getOrigin() {
+        return getOrigin(this);
+    }
+}
+
 export const cellSize = 20;
 const cellBorderWidth = 2;
 export const cellStep = cellSize + cellBorderWidth;
@@ -11,7 +22,10 @@ export const cellStep = cellSize + cellBorderWidth;
  * @returns {Cell[]}
  */
 export function visibleCells(canvas) {
-    const [originX, originY] = getOrigin(canvas);
+    const [originX, originY] = new Viewport(
+        canvas.width,
+        canvas.height
+    ).getOrigin();
 
     const minX = Math.floor(-originX / cellStep);
     const maxX = Math.ceil((canvas.width - originX) / cellStep) - 1;
@@ -74,7 +88,10 @@ function getOrigin(canvas) {
  * @returns {number[]}
  */
 export function cellPosition(canvas, cell) {
-    const [originX, originY] = getOrigin(canvas);
+    const [originX, originY] = new Viewport(
+        canvas.width,
+        canvas.height
+    ).getOrigin();
     const posX = originX + cell.x * cellStep;
     const posY = originY - cell.y * cellStep;
 
@@ -114,7 +131,10 @@ export function cellBodyPosition(canvas, cell) {
  * @returns {Cell}
  */
 export function cellAtPosition(canvas, x, y) {
-    const [originX, originY] = getOrigin(canvas);
+    const [originX, originY] = new Viewport(
+        canvas.width,
+        canvas.height
+    ).getOrigin();
 
     const cellX = Math.floor((x - originX) / cellStep);
     const cellY = -Math.floor((y - originY) / cellStep);
