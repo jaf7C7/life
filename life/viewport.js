@@ -1,6 +1,6 @@
 import { Cell } from './cell.js';
 
-class Viewport {
+export class Viewport {
     /**
      * Returns a new `Viewport` instance.
      *
@@ -24,6 +24,10 @@ class Viewport {
         const originX = this.width / 2 - cellStep / 2;
         const originY = this.height / 2 - cellStep / 2;
         return [originX, originY];
+    }
+
+    isBorderPixel(pixel) {
+        return isBorderPixel(pixel);
     }
 }
 

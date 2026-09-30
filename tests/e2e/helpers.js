@@ -5,8 +5,8 @@ import {
     cellBorderColor
 } from '../../life/app.js';
 import {
+    Viewport,
     cellPosition,
-    isBorderPixel,
     cellCentre,
     cellStep
 } from '../../life/viewport.js';
@@ -118,7 +118,10 @@ class RenderedCell {
      * @returns {boolean}
      */
     hasBorderPixel(pixel) {
-        return isBorderPixel(pixel);
+        return new Viewport(
+            'FIXME: any old width',
+            'FIXME: any old height'
+        ).isBorderPixel(pixel);
     }
 
     /**
