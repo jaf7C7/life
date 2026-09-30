@@ -11,6 +11,7 @@ export class Viewport {
     constructor(width, height) {
         this.width = width;
         this.height = height;
+        this.cellSize = 20;
     }
 
     /**
@@ -35,7 +36,7 @@ export class Viewport {
      */
     isBorderPixel(pixel) {
         return [pixel.x, pixel.y].some(
-            (e) => e === 0 || e === cellSize + cellBorderWidth / 2
+            (e) => e === 0 || e === this.cellSize + cellBorderWidth / 2
         );
     }
 
@@ -117,9 +118,10 @@ export class Viewport {
     }
 }
 
-export const cellSize = 20;
 const cellBorderWidth = 2;
-export const cellStep = cellSize + cellBorderWidth;
+export const cellStep =
+    new Viewport('FIXME: any old width', 'FIXME: any old height').cellSize +
+    cellBorderWidth;
 
 /**
  * Returns every cell currently visible within the canvas viewport.
