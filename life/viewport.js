@@ -6,8 +6,17 @@ class Viewport {
         this.height = height;
     }
 
+    /**
+     * Returns the canvas pixel co-ords of the cell grid's origin (the top-left
+     * corner of cell `0,0`), relative to the top-left corner of the canvas.
+     *
+     * @returns {number[]}
+     */
     get origin() {
-        return getOrigin(this);
+        // This sets the centre of cell 0,0 at the centre of the canvas.
+        const originX = this.width / 2 - cellStep / 2;
+        const originY = this.height / 2 - cellStep / 2;
+        return [originX, originY];
     }
 }
 
@@ -53,20 +62,6 @@ export function cellCentre(canvas, cell) {
     const [cornerX, cornerY] = cellPosition(canvas, cell);
     const [centreX, centreY] = [cornerX + cellStep / 2, cornerY + cellStep / 2];
     return [centreX, centreY];
-}
-
-/**
- * Returns the canvas pixel co-ords of the cell grid's origin (the top-left
- * corner of cell `0,0`), relative to the top-left corner of the canvas.
- *
- * @param {object} canvas
- * @returns {number[]}
- */
-function getOrigin(canvas) {
-    // This sets the centre of cell 0,0 at the centre of the canvas.
-    const originX = canvas.width / 2 - cellStep / 2;
-    const originY = canvas.height / 2 - cellStep / 2;
-    return [originX, originY];
 }
 
 /**
