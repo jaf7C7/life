@@ -79,6 +79,42 @@ export class Viewport {
 
         return [posX, posY];
     }
+
+    /**
+     * Converts from cell co-ords to viewport pixel offset.
+     *
+     * @param {Cell} cell
+     * @returns {number[]} The co-ordinates in canvas pixels of the top-left
+     *   corner of the cell body (not the cell's border). This is intended to be
+     *   consumed by `ctx.fillRect` to draw the cell.
+     */
+    cellBodyPosition(cell) {
+        const [posX, posY] = this.cellPosition(cell);
+
+        // `posX` and `posY` are the canvas pixel co-ords for the top left corner
+        // of the cell inclusive of its border. `cellBorderWidth / 2` is added to
+        // each co-ord to give the position of the top-left corner of the *body* of
+        // the cell, which is needed by `ctx.fillRect` to paint the cell. the
+        // background is painted first then each cell painted onto the background
+        // (see `render`).
+        return [posX + cellBorderWidth / 2, posY + cellBorderWidth / 2];
+    }
+
+    /**
+     * Returns the canvas pixel co-ords of the centre of the given cell.
+     *
+     * @param {Cell} cell
+     * @returns {number[]} The co-ordinates of the cell's centre **in canvas
+     *   pixels**
+     */
+    cellCentre(cell) {
+        const [cornerX, cornerY] = this.cellPosition(cell);
+        const [centreX, centreY] = [
+            cornerX + cellStep / 2,
+            cornerY + cellStep / 2
+        ];
+        return [centreX, centreY];
+    }
 }
 
 export const cellSize = 20;
@@ -109,44 +145,4 @@ export function visibleCells(canvas) {
     }
 
     return result;
-}
-
-/**
- * Returns the canvas pixel co-ords of the centre of the given cell.
- *
- * @param {object} canvas
- * @param {Cell} cell
- * @returns {number[]} The co-ordinates of the cell's centre **in canvas
- *   pixels**
- */
-export function cellCentre(canvas, cell) {
-    const [cornerX, cornerY] = new Viewport(
-        canvas.width,
-        canvas.height
-    ).cellPosition(cell);
-    const [centreX, centreY] = [cornerX + cellStep / 2, cornerY + cellStep / 2];
-    return [centreX, centreY];
-}
-
-/**
- * Converts from cell co-ords to viewport pixel offset.
- *
- * @param {object} canvas
- * @param {Cell} cell
- * @returns {number[]} The co-ordinates in canvas pixels of the top-left corner
- *   of the cell body (not the cell's border). This is intended to be consumed
- *   by `ctx.fillRect` to draw the cell.
- */
-export function cellBodyPosition(canvas, cell) {
-    const [posX, posY] = new Viewport(canvas.width, canvas.height).cellPosition(
-        cell
-    );
-
-    // `posX` and `posY` are the canvas pixel co-ords for the top left corner
-    // of the cell inclusive of its border. `cellBorderWidth / 2` is added to
-    // each co-ord to give the position of the top-left corner of the *body* of
-    // the cell, which is needed by `ctx.fillRect` to paint the cell. the
-    // background is painted first then each cell painted onto the background
-    // (see `render`).
-    return [posX + cellBorderWidth / 2, posY + cellBorderWidth / 2];
 }

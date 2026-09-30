@@ -1,5 +1,5 @@
 import { Cell } from '../../life/cell.js';
-import { cellCentre } from '../../life/viewport.js';
+import { Viewport } from '../../life/viewport.js';
 
 /**
  * Converts from canvas pixels to CSS pixels in the vertical direction
@@ -75,7 +75,10 @@ export class MockUI {
             // This clicks the *centre* of cell `cellX,cellY`.
             clickCell(cellX, cellY) {
                 const cell = new Cell(cellX, cellY);
-                const [canvasX, canvasY] = cellCentre(this, cell);
+                const [canvasX, canvasY] = new Viewport(
+                    this.width,
+                    this.height
+                ).cellCentre(cell);
                 const x = canvasToCssX(this, canvasX);
                 const y = canvasToCssY(this, canvasY);
                 this.click({ x, y });

@@ -4,7 +4,7 @@ import {
     deadCellColor,
     cellBorderColor
 } from '../../life/app.js';
-import { Viewport, cellCentre, cellStep } from '../../life/viewport.js';
+import { Viewport, cellStep } from '../../life/viewport.js';
 
 /**
  * Converts RGB channel values to a CSS hex color string.
@@ -212,7 +212,10 @@ export class RenderedCanvas {
      */
     async clickCell(cellX, cellY) {
         const cell = new Cell(cellX, cellY);
-        const [centreX, centreY] = cellCentre(this, cell);
+        const [centreX, centreY] = new Viewport(
+            this.width,
+            this.height
+        ).cellCentre(cell);
         await this.click({ x: centreX, y: centreY });
     }
 
