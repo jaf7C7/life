@@ -1,6 +1,13 @@
 import { Cell } from './cell.js';
 
 class Viewport {
+    /**
+     * Returns a new `Viewport` instance.
+     *
+     * @param {number} width - The width of the viewport in canvas pixels
+     * @param {number} height - The height of the viewport in canvas pixels
+     * @returns {Viewport}
+     */
     constructor(width, height) {
         this.width = width;
         this.height = height;
