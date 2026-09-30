@@ -26,8 +26,17 @@ export class Viewport {
         return [originX, originY];
     }
 
+    /**
+     * Returns true if the given pixel lies on a cell's border.
+     *
+     * @param {{ x: number; y: number }} pixel - Position of the pixel relative
+     *   to the cell's top-left corner.
+     * @returns {boolean}
+     */
     isBorderPixel(pixel) {
-        return isBorderPixel(pixel);
+        return [pixel.x, pixel.y].some(
+            (e) => e === 0 || e === cellSize + cellBorderWidth / 2
+        );
     }
 }
 
@@ -137,17 +146,4 @@ export function cellAtPosition(canvas, x, y) {
     const cellY = -Math.floor((y - originY) / cellStep);
 
     return new Cell(cellX, cellY);
-}
-
-/**
- * Returns true if the given pixel lies on a cell's border.
- *
- * @param {{ x: number; y: number }} pixel - Position of the pixel relative to
- *   the cell's top-left corner.
- * @returns {boolean}
- */
-export function isBorderPixel(pixel) {
-    return [pixel.x, pixel.y].some(
-        (e) => e === 0 || e === cellSize + cellBorderWidth / 2
-    );
 }
