@@ -39,8 +39,23 @@ export class Viewport {
         );
     }
 
+    /**
+     * Converts from viewport/canvas co-ordinates to cell co-ordinates (see
+     * documentation for `cellBodyPosition`).
+     *
+     * @param {number} x - The distance in canvas pixels of the click location
+     *   from the left edge of the canvas
+     * @param {number} y - The distance in canvas pixels of the click location
+     *   from the top edge of the canvas
+     * @returns {Cell}
+     */
     cellAtPosition(x, y) {
-        return cellAtPosition(this, x, y);
+        const [originX, originY] = this.origin;
+
+        const cellX = Math.floor((x - originX) / cellStep);
+        const cellY = -Math.floor((y - originY) / cellStep);
+
+        return new Cell(cellX, cellY);
     }
 }
 
@@ -130,24 +145,4 @@ export function cellBodyPosition(canvas, cell) {
     // background is painted first then each cell painted onto the background
     // (see `render`).
     return [posX + cellBorderWidth / 2, posY + cellBorderWidth / 2];
-}
-
-/**
- * Converts from viewport/canvas co-ordinates to cell co-ordinates (see
- * documentation for `cellBodyPosition`).
- *
- * @param {object} canvas
- * @param {number} x - The distance in canvas pixels of the click location from
- *   the left edge of the canvas
- * @param {number} y - The distance in canvas pixels of the click location from
- *   the top edge of the canvas
- * @returns {Cell}
- */
-export function cellAtPosition(canvas, x, y) {
-    const [originX, originY] = new Viewport(canvas.width, canvas.height).origin;
-
-    const cellX = Math.floor((x - originX) / cellStep);
-    const cellY = -Math.floor((y - originY) / cellStep);
-
-    return new Cell(cellX, cellY);
 }
