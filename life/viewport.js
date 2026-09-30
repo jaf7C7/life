@@ -6,7 +6,7 @@ class Viewport {
         this.height = height;
     }
 
-    getOrigin() {
+    get origin() {
         return getOrigin(this);
     }
 }
@@ -22,10 +22,7 @@ export const cellStep = cellSize + cellBorderWidth;
  * @returns {Cell[]}
  */
 export function visibleCells(canvas) {
-    const [originX, originY] = new Viewport(
-        canvas.width,
-        canvas.height
-    ).getOrigin();
+    const [originX, originY] = new Viewport(canvas.width, canvas.height).origin;
 
     const minX = Math.floor(-originX / cellStep);
     const maxX = Math.ceil((canvas.width - originX) / cellStep) - 1;
@@ -88,10 +85,7 @@ function getOrigin(canvas) {
  * @returns {number[]}
  */
 export function cellPosition(canvas, cell) {
-    const [originX, originY] = new Viewport(
-        canvas.width,
-        canvas.height
-    ).getOrigin();
+    const [originX, originY] = new Viewport(canvas.width, canvas.height).origin;
     const posX = originX + cell.x * cellStep;
     const posY = originY - cell.y * cellStep;
 
@@ -131,10 +125,7 @@ export function cellBodyPosition(canvas, cell) {
  * @returns {Cell}
  */
 export function cellAtPosition(canvas, x, y) {
-    const [originX, originY] = new Viewport(
-        canvas.width,
-        canvas.height
-    ).getOrigin();
+    const [originX, originY] = new Viewport(canvas.width, canvas.height).origin;
 
     const cellX = Math.floor((x - originX) / cellStep);
     const cellY = -Math.floor((y - originY) / cellStep);
