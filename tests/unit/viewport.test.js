@@ -4,11 +4,10 @@ import { Viewport } from '../../life/viewport.js';
 
 suite('visibleCells()', () => {
     test('Should return just the origin cell if the canvas is smaller than a single cell', () => {
-        const canvas = {
-            width: Viewport.cellStep - 1,
-            height: Viewport.cellStep - 1
-        };
-        const result = new Viewport(canvas.width, canvas.height)
+        const result = new Viewport(
+            Viewport.cellStep - 1,
+            Viewport.cellStep - 1
+        )
             .visibleCells()
             .map((c) => c.toString());
 
@@ -16,11 +15,7 @@ suite('visibleCells()', () => {
     });
 
     test('Should return just the origin cell if the canvas is exactly equal to a single cell', () => {
-        const canvas = {
-            width: Viewport.cellStep,
-            height: Viewport.cellStep
-        };
-        const result = new Viewport(canvas.width, canvas.height)
+        const result = new Viewport(Viewport.cellStep, Viewport.cellStep)
             .visibleCells()
             .map((c) => c.toString());
 
@@ -28,11 +23,10 @@ suite('visibleCells()', () => {
     });
 
     test('Should return 9 cells if a square canvas is larger than a single cell', () => {
-        const canvas = {
-            width: Viewport.cellStep + 1,
-            height: Viewport.cellStep + 1
-        };
-        const result = new Viewport(canvas.width, canvas.height)
+        const result = new Viewport(
+            Viewport.cellStep + 1,
+            Viewport.cellStep + 1
+        )
             .visibleCells()
             .map((c) => c.toString())
             .sort();
@@ -89,8 +83,7 @@ suite('visibleCells()', () => {
         ];
 
         for (const { width, height, expectedResult } of testData) {
-            const canvas = { width, height };
-            const result = new Viewport(canvas.width, canvas.height)
+            const result = new Viewport(width, height)
                 .visibleCells()
                 .map((c) => c.toString())
                 .sort();
