@@ -2,6 +2,7 @@ import { Cell } from './cell.js';
 
 export class Viewport {
     static cellSize = 20;
+    static cellBorderWidth = 2;
 
     /**
      * Returns a new `Viewport` instance.
@@ -13,8 +14,7 @@ export class Viewport {
     constructor(width, height) {
         this.width = width;
         this.height = height;
-        this.cellBorderWidth = 2;
-        this.cellStep = Viewport.cellSize + this.cellBorderWidth;
+        this.cellStep = Viewport.cellSize + Viewport.cellBorderWidth;
     }
 
     /**
@@ -39,7 +39,9 @@ export class Viewport {
      */
     isBorderPixel(pixel) {
         return [pixel.x, pixel.y].some(
-            (e) => e === 0 || e === Viewport.cellSize + this.cellBorderWidth / 2
+            (e) =>
+                e === 0 ||
+                e === Viewport.cellSize + Viewport.cellBorderWidth / 2
         );
     }
 
@@ -102,8 +104,8 @@ export class Viewport {
         // background is painted first then each cell painted onto the background
         // (see `render`).
         return [
-            posX + this.cellBorderWidth / 2,
-            posY + this.cellBorderWidth / 2
+            posX + Viewport.cellBorderWidth / 2,
+            posY + Viewport.cellBorderWidth / 2
         ];
     }
 
