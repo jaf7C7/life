@@ -1,6 +1,8 @@
 import { Cell } from './cell.js';
 
 export class Viewport {
+    static cellSize = 20;
+
     /**
      * Returns a new `Viewport` instance.
      *
@@ -11,9 +13,8 @@ export class Viewport {
     constructor(width, height) {
         this.width = width;
         this.height = height;
-        this.cellSize = 20;
         this.cellBorderWidth = 2;
-        this.cellStep = this.cellSize + this.cellBorderWidth;
+        this.cellStep = Viewport.cellSize + this.cellBorderWidth;
     }
 
     /**
@@ -38,7 +39,7 @@ export class Viewport {
      */
     isBorderPixel(pixel) {
         return [pixel.x, pixel.y].some(
-            (e) => e === 0 || e === this.cellSize + this.cellBorderWidth / 2
+            (e) => e === 0 || e === Viewport.cellSize + this.cellBorderWidth / 2
         );
     }
 

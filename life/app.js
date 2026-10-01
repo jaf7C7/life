@@ -17,7 +17,7 @@ function renderCell(ctx, canvas, cell, color) {
     ctx.fillStyle = color;
     const viewport = new Viewport(canvas.width, canvas.height);
     const [posX, posY] = viewport.cellBodyPosition(cell);
-    ctx.fillRect(posX, posY, viewport.cellSize, viewport.cellSize);
+    ctx.fillRect(posX, posY, Viewport.cellSize, Viewport.cellSize);
 }
 
 /**
