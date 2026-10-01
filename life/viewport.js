@@ -128,6 +128,32 @@ export class Viewport {
         ];
         return [centreX, centreY];
     }
+
+    /**
+     * Returns every cell currently visible within the viewport.
+     *
+     * @returns {Cell[]}
+     */
+    visibleCells() {
+        const [originX, originY] = this.origin;
+
+        const minX = Math.floor(-originX / Viewport.cellStep);
+        const maxX = Math.ceil((this.width - originX) / Viewport.cellStep) - 1;
+
+        const minY =
+            Math.floor(-(this.height - originY) / Viewport.cellStep) + 1;
+        const maxY = Math.ceil(originY / Viewport.cellStep);
+
+        const result = [];
+        for (let x = minX; x <= maxX; x++) {
+            for (let y = minY; y <= maxY; y++) {
+                const cell = new Cell(x, y);
+                result.push(cell);
+            }
+        }
+
+        return result;
+    }
 }
 
 /**

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { suite, test } from 'mocha';
-import { Viewport, visibleCells } from '../../life/viewport.js';
+import { Viewport } from '../../life/viewport.js';
 
 suite('visibleCells()', () => {
     test('Should return just the origin cell if the canvas is smaller than a single cell', () => {
@@ -8,7 +8,9 @@ suite('visibleCells()', () => {
             width: Viewport.cellStep - 1,
             height: Viewport.cellStep - 1
         };
-        const result = visibleCells(canvas).map((c) => c.toString());
+        const result = new Viewport(canvas.width, canvas.height)
+            .visibleCells()
+            .map((c) => c.toString());
 
         expect(result).to.deep.equal(['0,0']);
     });
@@ -18,7 +20,9 @@ suite('visibleCells()', () => {
             width: Viewport.cellStep,
             height: Viewport.cellStep
         };
-        const result = visibleCells(canvas).map((c) => c.toString());
+        const result = new Viewport(canvas.width, canvas.height)
+            .visibleCells()
+            .map((c) => c.toString());
 
         expect(result).to.deep.equal(['0,0']);
     });
@@ -28,7 +32,8 @@ suite('visibleCells()', () => {
             width: Viewport.cellStep + 1,
             height: Viewport.cellStep + 1
         };
-        const result = visibleCells(canvas)
+        const result = new Viewport(canvas.width, canvas.height)
+            .visibleCells()
             .map((c) => c.toString())
             .sort();
 
@@ -85,7 +90,8 @@ suite('visibleCells()', () => {
 
         for (const { width, height, expectedResult } of testData) {
             const canvas = { width, height };
-            const result = visibleCells(canvas)
+            const result = new Viewport(canvas.width, canvas.height)
+                .visibleCells()
                 .map((c) => c.toString())
                 .sort();
 

@@ -1,5 +1,5 @@
 import { Cell } from './cell.js';
-import { Viewport, visibleCells } from './viewport.js';
+import { Viewport } from './viewport.js';
 
 export const livingCellColor = '#ff0000';
 export const deadCellColor = '#ffffff';
@@ -33,7 +33,10 @@ function render(canvas, cells) {
     ctx.fillStyle = cellBorderColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    for (const cell of visibleCells(canvas)) {
+    for (const cell of new Viewport(
+        canvas.width,
+        canvas.height
+    ).visibleCells()) {
         renderCell(ctx, canvas, cell, deadCellColor);
     }
 
