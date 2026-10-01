@@ -102,10 +102,7 @@ class RenderedCell {
         // more but it finds the [r, g, b, a] slice of the pixel we want to
         // target.
         // TODO: Work out what's going on here
-        const index =
-            (pixel.x +
-                pixel.y * new Viewport(this.width, this.height).cellStep) *
-            pixelDataSize;
+        const index = (pixel.x + pixel.y * Viewport.cellStep) * pixelDataSize;
         return this.imgData.slice(index, index + pixelDataSize);
     }
 
@@ -130,18 +127,13 @@ class RenderedCell {
      * @returns {boolean}
      */
     cellIsColor(color) {
-        return Array.from(
-            { length: new Viewport(this.width, this.height).cellStep },
-            (_, x) =>
-                Array.from(
-                    { length: new Viewport(this.width, this.height).cellStep },
-                    (_, y) => {
-                        const pixel = this.pixel(x, y);
-                        return this.hasBorderPixel(pixel)
-                            ? pixel.color === cellBorderColor
-                            : pixel.color === color;
-                    }
-                )
+        return Array.from({ length: Viewport.cellStep }, (_, x) =>
+            Array.from({ length: Viewport.cellStep }, (_, y) => {
+                const pixel = this.pixel(x, y);
+                return this.hasBorderPixel(pixel)
+                    ? pixel.color === cellBorderColor
+                    : pixel.color === color;
+            })
         ).every((row) => row.every(Boolean));
     }
 
@@ -269,7 +261,7 @@ export class RenderedCanvas {
             {
                 posX: cell.posX,
                 posY: cell.posY,
-                step: new Viewport(this.width, this.height).cellStep
+                step: Viewport.cellStep
             }
         );
     }

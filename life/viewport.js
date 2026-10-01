@@ -3,6 +3,7 @@ import { Cell } from './cell.js';
 export class Viewport {
     static cellSize = 20;
     static cellBorderWidth = 2;
+    static cellStep = Viewport.cellSize + Viewport.cellBorderWidth;
 
     /**
      * Returns a new `Viewport` instance.
@@ -14,7 +15,10 @@ export class Viewport {
     constructor(width, height) {
         this.width = width;
         this.height = height;
-        this.cellStep = Viewport.cellSize + Viewport.cellBorderWidth;
+    }
+
+    get cellStep() {
+        return Viewport.cellStep;
     }
 
     /**
@@ -135,23 +139,11 @@ export class Viewport {
 export function visibleCells(canvas) {
     const [originX, originY] = new Viewport(canvas.width, canvas.height).origin;
 
-    const minX = Math.floor(
-        -originX / new Viewport(canvas.width, canvas.height).cellStep
-    );
-    const maxX =
-        Math.ceil(
-            (canvas.width - originX) /
-                new Viewport(canvas.width, canvas.height).cellStep
-        ) - 1;
+    const minX = Math.floor(-originX / Viewport.cellStep);
+    const maxX = Math.ceil((canvas.width - originX) / Viewport.cellStep) - 1;
 
-    const minY =
-        Math.floor(
-            -(canvas.height - originY) /
-                new Viewport(canvas.width, canvas.height).cellStep
-        ) + 1;
-    const maxY = Math.ceil(
-        originY / new Viewport(canvas.width, canvas.height).cellStep
-    );
+    const minY = Math.floor(-(canvas.height - originY) / Viewport.cellStep) + 1;
+    const maxY = Math.ceil(originY / Viewport.cellStep);
 
     const result = [];
     for (let x = minX; x <= maxX; x++) {

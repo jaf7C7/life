@@ -5,8 +5,8 @@ import { Viewport, visibleCells } from '../../life/viewport.js';
 suite('visibleCells()', () => {
     test('Should return just the origin cell if the canvas is smaller than a single cell', () => {
         const canvas = {
-            width: new Viewport('FIXME', 'FIXME').cellStep - 1,
-            height: new Viewport('FIXME', 'FIXME').cellStep - 1
+            width: Viewport.cellStep - 1,
+            height: Viewport.cellStep - 1
         };
         const result = visibleCells(canvas).map((c) => c.toString());
 
@@ -15,8 +15,8 @@ suite('visibleCells()', () => {
 
     test('Should return just the origin cell if the canvas is exactly equal to a single cell', () => {
         const canvas = {
-            width: new Viewport('FIXME', 'FIXME').cellStep,
-            height: new Viewport('FIXME', 'FIXME').cellStep
+            width: Viewport.cellStep,
+            height: Viewport.cellStep
         };
         const result = visibleCells(canvas).map((c) => c.toString());
 
@@ -25,8 +25,8 @@ suite('visibleCells()', () => {
 
     test('Should return 9 cells if a square canvas is larger than a single cell', () => {
         const canvas = {
-            width: new Viewport('FIXME', 'FIXME').cellStep + 1,
-            height: new Viewport('FIXME', 'FIXME').cellStep + 1
+            width: Viewport.cellStep + 1,
+            height: Viewport.cellStep + 1
         };
         const result = visibleCells(canvas)
             .map((c) => c.toString())
@@ -50,35 +50,35 @@ suite('visibleCells()', () => {
     test('Should handle non-square canvases', () => {
         const testData = [
             {
-                width: new Viewport('FIXME', 'FIXME').cellStep,
-                height: 2 * new Viewport('FIXME', 'FIXME').cellStep,
+                width: Viewport.cellStep,
+                height: 2 * Viewport.cellStep,
                 expectedResult: ['0,1', '0,0', '0,-1']
             },
             {
-                width: 2 * new Viewport('FIXME', 'FIXME').cellStep,
-                height: new Viewport('FIXME', 'FIXME').cellStep,
+                width: 2 * Viewport.cellStep,
+                height: Viewport.cellStep,
                 expectedResult: ['-1,0', '0,0', '1,0']
             },
 
             {
-                width: new Viewport('FIXME', 'FIXME').cellStep,
-                height: new Viewport('FIXME', 'FIXME').cellStep + 1,
+                width: Viewport.cellStep,
+                height: Viewport.cellStep + 1,
                 expectedResult: ['0,1', '0,0', '0,-1']
             },
             {
-                width: new Viewport('FIXME', 'FIXME').cellStep + 1,
-                height: new Viewport('FIXME', 'FIXME').cellStep,
+                width: Viewport.cellStep + 1,
+                height: Viewport.cellStep,
                 expectedResult: ['-1,0', '0,0', '1,0']
             },
 
             {
-                width: new Viewport('FIXME', 'FIXME').cellStep - 1,
-                height: new Viewport('FIXME', 'FIXME').cellStep + 1,
+                width: Viewport.cellStep - 1,
+                height: Viewport.cellStep + 1,
                 expectedResult: ['0,1', '0,0', '0,-1']
             },
             {
-                width: new Viewport('FIXME', 'FIXME').cellStep + 1,
-                height: new Viewport('FIXME', 'FIXME').cellStep - 1,
+                width: Viewport.cellStep + 1,
+                height: Viewport.cellStep - 1,
                 expectedResult: ['-1,0', '0,0', '1,0']
             }
         ];
