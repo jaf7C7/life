@@ -155,29 +155,3 @@ export class Viewport {
         return result;
     }
 }
-
-/**
- * Returns every cell currently visible within the canvas viewport.
- *
- * @param {object} canvas
- * @returns {Cell[]}
- */
-export function visibleCells(canvas) {
-    const [originX, originY] = new Viewport(canvas.width, canvas.height).origin;
-
-    const minX = Math.floor(-originX / Viewport.cellStep);
-    const maxX = Math.ceil((canvas.width - originX) / Viewport.cellStep) - 1;
-
-    const minY = Math.floor(-(canvas.height - originY) / Viewport.cellStep) + 1;
-    const maxY = Math.ceil(originY / Viewport.cellStep);
-
-    const result = [];
-    for (let x = minX; x <= maxX; x++) {
-        for (let y = minY; y <= maxY; y++) {
-            const cell = new Cell(x, y);
-            result.push(cell);
-        }
-    }
-
-    return result;
-}
