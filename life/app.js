@@ -9,13 +9,11 @@ export const cellBorderColor = '#000000';
  * Draws a cell in the viewport.
  *
  * @param {CanvasRenderingContext2D} ctx
- * @param {object} canvas - A canvas object
+ * @param {Viewport} viewport
  * @param {Cell} cell
  * @param {string} color - The color to fill the cell with in '#xxxxxx' format
  */
-function renderCell(ctx, canvas, cell, color) {
-    const viewport = new Viewport(canvas.width, canvas.height);
-
+function renderCell(ctx, viewport, cell, color) {
     const [posX, posY] = viewport.cellBodyPosition(cell);
 
     ctx.fillStyle = color;
@@ -27,21 +25,19 @@ function renderCell(ctx, canvas, cell, color) {
  * different color.
  *
  * @param {object} ctx - The drawing context for the canvas
- * @param {object} canvas
+ * @param {Viewport} viewport
  * @param {Set<string>} cells
  */
-function render(ctx, canvas, cells) {
-    const viewport = new Viewport(canvas.width, canvas.height);
-
+function render(ctx, viewport, cells) {
     ctx.fillStyle = cellBorderColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, viewport.width, viewport.height);
 
     for (const cell of viewport.visibleCells()) {
-        renderCell(ctx, canvas, cell, deadCellColor);
+        renderCell(ctx, viewport, cell, deadCellColor);
     }
 
     for (const cell of liveCells(cells)) {
-        renderCell(ctx, canvas, cell, livingCellColor);
+        renderCell(ctx, viewport, cell, livingCellColor);
     }
 }
 
@@ -105,7 +101,7 @@ function createClickHandler(ctx, canvas, cells) {
 
         toggleCell(cells, cell);
 
-        render(ctx, canvas, cells);
+        render(ctx, viewport, cells);
     };
 }
 
@@ -124,10 +120,11 @@ function createClickHandler(ctx, canvas, cells) {
 export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
     const ctx = canvas.getContext('2d');
+    const viewport = new Viewport(canvas.width, canvas.height);
 
     const handleClick = createClickHandler(ctx, canvas, cells);
 
     canvas.addEventListener('click', handleClick);
 
-    render(ctx, canvas, cells);
+    render(ctx, viewport, cells);
 }
