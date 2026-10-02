@@ -14,9 +14,11 @@ export const cellBorderColor = '#000000';
  * @param {string} color - The color to fill the cell with in '#xxxxxx' format
  */
 function renderCell(ctx, canvas, cell, color) {
-    ctx.fillStyle = color;
     const viewport = new Viewport(canvas.width, canvas.height);
+
     const [posX, posY] = viewport.cellBodyPosition(cell);
+
+    ctx.fillStyle = color;
     ctx.fillRect(posX, posY, Viewport.cellSize, Viewport.cellSize);
 }
 
@@ -28,15 +30,14 @@ function renderCell(ctx, canvas, cell, color) {
  * @param {Set<string>} cells
  */
 function render(canvas, cells) {
+    const viewport = new Viewport(canvas.width, canvas.height);
+
     const ctx = canvas.getContext('2d');
 
     ctx.fillStyle = cellBorderColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    for (const cell of new Viewport(
-        canvas.width,
-        canvas.height
-    ).visibleCells()) {
+    for (const cell of viewport.visibleCells()) {
         renderCell(ctx, canvas, cell, deadCellColor);
     }
 
@@ -96,11 +97,11 @@ function cssToCanvas(canvas, xCSS, yCSS) {
  * @returns {(event: MouseEvent) => void}
  */
 function createClickHandler(canvas, cells) {
+    const viewport = new Viewport(canvas.width, canvas.height);
+
     return ({ offsetX, offsetY }) => {
         const [xCanvas, yCanvas] = cssToCanvas(canvas, offsetX, offsetY);
-        const cell = new Viewport(canvas.width, canvas.height)
-            .cellAtPosition(xCanvas, yCanvas)
-            .toString();
+        const cell = viewport.cellAtPosition(xCanvas, yCanvas).toString();
 
         toggleCell(cells, cell);
 
