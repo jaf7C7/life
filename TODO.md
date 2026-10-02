@@ -40,6 +40,7 @@
       - [ ] define `CanvasPixel` and `CssPixel` types so jsdoc can help catch unit errors
       - [ ] `RenderedCanvas` has `width` and `height` properties which are in _CSS pixels_, but this should be in _Canvas pixels_ to be consistent with `Canvas` (which doesn't exist as a class yet). Maybe use `Locator.getAttribute` in the constructor to get `height`, `width`, `clientHeight` and `clientWidth`.
       - [ ] Move unit conversion into `cellCentre` as it's always used to generate CSS pixel co-ords to be passed to `click`, but make the change to `RenderedCanvas` first or this will break the e2e tests.
+      - [ ] Make sure that live cells outside of the viewport do not get rendered (`life/app.js:40`)
 
   - [ ] Make sure all tests fail with an informative error message
   - [ ] Add acceptance tests

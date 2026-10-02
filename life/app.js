@@ -36,6 +36,7 @@ function render(ctx, viewport, cells) {
         renderCell(ctx, viewport, cell, deadCellColor);
     }
 
+    // BUG: Live cells outside of the viewport still get rendered
     for (const cell of liveCells(cells)) {
         renderCell(ctx, viewport, cell, livingCellColor);
     }
@@ -89,13 +90,13 @@ function cssToCanvas(canvas, xCSS, yCSS) {
  *
  * @param {object} ctx - The drawing context for the canvas
  * @param {object} canvas
+ * @param {Viewport} viewport
  * @param {Set<string>} cells
  * @returns {(event: MouseEvent) => void}
  */
-function createClickHandler(ctx, canvas, cells) {
-    const viewport = new Viewport(canvas.width, canvas.height);
-
+function createClickHandler(ctx, canvas, viewport, cells) {
     return ({ offsetX, offsetY }) => {
+        // TODO: move `cssToCanvas` to `Viewport` class and eliminate `canvas` from `createClickHandler`
         const [xCanvas, yCanvas] = cssToCanvas(canvas, offsetX, offsetY);
         const cell = viewport.cellAtPosition(xCanvas, yCanvas).toString();
 
@@ -122,7 +123,7 @@ export function initApp(ui, cells) {
     const ctx = canvas.getContext('2d');
     const viewport = new Viewport(canvas.width, canvas.height);
 
-    const handleClick = createClickHandler(ctx, canvas, cells);
+    const handleClick = createClickHandler(ctx, canvas, viewport, cells);
 
     canvas.addEventListener('click', handleClick);
 
