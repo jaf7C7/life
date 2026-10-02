@@ -26,13 +26,12 @@ function renderCell(ctx, canvas, cell, color) {
  * Renders a grid of dead cells, then paints the live cells over the top in a
  * different color.
  *
+ * @param {object} ctx - The drawing context for the canvas
  * @param {object} canvas
  * @param {Set<string>} cells
  */
-function render(canvas, cells) {
+function render(ctx, canvas, cells) {
     const viewport = new Viewport(canvas.width, canvas.height);
-
-    const ctx = canvas.getContext('2d');
 
     ctx.fillStyle = cellBorderColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -92,11 +91,12 @@ function cssToCanvas(canvas, xCSS, yCSS) {
 /**
  * Returns a callback function to handle clicks on the canvas.
  *
+ * @param {object} ctx - The drawing context for the canvas
  * @param {object} canvas
  * @param {Set<string>} cells
  * @returns {(event: MouseEvent) => void}
  */
-function createClickHandler(canvas, cells) {
+function createClickHandler(ctx, canvas, cells) {
     const viewport = new Viewport(canvas.width, canvas.height);
 
     return ({ offsetX, offsetY }) => {
@@ -105,7 +105,7 @@ function createClickHandler(canvas, cells) {
 
         toggleCell(cells, cell);
 
-        render(canvas, cells);
+        render(ctx, canvas, cells);
     };
 }
 
@@ -123,9 +123,11 @@ function createClickHandler(canvas, cells) {
  */
 export function initApp(ui, cells) {
     const canvas = ui.createElement('canvas');
-    const handleClick = createClickHandler(canvas, cells);
+    const ctx = canvas.getContext('2d');
+
+    const handleClick = createClickHandler(ctx, canvas, cells);
 
     canvas.addEventListener('click', handleClick);
 
-    render(canvas, cells);
+    render(ctx, canvas, cells);
 }
