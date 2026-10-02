@@ -13,16 +13,21 @@ catalogue) to corroborate and extend. Claims were then checked mechanically:
 
 - Both suites were run: 18 unit tests and 12 e2e tests (4 tests × 3 browsers), all passing, and
   `eslint` was clean.
-- Symbol usages were grepped.
-- Five mutation experiments were run in a throwaway git worktree, so the working tree was never
+- Symbol usages were grepped across `life/` and `tests/`.
+- Seven mutation experiments were run in a throwaway git worktree, so the working tree was never
   touched. Each experiment made one deliberate change, then re-ran the relevant suite:
   - **M1:** stop painting live cells in `app.js`. **Unit suite:** still passes, 18/18.
-  - **M2:** remove the CSS conversion from the unit `clickCell` helper. **Unit suite:** fails
-    as it should (`expected Set{ '5,3' } to deeply equal Set{ '1,1' }`).
+  - **M2:** remove the CSS conversion from the unit `clickCell` helper. **Unit suite:** 1 test
+    fails, as it should.
   - **M3:** change `livingCellColor` to `#00ff00`. **E2e suite (Chromium):** still passes, 4/4.
   - **M4:** give the canvas a CSS size of 600×300 in `index.html`. **E2e suite (Chromium):**
     3 of 4 tests fail, including one that never clicks.
-  - **M5:** change `livingCellColor` to a near-white. **Unit suite:** still passes, 18/18.
+  - **M5:** change `livingCellColor` to a near-white (`#fefefe`). **Unit suite:** still passes,
+    18/18.
+  - **M6:** make the exported free function `visibleCells(canvas)` return garbage.
+    **Unit suite:** still passes, 18/18. Nothing imports it, so no suite can notice.
+  - **M7:** remove the `render` call after a click is handled. **Unit suite:** still passes,
+    18/18. **E2e suite (Chromium):** 2 of 4 fail.
 
 ---
 
@@ -63,188 +68,175 @@ catalogue) to corroborate and extend. Claims were then checked mechanically:
 
 ## The smells
 
-### Smell 1: `Viewport` makes callers invent a canvas size just to read the cell size
-
-**Where:** `life/viewport.js:11-17`. The constructor takes `(width, height)` but also sets
-`cellSize = 20`, `cellBorderWidth = 2` and `cellStep`, and none of those three depend on
-`width` or `height`. Any code that only wants the cell size still has to construct a
-`Viewport`, and has no sensible dimensions to give it, so it passes placeholders:
-
-- `new Viewport('FIXME', 'FIXME').cellStep` appears 18 times in `tests/unit/viewport.test.js`
-  and 4 times in `tests/unit/life.test.js` (57, 84, 105, 109).
-- `new Viewport('FIXME: any old width', 'FIXME: any old height')` appears in
-  `tests/e2e/helpers.js:119-122`.
-- `new Viewport(this.width, this.height)` appears in `tests/e2e/helpers.js:107, 134, 137`.
-  Here `this` is a `RenderedCell`, which has no `width` or `height`, so both arguments are
-  `undefined`.
-
-**Verified:** grepped: there are 24 `FIXME` strings across the three test files, all of them
-`Viewport` constructor arguments. The suites pass only because each of these call sites reads
-nothing but the size fields. Calling `.origin` or `.cellPosition()` on any of these instances
-would give `NaN` without an error.
-
-**Why it's bad:**
-
-- **Freeman & Pryce: listen to the tests.** Every one of these `FIXME`s is a test saying "I
-  can't construct this object honestly." The object is asking for data its callers don't have
-  and it doesn't need for the question being asked. The fix belongs in the design, not in the
-  tests.
-- **Freeman & Pryce: Context Independence.** "How big is a cell?" is a fact about the grid, not
-  about any canvas. Tying it to a canvas-sized object makes the fact depend on context it
-  doesn't need.
-- **Fowler: Misplaced data / Move Field.** The three size fields are constants that live on
-  the wrong object. They're copied onto every instance but never vary. `width`/`height` are
-  also typed as `number` in the JSDoc but get strings and `undefined`, and nothing catches it.
-  That's a quieter version of the unit confusion in Smell 3.
-- **Practical cost:** the placeholder spreads. Each new test that needs `cellStep` copies it,
-  and the e2e `undefined` case shows it has already spread to places where nobody chose it on
-  purpose.
-
-**The refactoring:** **Move Field** the size constants off the instance.
-
-1. Add static fields to `Viewport`: `static cellSize = 20`, `static cellBorderWidth = 2`,
-   `static cellStep = Viewport.cellSize + Viewport.cellBorderWidth`. Keep the instance fields
-   as getters that return the static values, so production code keeps working unchanged. Run
-   the tests.
-2. Replace every `new Viewport(<anything>).cellStep`/`.isBorderPixel` in tests with
-   `Viewport.cellStep` (a find/replace on the `FIXME` strings, plus the three `this.width`
-   calls in `tests/e2e/helpers.js`). Run both suites.
-3. Switch production uses inside `viewport.js` and `app.js:20` to the statics (or keep the
-   getters if you want an instance to be able to override them later, e.g. for zoom. Decide
-   that when zoom exists, not now).
-4. Delete the instance getters once nothing uses them.
-
----
-
-### Smell 2: the `Viewport` extraction is half-done, so production code rebuilds it from a raw canvas at every call
+### Smell 1: `viewport.js` keeps a dead copy of `visibleCells` and two spellings of `cellStep`
 
 **Where:**
 
-- `life/viewport.js:132-162`: `visibleCells(canvas)` is still a free function taking a canvas.
-  It constructs **five** separate `Viewport`s from `canvas.width`/`canvas.height`
-  (lines 133, 136, 141, 147, 150) to read `origin` once and `cellStep` four times.
-- `life/app.js:18`: `renderCell` constructs a new `Viewport` for every cell drawn, then reads
-  `viewport.cellSize` to size the rectangle (line 20).
-- `life/app.js:98`: the click handler constructs another one.
-- `life/app.js:81-85`: `cssToCanvas`, which is geometry, still lives in `app.js` rather than
-  with the other coordinate maths.
-- `tests/unit/viewport.test.js` still passes bare `{ width, height }` literals as "the canvas".
+- `life/viewport.js:159-183`: an exported free function `visibleCells(canvas)`. Its body is a
+  line-for-line copy of the `Viewport.visibleCells()` method (137-156), with `canvas.width`
+  in place of `this.width` and a fresh `new Viewport(canvas.width, canvas.height)` to get the
+  origin.
+- `life/viewport.js:20-22`: an instance getter `get cellStep()` that only returns the static
+  `Viewport.cellStep`. Four methods read the constant through the getter (`origin` 32-33,
+  `cellAtPosition` 65-66, `cellPosition` 87-88, `cellCentre` 126-127), while three others read
+  the static directly (`isBorderPixel` 48, `cellBodyPosition` 111-112, `visibleCells` 140-145).
+  All callers outside the class use the static.
 
-**Verified:** grepped all `new Viewport` call sites. Production builds a fresh `Viewport` at 7
-distinct places, and one of those runs once per visible cell per render. No `Viewport` instance
-survives beyond a single expression.
+**Verified:** grepped for `visibleCells` across `life/` and `tests/`. The free function has no
+importer: `app.js:36-39` and every test in `tests/unit/viewport.test.js` call the method.
+Mutation M6 (make the free function return garbage) leaves all 18 unit tests passing, and since
+nothing imports it the e2e suite can't reach it either. Grepped `cellStep`: the instance getter's
+only readers are the four methods listed above.
 
 **Why it's bad:**
 
-- **Fowler: Combine Functions into Class, unfinished.** The point of that refactoring is that
-  the shared data (`width`, `height`) and the derived values (`origin`, `cellStep`) are held in
-  one place and the functions become methods on it. Here the class exists, but the canvas is
-  still the thing passed around, and each caller reconstructs the class from it. This is the
-  **Data Clump** (`canvas.width, canvas.height`) the class was supposed to absorb.
-- **Fowler: Duplicated Code.** `new Viewport(canvas.width, canvas.height)` five times in one
-  function is duplication at its most literal. It hides the one line of actual logic.
-- **Freeman & Pryce: Context Independence / SOLID: ISP.** `visibleCells` still claims to need
-  "a canvas" when it needs two numbers. That's why the unit tests can pass a two-field literal
-  and why the e2e helper can pass CSS dimensions where canvas dimensions belong (Smell 3).
+- **Fowler: Dead Code.** An exported function invites someone to call it. Because it's
+  untested (M6), a caller would get a copy of the algorithm that nothing checks, and that will
+  drift from the method the first time the method is fixed or changed.
+- **Fowler: Duplicated Code.** Two copies of a non-trivial range calculation (the off-by-one
+  `- 1`/`+ 1` corrections in 141 and 144 are exactly the kind of detail that gets fixed in one
+  copy only).
+- **Fowler: Lazy Element / Middle Man.** The getter adds a name and a hop without adding
+  meaning, and it creates two ways of spelling the same constant inside one class. A reader
+  must check whether `this.cellStep` and `Viewport.cellStep` can ever differ (they can't),
+  which is wasted effort.
+
+**The refactoring:** **Remove Dead Code**, then **Inline Function**.
+
+1. **Remove Dead Code:** delete `visibleCells(canvas)` (159-183). Run both suites.
+2. **Inline Function** `get cellStep()`: replace each `this.cellStep` in the four methods with
+   `Viewport.cellStep`, then delete the getter. Run the unit suite after each method.
+3. If you expect per-instance cell sizes later (e.g. zoom), do the opposite instead: route
+   _every_ read through the instance (`this.cellStep`, and add `this.cellSize`/
+   `this.cellBorderWidth` getters). Either is fine, but pick one spelling and use it
+   everywhere. Don't design for zoom before zoom exists; the statics are the simpler default.
+
+---
+
+### Smell 2: production code rebuilds a `Viewport` from a raw canvas at every call
+
+**Where:**
+
+- `life/app.js:16-21`: `renderCell(ctx, canvas, cell, color)` constructs a new `Viewport` for
+  every cell it draws, then reads `Viewport.cellSize` to size the rectangle itself (line 20).
+- `life/app.js:36-39`: `render` constructs another one to list the visible cells.
+- `life/app.js:101`: the click handler constructs another one.
+- `life/app.js:84-88`: `cssToCanvas`, which is pixel-space geometry, lives in `app.js` rather
+  than with the rest of the coordinate maths, and takes the whole canvas.
+
+**Verified:** traced `render` for the default 300×150 canvas: `visibleCells()` returns 15 × 7 =
+105 cells, so one render builds 106 `Viewport` instances plus one per live cell. No `Viewport`
+instance outlives the expression that creates it.
+
+**Why it's bad:**
+
+- **Fowler: Data Clump.** `canvas.width, canvas.height` travels together to every call site,
+  and every call site turns it into the same object. The `Viewport` class was clearly created
+  to absorb this clump, but the canvas is still the thing being passed around.
+- **Freeman & Pryce: Context Independence / SOLID: ISP.** `renderCell` and `cssToCanvas` both
+  take "a canvas" when one needs a viewport and the other needs four numbers. The canvas is a
+  platform object, so anything that takes it can only be unit-tested with a fake canvas
+  (Smell 6).
 - **Freeman & Pryce: Tell, Don't Ask / Fowler: Feature Envy.** `renderCell` asks the viewport
-  for a corner (`cellBodyPosition`) and separately for a size (`cellSize`), then assembles a
-  rectangle itself. The viewport knows both, so it should hand back the rectangle.
+  for a corner (`cellBodyPosition`) and separately reads a size (`Viewport.cellSize`), then
+  assembles the rectangle itself. The viewport knows both and should hand back the rectangle.
 
-**The refactoring:** finish **Combine Functions into Class**, then **Move Function**.
+**The refactoring:** **Introduce Parameter Object** (the `Viewport` already exists, so this is
+about passing it), then **Extract Function** and **Move Function**.
 
-1. **Move Function** `visibleCells` onto `Viewport` as `visibleCells()`. Inside, use
-   `this.origin` once (**Extract Variable**) and `this.cellStep`/`this.width`/`this.height`.
-   Leave the free function as a forwarder,
-   `(canvas) => new Viewport(canvas.width, canvas.height).visibleCells()`, until callers move.
-2. Migrate `viewport.test.js` to `new Viewport(w, h).visibleCells()`, which makes the "canvas"
-   literals disappear. Delete the forwarder.
-3. In `app.js`, construct **one** `Viewport` per render/click (in `render` and in
-   `createClickHandler`) and pass it down. Then `renderCell(ctx, viewport, cell, color)` no longer
-   touches `canvas`.
-4. **Extract Function** `Viewport.cellBodyRect(cell)` returning `{ x, y, width, height }`, and
+1. In `render`, build **one** `const viewport = new Viewport(canvas.width, canvas.height)`
+   (**Extract Variable**) and use it for `visibleCells()`.
+2. **Change Function Declaration:** `renderCell(ctx, viewport, cell, color)`. Delete the
+   construction inside it. Run the tests.
+3. **Extract Function** `Viewport.cellBodyRect(cell)` returning `{ x, y, width, height }`, and
    have `renderCell` call `ctx.fillRect(rect.x, rect.y, rect.width, rect.height)`. That removes
-   the Feature Envy on `cellSize`.
+   the Feature Envy on `cellSize`. Add a unit test for `cellBodyRect` in `viewport.test.js`.
+4. In `createClickHandler`, build one `Viewport` per click (or, once Smell 6 has a renderer
+   object, hold one per canvas).
 5. **Move Function** `cssToCanvas` into `viewport.js`. It needs `clientWidth`/`clientHeight`,
-   which the `Viewport` doesn't hold, so either add a `Viewport.fromElement(el)` factory that
-   also records the CSS size and exposes `cssToCanvas(point)`, or keep a separate small `Scale`
-   object. Either way, the click handler becomes
-   `viewport.cellAtPosition(viewport.cssToCanvas({ x: offsetX, y: offsetY }))`.
+   which `Viewport` doesn't hold, so either add a `Viewport.fromElement(el)` factory that also
+   records the CSS size and exposes `cssToCanvas(point)`, or keep a separate small `Scale`
+   object. The click handler then becomes
+   `viewport.cellAtPosition(...viewport.cssToCanvas(offsetX, offsetY))`.
 
 ---
 
 ### Smell 3: CSS pixels and canvas pixels are both bare numbers, and the e2e helper mixes them up
 
-**Where:** `tests/e2e/helpers.js:195-200`. `RenderedCanvas.fromPage` takes `width`/`height`
-from `locator.boundingBox()`, which gives **CSS** pixels. These are fed into
-`new Viewport(this.width, this.height)` (lines 223, 243, 272), whose constructor documents
-**canvas** pixels. `clickCell` (221-228) then passes the canvas-pixel `cellCentre` straight to
-`click()`, which Playwright treats as CSS pixels. On the unit side, the equivalent conversion is
-correct but lives in two near-identical functions, `canvasToCssX`/`canvasToCssY`
-(`tests/unit/helpers.js:11-26`). Everything in `viewport.js` returns anonymous `number[]` pairs
-with no indication of which pixel space they belong to.
+**Where:** `tests/e2e/helpers.js`:
+
+- `RenderedCanvas.fromPage` (187-192) takes `width`/`height` from `locator.boundingBox()`,
+  which gives **CSS** pixels.
+- `clickCell` (213-220) and `cell` (232-244) feed those into `new Viewport(this.width,
+this.height)`, whose constructor documents **canvas** pixels.
+- `clickCell` then passes the canvas-pixel `cellCentre` straight to `click()`, which Playwright
+  treats as CSS pixels.
+
+On the unit side, the conversion is done correctly, but in two near-identical functions,
+`canvasToCssX`/`canvasToCssY` (`tests/unit/helpers.js:11-26`). The unit and e2e `clickCell`
+helpers are two copies of the same idea, one with the conversion and one without. Everything in
+`viewport.js` returns anonymous `number[]` pairs, with no indication of which pixel space they
+belong to.
 
 **Verified:** mutation M4 (a CSS `width: 600px; height: 300px` on the canvas) makes 3 of the 4
-Chromium e2e tests fail. One of the failures, "Cell `1,1` is rendered in the initial grid",
-never clicks at all. It fails only because the helper samples pixels from the wrong place. The
-app itself handles the scaling correctly: the unit tests run with a 300×150 backing store
-shown at 200×400 CSS pixels, and mutation M2 confirms those tests would catch a missing
-conversion. So the e2e suite would report a working app as broken the moment the canvas is
-styled. The two pixel spaces are equal today only because `index.html` gives the canvas no
-CSS size.
+Chromium e2e tests fail. One of them, "Cell `1,1` is rendered in the initial grid", never
+clicks, so it can only be failing because the helper samples pixels from the wrong place. The
+app itself handles scaling correctly: the unit fake has a 300×150 backing store displayed at
+200×400 CSS pixels, and mutation M2 confirms those tests would catch a missing conversion. So
+the e2e suite would report a working app as broken as soon as the canvas is styled. The two
+pixel spaces are equal today only because `index.html` gives the canvas no CSS size.
 
 **Why it's bad:**
 
 - **Freeman & Pryce: No String Types (for units).** Two different units are both `number`, so
-  the type system can't stop one being passed where the other is expected. The code already
-  needs long explanatory comments to keep them apart (`tests/unit/helpers.js:54-63`,
-  `tests/unit/life.test.js:23-31, 52-54, 79-81`). When a distinction needs that much
-  commentary, it should be a type.
+  nothing stops one being passed where the other is expected. The code already needs long
+  comments to keep them apart (`tests/unit/helpers.js:54-63`, `tests/unit/life.test.js:23-31,
+52-54, 76-78`). When a distinction needs that much commentary, it should be a type.
 - **Freeman & Pryce: an acceptance test should describe the system from outside.** The e2e
-  helper is supposed to be an independent observer. Because it reuses the production geometry
-  with the wrong inputs, it's coupled to an accident of layout (no CSS sizing) that has nothing
-  to do with the feature under test.
+  helper reuses production geometry with the wrong inputs, so it's coupled to an accident of
+  layout (no CSS sizing) that has nothing to do with the features under test.
 - **Fowler: Primitive Obsession / Duplicated Code.** Bare `[x, y]` arrays stand in for points.
-  The X and Y conversions are one function duplicated with the axis swapped (**Parameterize
-  Function**).
+  The X and Y conversions are one function with the axis swapped (**Parameterize Function**).
 
-**The refactoring:** fix the e2e helper first (test repair, so do it on its own), then
-**Replace Primitive with Object** for points.
+**The refactoring:** fix the e2e helper first (that's test repair, so do it on its own), then
+**Parameterize Function** and **Replace Primitive with Object** for points.
 
-1. In `RenderedCanvas.fromPage`, read the backing-store size from the element:
+1. In `RenderedCanvas.fromPage`, read both sizes from the element:
    `locator.evaluate(el => ({ width: el.width, height: el.height, clientWidth: el.clientWidth,
-clientHeight: el.clientHeight }))`. Store both pairs.
-2. In `clickCell`, convert the canvas-pixel centre to CSS pixels before clicking, using the
-   same conversion the unit helper uses.
-3. Re-run mutation M4 (add a CSS size to the canvas) and confirm the e2e suite now passes with
-   it, then revert the CSS. Consider keeping a scaled canvas in the e2e page permanently, so
-   the suite keeps checking the conversion.
-4. **Parameterize Function**: replace `canvasToCssX`/`canvasToCssY` with one
-   `canvasToCss(canvas, { x, y })` returning a point. Share it between the unit and e2e helpers,
-   or duplicate it deliberately if you want the two suites fully independent.
+clientHeight: el.clientHeight }))`. Store both pairs, named by pixel space.
+2. Use the canvas-pixel pair for every `new Viewport(...)`. In `clickCell`, convert the
+   canvas-pixel centre to CSS pixels before clicking.
+3. Re-run mutation M4 and confirm the e2e suite now passes with a CSS-sized canvas, then revert
+   the CSS. Consider keeping a scaled canvas in the e2e page permanently, so the suite keeps
+   checking the conversion.
+4. **Parameterize Function:** replace `canvasToCssX`/`canvasToCssY` with one
+   `canvasToCss(canvas, { x, y })` returning a point. Share it between the unit and e2e
+   helpers, or duplicate it deliberately if you want the two suites to stay independent.
 5. Optionally, introduce named point shapes (`CanvasPoint`, `CssPoint` as JSDoc typedefs, or
-   small classes) for `Viewport`'s return values and `cssToCanvas`'s input/output. Take this as
-   far as the confusion keeps recurring, and no further.
+   small classes) for `Viewport`'s return values and `cssToCanvas`'s input and output. Take
+   this as far as the confusion keeps recurring, and no further.
 
 ---
 
 ### Smell 4: cells are strings everywhere except where they're briefly `Cell`s
 
-**Where:** the live-cell state is a `Set<string>` of `"x,y"` keys (`index.html:18`,
-`app.js:28, 49, 60-62, 92, 118`, `rules.js:38-39`). `Cell` exists (`cell.js`), but code converts
-in and out of it constantly:
+**Where:** the live-cell state is a `Set<string>` of `"x,y"` keys (`index.html:18`;
+`app.js:28, 52, 63-64, 95, 121`; `rules.js:38-39`). `Cell` exists (`cell.js`), but code
+converts in and out of it constantly:
 
 - `rules.js:45` parses every key into a `Cell`, and `rules.js:49` and `:58` turn `Cell`s back
   into strings.
-- `app.js:53` parses again for rendering.
-- `app.js:100` stringifies the clicked cell.
+- `app.js:56` (`liveCells`) parses again for rendering.
+- `app.js:101-103` stringifies the clicked cell.
 - `newCells` (`rules.js:30-32`) works directly on the string keys of a plain-object counter.
 
-`app.js` has three `// SMELL: primitive obsession` markers (lines 45, 56, 87) acknowledging this.
+`app.js` carries three `// SMELL: primitive obsession` markers (lines 48, 59, 90) acknowledging
+this.
 
 **Verified:** every test in `rules.test.js` and `life.test.js` builds its inputs and asserts on
-its outputs as string literals (`'0,0'`, `'-1,-1'`, …). `viewport.test.js` maps `Cell`s back to
-strings (`.map((c) => c.toString())`) before comparing them. The whole suite depends on the
-encoding.
+its outputs as string literals (`'0,0'`, `'-1,-1'`, …). Every test in `viewport.test.js` maps
+`Cell`s back to strings (`.map((c) => c.toString())`) and sorts them before comparing. The whole
+suite depends on the encoding.
 
 **Why it's bad:**
 
@@ -270,17 +262,20 @@ encoding (this also sets up Smell 5).
    `for (const cell of population)`, and each `neighbour.toString()`/`cells.has(key)` pair
    becomes `population.has(neighbour)`. The neighbour counter can stay keyed internally for now
    (Smell 9 restructures it).
-4. Update `rules.test.js` to build inputs with `Population.of(cell(0, 0), …)` (a tiny `cell(x,
-y)` test helper keeps this readable) and assert with `population.has(cell(0, 0))`. For the
-   blinker's whole-set comparison, add `equals(other)` or compare sorted cell lists.
-5. Migrate `app.js` and `index.html` to create and pass a `Population` (together with Smell 5),
-   and remove the `// SMELL` markers only once the strings are actually gone.
+4. Update `rules.test.js` to build inputs with `Population.of(cell(0, 0), …)` (a tiny
+   `cell(x, y)` test helper keeps this readable) and assert with `population.has(cell(0, 0))`.
+   For the blinker's whole-set comparison, add `equals(other)` or compare sorted cell lists.
+5. Give `Cell` an `equals(other)` (or compare `{ x, y }` with `deep.equal`) so
+   `viewport.test.js` can assert on cells rather than on their string form.
+6. Migrate `app.js` and `index.html` to create and pass a `Population` (together with Smell 5).
+   Delete `liveCells` and remove the `// SMELL` markers only once the strings are actually
+   gone.
 
 ---
 
 ### Smell 5: the app mutates a raw `Set` it was handed, and tests assert through that shared reference
 
-**Where:** `index.html:18-20` creates `new Set()` and passes it to `initApp`. `app.js:64-70`
+**Where:** `index.html:18-20` creates `new Set()` and passes it to `initApp`. `app.js:67-73`
 (`toggleCell`) asks `cells.has(cell)`, then calls `delete`/`add` on the set from outside. Every
 click test in `tests/unit/life.test.js` creates its own `Set`, passes it in, and inspects that
 same object after clicking (`expect(cells).to.deep.equal(...)`).
@@ -294,7 +289,7 @@ same object after clicking (`expect(cells).to.deep.equal(...)`).
   holding it can change it without the canvas being redrawn. The app has no control over its
   own state.
 - **Freeman & Pryce: listen to the tests.** The tests need the shared reference because the app
-  has no other observable output. `render` writes to a fake 2D context that records nothing
+  has no other observable output: `render` writes to a fake 2D context that records nothing
   (Smell 6). The shared `Set` is a workaround for a missing seam.
 
 **The refactoring:** **Encapsulate Collection** (building on Smell 4's `Population`) plus
@@ -315,22 +310,27 @@ same object after clicking (`expect(cells).to.deep.equal(...)`).
 
 **Where:** `life/app.js` in full:
 
-- `render`/`renderCell` (lines 16-43) draw directly with the Canvas 2D API.
-- `createClickHandler` (95-106) translates DOM events.
-- `cssToCanvas` (81-85) is coordinate maths.
-- `toggleCell` (64-70) mutates state.
+- `render`/`renderCell` (16-46) draw directly with the Canvas 2D API.
+- `createClickHandler` (98-109) translates DOM events and then re-renders.
+- `cssToCanvas` (84-88) is coordinate maths.
+- `toggleCell` (67-73) mutates state.
 - The colour constants (4-6) are styling.
 
 `renderCell(ctx, canvas, cell, color)` takes four parameters, two of which (`ctx`, `canvas`)
-are always the same pair. In tests, `MockUI.createElement` (`tests/unit/helpers.js:38-95`)
+always travel together. In tests, `MockUI.createElement` (`tests/unit/helpers.js:38-95`)
 returns a hand-rolled fake `HTMLCanvasElement`, whose `getContext()` returns
 `{ fillRect() {} }`.
 
-**Verified:** mutation M1 (comment out the loop that paints live cells) leaves all 18 unit
-tests passing, and so does mutation M5 (make the live colour indistinguishable from the dead
-colour). No unit test observes anything that is drawn. Rendering is covered only by the e2e
-suite, which is slower and, per Smells 3 and 10, partly derives its expectations from
-production code.
+**Verified:** no unit test observes anything that is drawn, or even whether drawing happens.
+
+- Mutation M1 (stop painting live cells) leaves all 18 unit tests passing.
+- Mutation M5 (make the live colour indistinguishable from the dead colour) leaves all 18
+  passing.
+- Mutation M7 (stop re-rendering after a click) leaves all 18 passing. Only the e2e suite
+  catches it (2 of 4 fail).
+
+Rendering is therefore covered only by the e2e suite, which is slower and, per Smells 3 and 10,
+partly derives its expectations from production code.
 
 **Why it's bad:**
 
@@ -342,23 +342,23 @@ production code.
   - state semantics change.
 - **Freeman & Pryce: only mock types you own.** The unit tests fake `HTMLCanvasElement` and
   `CanvasRenderingContext2D`, which are platform types. The fake is a guess at their behaviour
-  (fixed `clientWidth`/`clientHeight` that a real element would compute from layout), and it's
-  too thin to assert against. The alternative is a small port in the app's own terms ("show
-  this population"), which the app depends on. A thin canvas adapter implements the port, and
-  the adapter is tested against the real browser.
+  (fixed `clientWidth`/`clientHeight` that a real element computes from layout), and it's too
+  thin to assert against. The alternative is a small port in the app's own terms ("show this
+  population"), which the app depends on. A thin canvas adapter implements the port, and the
+  adapter is tested against the real browser.
 - **SOLID: DIP.** The high-level policy ("when a cell is clicked, toggle it and redisplay")
   depends directly on a low-level detail (the Canvas 2D API). Inverting that dependency gives
   the unit tests something meaningful to fake, which is also the missing seam from Smell 5.
-- **Fowler: Long Parameter List / Data Clump.** `ctx` and `canvas` travel together everywhere
-  and would become fields of a renderer object.
+- **Fowler: Long Parameter List / Data Clump.** `ctx` and `canvas` travel together and would
+  become fields of a renderer object.
 
 **The refactoring:** **Extract Class** twice, with ports named after their role.
 
 1. **Extract Class** `CanvasRenderer` (e.g. `life/canvasRenderer.js`). Its constructor takes
    the canvas element and a `Viewport` (Smell 2), and its one method `draw(population)` holds
    the current `render` body. **Move Function** `renderCell` and **Move Field** the colour
-   constants into it. `ctx` and the viewport become fields, so `renderCell(cell, color)` has two
-   parameters.
+   constants into it. `ctx` and the viewport become fields, so `renderCell(cell, color)` has
+   two parameters.
 2. Define the port: a documented `Display` shape with `draw(population)`. Have `initApp`
    receive a display (or a factory for one) instead of calling `render` itself.
 3. **Extract Function** the input side: a click handler that takes the CSS offset, maps it to a
@@ -367,8 +367,9 @@ production code.
 4. In unit tests, replace the fake 2D context with a fake `Display` that records each
    population it was asked to draw. A test like "Clicking on the center adds cell 0,0" then
    asserts "the last thing drawn contains exactly cell (0, 0)", which is a behaviour of the app
-   and not a state probe. Re-run mutations M1 and M5 against a focused `CanvasRenderer` browser
-   test (or accept that e2e covers them), so they no longer pass silently.
+   and not a state probe, and M7 would now fail a unit test. Re-run M1 and M5 against a focused
+   `CanvasRenderer` browser test (or accept that e2e covers them), so they no longer pass
+   silently.
 5. What remains in `app.js` is wiring (**Composite Simpler than the Sum of Its Parts**): build
    the viewport, the renderer and the population, then connect the click handler.
 
@@ -377,7 +378,7 @@ production code.
 ### Smell 7: the `UI` port is misnamed, ignores its argument, and its fake doubles as a test driver
 
 **Where:** `life/ui.js:1-8`. `UI.createElement()` takes no parameter, although the typedef in
-`app.js:108-111` declares `(tag: string) => object` and `app.js:121` passes `'canvas'`. It
+`app.js:111-114` declares `(tag: string) => object` and `app.js:124` passes `'canvas'`. It
 always creates a canvas, sets a `data-testid`, **and** appends it to `document.body`. The fake,
 `MockUI.createElement(type)` (`tests/unit/helpers.js:38`), does honour `type`, so the fake and
 the real implementation have different contracts. The fake element also carries test-driver
@@ -394,19 +395,19 @@ it isn't.
   real object ignores means the tests describe a system that doesn't exist. Passing `'div'`
   would work in unit tests and silently produce a canvas in the browser.
 - **Freeman & Pryce: name the role.** Neither `UI` nor `createElement` names what the app needs,
-  which is "a surface to draw on that reports clicks". Once Smell 6 introduces a `Display` port,
-  `UI` either becomes that port's factory or disappears.
+  which is "a surface to draw on that reports clicks". Once Smell 6 introduces a `Display`
+  port, `UI` either becomes that port's factory or disappears.
 - **SRP (in test code).** The fake element is both a stand-in for a DOM node and a driver that
-  simulates gestures and does coordinate conversion. Driver logic belongs in helpers that _use_
-  the fake. Coordinate conversion inside a fake is exactly where a units bug is hardest to
-  notice.
+  simulates gestures and converts coordinates. Driver logic belongs in helpers that _use_ the
+  fake. Coordinate conversion inside a fake is exactly where a units bug is hardest to notice.
 
 **The refactoring:**
 
 1. **Change Function Declaration:** rename `UI.createElement()` to something honest, such as
    `mountCanvas()`. Drop the phantom `tag` from the typedef and call site, and rename
    `MockUI.createElement(type)` to match, without its parameter. Fix `MockUI`'s doc comment.
-2. Move the `UI` typedef next to the class it describes (`ui.js`), or next to Smell 6's port.
+2. **Move** the `UI` typedef next to the class it describes (`ui.js`), or next to Smell 6's
+   port.
 3. **Extract Function** `click`/`clickCell` out of the fake element into standalone helpers,
    e.g. `clickAt(canvas, cssPoint)` and `clickCell(canvas, cell)`. The fake keeps only what it
    needs to impersonate an element (dimensions, `addEventListener`) plus one hook to dispatch an
@@ -422,8 +423,8 @@ it isn't.
 
 - All six tests repeat `const cells = new Set(); const ui = new MockUI(); initApp(ui, cells);`,
   and five follow it with `ui.findElement('canvas')`.
-- Four tests (lines 32, 47, 74, 99) rebuild the same `canvasCentre` object.
-- The comment block at 52-54 is repeated verbatim at 79-81.
+- Four tests (lines 32, 47, 71, 93) rebuild the same `canvasCentre` object.
+- The comment block at 52-54 is repeated verbatim at 76-78.
 - The suite is named `'User Interface'` (line 7), but it tests `initApp`'s click-to-cell
   behaviour.
 
@@ -455,19 +456,24 @@ it isn't.
 (b) tallies neighbour counts of dead cells into `counter`. A second phase, `newCells` (30-32),
 then picks births. The rule thresholds appear as `> 1 && < 4` (line 57) and `=== 3` (line 31),
 with no names. `counter` is a `{ [key: string]: number }` object used as a map, and `newCells`
-names the result, not the rule.
+names the result, not the rule. On the test side, `rules.test.js:63-71` ("Blinker oscillator")
+asserts only that two generations return the starting state, so on its own it can't tell an
+oscillator from a still life. The other tests in the file catch that today, but the blinker test
+doesn't describe what its name claims.
 
 **Why it's bad:**
 
 - **Fowler: Long Function / Split Phase.** The survival check and the birth tally are two
   computations sharing a loop. **Split Phase** applies when code does two things in sequence
-  that could be separated by an intermediate structure. Here that structure is "the live-
-  neighbour count for every relevant cell".
+  that could be separated by an intermediate structure. Here that structure is "the
+  live-neighbour count for every relevant cell".
 - **Fowler: Mysterious Name.** The README names the four rules (underpopulation, survival,
   overpopulation, reproduction), and none of those names appears in the code.
   `liveNeighbourCount > 1 && liveNeighbourCount < 4` is the survival rule in disguise.
 - **Freeman & Pryce: No String Types.** The counter is keyed by Smell 4's string encoding,
   which leaks straight into the result set via `newCells`.
+- **Freeman & Pryce: specify precisely what should happen.** An oscillator test that doesn't
+  check the intermediate phase is under-specified relative to its name.
 
 **The refactoring:** **Split Phase**, then **Extract Function** on the rules. Do this after
 Smell 4, so it's written against `Population`/`Cell` from the start.
@@ -482,7 +488,8 @@ Smell 4, so it's written against `Population`/`Cell` from the start.
    `isBorn(counts.get(cell))`.
 4. Delete `newCells` and the ad-hoc `counter`.
 5. `rules.test.js` covers 0, 1, 2, 3 and 4 neighbours for live cells and 3 and 4 for dead
-   cells, which is a sufficient safety net for this change.
+   cells, which is a sufficient safety net for this change. While the file is open, add the
+   blinker's intermediate assertion (`next(vertical)` equals the horizontal row).
 
 ---
 
@@ -490,17 +497,19 @@ Smell 4, so it's written against `Population`/`Cell` from the start.
 
 **Where:**
 
-- `life/viewport.js:39-43` (`Viewport.isBorderPixel`) and `life/viewport.js:116-123`
-  (`Viewport.cellCentre`) have no production callers.
+- `life/viewport.js:44-50` (`Viewport.isBorderPixel`) and `life/viewport.js:123-130`
+  (`Viewport.cellCentre`) have no production callers. `isBorderPixel` doesn't read `this`, yet
+  it's an instance method, so its one caller has to invent a `Viewport` to reach it.
 - `life/app.js:4-6` exports `livingCellColor`, `deadCellColor` and `cellBorderColor`. The only
   importer is `tests/e2e/helpers.js:2-6`, which uses them as the expected colours.
 - The e2e helper also uses the production `cellPosition` to decide where to sample
-  (`tests/e2e/helpers.js:243`).
+  (`tests/e2e/helpers.js:235`).
 
 **Verified:**
 
-- Grepped each symbol. `isBorderPixel` is called only from `tests/e2e/helpers.js:122`, and
-  `cellCentre` only from `tests/unit/helpers.js:81` and `tests/e2e/helpers.js:226`.
+- Grepped each symbol. `isBorderPixel` is called only from `tests/e2e/helpers.js:116-119`, on a
+  `new Viewport('FIXME: any old width', 'FIXME: any old height')`. `cellCentre` is called only
+  from `tests/unit/helpers.js:78-81` and `tests/e2e/helpers.js:215-218`.
 - Mutation M3 (change `livingCellColor` to green) leaves all 4 Chromium e2e tests passing. The
   e2e suite can't detect a change to the live-cell colour, because it asks production what that
   colour should be.
@@ -510,6 +519,9 @@ Smell 4, so it's written against `Population`/`Cell` from the start.
 - **Freeman & Pryce: an acceptance test states its expectations independently.** If the e2e
   test asks production "what colour is a live cell?", then a regression in that answer moves
   the expectation along with the behaviour, and the test can't notice. M3 demonstrates this.
+- **Freeman & Pryce: listen to the tests.** The `FIXME` placeholder arguments are the test
+  saying "I can't construct this object honestly." The object is demanding data it doesn't
+  need for the question being asked.
 - **Fowler: Speculative Generality / Dead Code (from production's point of view).**
   `isBorderPixel` hard-codes `cellSize + cellBorderWidth / 2` as the far border pixel. That's a
   fact about how the _test_ slices image data, not about the game, but it lives on a production
@@ -521,8 +533,8 @@ Smell 4, so it's written against `Population`/`Cell` from the start.
 tests.
 
 1. **Move Function** `isBorderPixel` into `tests/e2e/helpers.js` as a plain function taking the
-   pixel, using `Viewport.cellSize`/`cellBorderWidth` (after Smell 1). Remove it from
-   `Viewport`.
+   pixel, using `Viewport.cellSize`/`Viewport.cellBorderWidth`. Remove it from `Viewport`. The
+   `FIXME` construction disappears with it.
 2. Decide `cellCentre`'s home. Both callers are test helpers, so either move it to a shared
    test helper or leave it on `Viewport` only if the production click path starts using it.
 3. In the e2e helper, define the expected colours as literals (`const LIVE = '#ff0000'`, etc.)
@@ -542,15 +554,15 @@ tests.
 
 - `Pixel` declares `data;` (line 32), and `RenderedCell.pixel()` assigns it after construction
   (84-88).
-- `RenderedCanvas.cell()` (240-252) creates a `RenderedCell`, then assigns `posX`, `posY` and
-  `imgData` onto it. `RenderedCell` reads `this.imgData` (line 109) without declaring it.
-- `RenderedCell` reads `this.width`/`this.height` (107, 134, 137), which are never set (see
-  Smell 1).
-- `RenderedCell.hasBorderPixel` (118-123) builds a placeholder `Viewport` just to forward to
-  `isBorderPixel`.
-- `pixelData` (97-110) contains "I can't understand this calculation any more… TODO: Work out
+- `RenderedCanvas.cell()` (232-244) creates a `RenderedCell`, then assigns `posX`, `posY` and
+  `imgData` onto it. `RenderedCell` reads `this.imgData` (line 106) without declaring it.
+- `RenderedCanvas.cell()` passes the `RenderedCell` to `Viewport.cellPosition` (235) as though
+  it were a `Cell`. That works only because both happen to have `x` and `y`.
+- `RenderedCell.hasBorderPixel` (115-120) does nothing but build a placeholder `Viewport` and
+  forward to `isBorderPixel`.
+- `pixelData` (97-107) contains "I can't understand this calculation any more… TODO: Work out
   what's going on here".
-- `cellImgData` (263-275) takes a whole `RenderedCell` only to read `posX`/`posY` from it.
+- `cellImgData` (255-267) takes a whole `RenderedCell` only to read `posX`/`posY` from it.
 
 **Why it's bad:**
 
@@ -561,16 +573,20 @@ tests.
 - **Fowler: Middle Man.** `hasBorderPixel` adds a name and a hop without adding meaning, plus a
   placeholder construction.
 - **Fowler: Comments.** A comment saying the code isn't understood calls for **Extract
-  Variable** and **Rename**. The calculation is ordinary row-major indexing. `getImageData` is
-  asked for a `cellStep × cellStep` block (line 267) and returns it row by row, 4 bytes per
+  Variable** and **Rename**. The calculation is ordinary row-major indexing: `getImageData` is
+  asked for a `cellStep × cellStep` block (line 259) and returns it row by row, 4 bytes per
   pixel, so pixel (x, y) starts at `(y * rowWidth + x) * 4`, where `rowWidth` is `cellStep`.
+- **Freeman & Pryce: No String Types / Fowler: Primitive Obsession, mirrored.** Using a
+  `RenderedCell` where a `Cell` is expected is an implicit, unchecked type pun. Constructing
+  the real `Cell` (and keeping it as a field) states the relationship.
 
 **The refactoring:**
 
-1. **Change Function Declaration** on `RenderedCell` to take `(x, y, imgData)`. Make
-   `RenderedCanvas.cell()` compute the position, fetch the image data, then construct. Keep
-   `posX`/`posY` as locals in `cell()` and pass them to `cellImgData(posX, posY)` directly
-   (**Remove Setting Method**, **Change Function Declaration**).
+1. **Change Function Declaration** on `RenderedCell` to take `(cell, imgData)`, where `cell` is
+   a real `Cell`. Make `RenderedCanvas.cell()` build the `Cell`, compute the position from it,
+   fetch the image data, then construct. Keep `posX`/`posY` as locals in `cell()` and pass them
+   to `cellImgData(posX, posY)` directly (**Remove Setting Method**, **Change Function
+   Declaration**).
 2. Do the same for `Pixel`: construct it with `(x, y, rgba)`.
 3. **Inline Function** `hasBorderPixel` into `cellIsColor`, calling the test-side
    `isBorderPixel` from Smell 10.
@@ -585,85 +601,85 @@ tests.
 **Where:**
 
 - `package.json:6`: `"main": "index.js"` names a file that doesn't exist.
-- `life/viewport.js:9`: the constructor's JSDoc has `@returns {Viewport}`. Constructors don't
+- `life/viewport.js:13`: the constructor's JSDoc has `@returns {Viewport}`. Constructors don't
   document a return value, and the tag adds nothing.
-- `life/viewport.js:49-52`: `cellAtPosition`'s parameters are described as "the click
+- `life/viewport.js:56-59`: `cellAtPosition`'s parameters are described as "the click
   location". This is a pure geometry function, so describing it in terms of one caller's use is
   misleading.
-- `tests/e2e/helpers.js:172-173` documents `RenderedCanvas.width`/`height` as "in pixels", while
-  the constructor (179-180) says "in CSS pixels". Smell 3 turns on exactly that difference.
-- `tests/e2e/helpers.js:238`: `cell()` is `async` but documents `@returns {RenderedCell}`
-  rather than a `Promise`. `cellImgData` (261) has the same problem.
+- `tests/e2e/helpers.js:164-165` documents `RenderedCanvas.width`/`height` as "in pixels", while
+  the constructor (171-172) says "in CSS pixels". Smell 3 turns on exactly that difference.
+- `tests/e2e/helpers.js:230`: `cell()` is `async` but documents `@returns {RenderedCell}`
+  rather than a `Promise`. `cellImgData` (253) has the same problem, and `fromPage` (182-186)
+  has no `@returns` at all.
 - Typos: "aribtrary" (`tests/unit/life.test.js:27`) and "The blinker the simplest oscillator"
   (`tests/unit/rules.test.js:64`).
 
 **Why it's bad:** **Fowler: Comments.** A comment is only useful while it's accurate. A wrong
 annotation is worse than none, because readers and tooling (the project runs
-`eslint-plugin-jsdoc`) both trust it. The `width` mismatch is the one that matters, because
-it documents away the bug in Smell 3.
+`eslint-plugin-jsdoc`) both trust it. The `width` mismatch is the one that matters, because it
+documents away the bug in Smell 3.
 
 **The refactoring:** edit directly. Remove or correct `"main"`, drop the constructor
 `@returns`, describe `cellAtPosition`'s parameters as canvas-pixel coordinates, make the
 `RenderedCanvas` field docs say which pixel space they're in (and update them when Smell 3
-changes it), change the async `@returns` to `Promise<…>`, and fix the typos.
+changes it), change the async `@returns` to `Promise<…>` and add the missing one, and fix the
+typos.
 
 ---
 
 ## Suggested order of work
 
-1. **Smell 12 (comments and metadata).** No dependencies and minutes of work. Doing it first
-   keeps one-line edits out of the diffs for the structural changes, where they'd make review
-   harder.
+1. **Smell 12 (comments and metadata), then Smell 1 (dead `visibleCells`, one `cellStep`
+   spelling).** Neither has dependencies, and each is minutes of work. Doing them first keeps
+   one-line edits out of the diffs for the structural changes, where they'd make review harder.
+   Smell 1 matters before Smell 2 in particular: Smell 2 adds methods to `Viewport`, and doing
+   it with the getter still present means choosing between two spellings of `cellStep` in each
+   new method. Deleting the dead free function also means nobody "fixes" the wrong copy of
+   `visibleCells` during the later steps.
 
-2. **Smell 1 (move the size constants off `Viewport` instances).** This is small and
-   mechanical, and it touches every test file. Every later step that touches tests
-   (Smells 2, 3, 8, 10, 11) would otherwise have to work around, or copy, the `FIXME`
-   constructions. It also removes the `undefined`-argument constructions in the e2e helper
-   before Smell 11 restructures that class.
-
-3. **Smell 3, steps 1-3 (make the e2e helper use canvas pixels).** This is test repair, not
+2. **Smell 3, steps 1-3 (make the e2e helper use canvas pixels).** This is test repair, not
    refactoring, so it goes in its own commit, before any refactoring that relies on the e2e
-   suite. Mutation M4 shows the suite currently gives false failures under a CSS-sized canvas.
-   More importantly, it's the only suite that observes rendering (Smell 6), so it needs to be
+   suite. Mutation M4 shows the suite gives false failures under a CSS-sized canvas, and M1, M5
+   and M7 show it is the only suite that observes rendering at all (Smell 6). It needs to be
    trustworthy before Smells 2 and 6 move rendering and geometry code around.
 
-4. **Smell 2 (finish `Viewport`), then Smell 3, steps 4-5 (point types, one conversion
-   function).** Both sit in `viewport.js`, `app.js` and the two helpers, so those files are
-   opened once. Smell 2 has the widest fan-out among the production smells: Smells 6, 10 and 11
-   all need to know where geometry lives, and once `visibleCells`, `cellBodyRect` and
-   `cssToCanvas` are on `Viewport`, that's decided. Doing Smell 6 first would mean building
-   `CanvasRenderer` against the free functions and rewriting it.
+3. **Smell 2 (pass one `Viewport`, add `cellBodyRect`, move `cssToCanvas`), then Smell 3,
+   steps 4-5 (one conversion function, point types).** Both sit in `viewport.js`, `app.js` and
+   the two helpers, so those files are opened once. Smell 2 has the widest fan-out among the
+   production smells: Smells 6, 10 and 11 all need to know where geometry lives, and once
+   `cellBodyRect` and `cssToCanvas` are on `Viewport`, that's decided. Doing Smell 6 first would
+   mean building `CanvasRenderer` against `renderCell(ctx, canvas, …)` and rewriting it.
 
-5. **Smell 8 (extract unit-test setup).** Before any step that changes `initApp`'s signature
+4. **Smell 8 (extract unit-test setup).** Before any step that changes `initApp`'s signature
    (Smells 5, 6, 7), so those changes are edited in one `startApp()` helper instead of six
-   tests. It comes after step 4 so the consolidated conversion helper it documents already
-   exists.
+   tests. It comes after step 3 so the consolidated conversion helper its comment points to
+   already exists.
 
-6. **Smell 4 (`Population`), then Smell 5 (`toggle` onto `Population`).** They add one class and
-   share the same callers (`rules.js`, `app.js`, `index.html`, both unit test files), so do
+5. **Smell 4 (`Population`), then Smell 5 (`toggle` onto `Population`).** They add one class and
+   share the same callers (`rules.js`, `app.js`, `index.html`, three unit test files), so do
    them back to back. This must come before Smell 6 so the display port's `draw(population)` is
    defined in domain terms from the start, not over a `Set<string>` that would need changing
    again.
 
-7. **Smell 9 (`rules.next` Split Phase).** Straight after step 6, while `rules.js` is open and
+6. **Smell 9 (`rules.next` Split Phase).** Straight after step 5, while `rules.js` is open and
    its tests have just been rewritten around `Population`. Doing it earlier would mean writing
    `neighbourCounts` against string keys and then rewriting it.
 
-8. **Smell 6 (extract `CanvasRenderer` and a `Display` port), then Smell 7 (rename and slim
+7. **Smell 6 (extract `CanvasRenderer` and a `Display` port), then Smell 7 (rename and slim
    `UI`/`MockUI`).**
-   - By now the renderer is assembled from existing parts (`Viewport`, `Population`), so the
-     extraction is mostly moving code.
+   - By now the renderer is assembled from existing parts (`Viewport` with `cellBodyRect`,
+     `Population`), so the extraction is mostly moving code.
    - Smell 7 follows immediately because it touches the same seam (`initApp`'s parameters,
      `MockUI`), and Smell 6's fake `Display` decides what's left for `MockUI` to do. Slimming
      the fake first would mean reshaping it twice.
    - This step also unlocks Smell 5's final step (assert on what was drawn, not on the shared
-     collection). Do that here too.
+     collection). Do that here too, and confirm M7 now fails a unit test.
 
-9. **Smell 10 (move test-only code out of production), then Smell 11 (e2e helper
+8. **Smell 10 (move test-only code out of production), then Smell 11 (e2e helper
    construction).**
    - Both are almost entirely in `tests/e2e/helpers.js`, so the file is opened once.
    - Smell 10 goes first because moving `isBorderPixel` into that file is what lets Smell 11
      inline `hasBorderPixel` into a local call.
-   - They come last because by now `Viewport` (step 4) and the renderer (step 8) have settled
+   - They come last because by now `Viewport` (step 3) and the renderer (step 7) have settled
      which geometry and colours are production API. `cellCentre` and the colour constants are
      therefore moved only once, to their final homes.
