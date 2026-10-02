@@ -17,10 +17,6 @@ export class Viewport {
         this.height = height;
     }
 
-    get cellStep() {
-        return Viewport.cellStep;
-    }
-
     /**
      * Returns the canvas pixel co-ords of the cell grid's origin (the top-left
      * corner of cell `0,0`), relative to the top-left corner of the canvas.
@@ -29,8 +25,8 @@ export class Viewport {
      */
     get origin() {
         // This sets the centre of cell 0,0 at the centre of the canvas.
-        const originX = this.width / 2 - this.cellStep / 2;
-        const originY = this.height / 2 - this.cellStep / 2;
+        const originX = this.width / 2 - Viewport.cellStep / 2;
+        const originY = this.height / 2 - Viewport.cellStep / 2;
         return [originX, originY];
     }
 
@@ -62,8 +58,8 @@ export class Viewport {
     cellAtPosition(x, y) {
         const [originX, originY] = this.origin;
 
-        const cellX = Math.floor((x - originX) / this.cellStep);
-        const cellY = -Math.floor((y - originY) / this.cellStep);
+        const cellX = Math.floor((x - originX) / Viewport.cellStep);
+        const cellY = -Math.floor((y - originY) / Viewport.cellStep);
 
         return new Cell(cellX, cellY);
     }
@@ -84,8 +80,8 @@ export class Viewport {
      */
     cellPosition(cell) {
         const [originX, originY] = this.origin;
-        const posX = originX + cell.x * this.cellStep;
-        const posY = originY - cell.y * this.cellStep;
+        const posX = originX + cell.x * Viewport.cellStep;
+        const posY = originY - cell.y * Viewport.cellStep;
 
         return [posX, posY];
     }
@@ -123,8 +119,8 @@ export class Viewport {
     cellCentre(cell) {
         const [cornerX, cornerY] = this.cellPosition(cell);
         const [centreX, centreY] = [
-            cornerX + this.cellStep / 2,
-            cornerY + this.cellStep / 2
+            cornerX + Viewport.cellStep / 2,
+            cornerY + Viewport.cellStep / 2
         ];
         return [centreX, centreY];
     }
