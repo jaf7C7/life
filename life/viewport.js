@@ -25,9 +25,10 @@ export class Viewport {
      */
     get origin() {
         // This sets the centre of cell 0,0 at the centre of the canvas.
-        const originX = this.width / 2 - Viewport.cellStep / 2;
-        const originY = this.height / 2 - Viewport.cellStep / 2;
-        return [originX, originY];
+        return {
+            x: this.width / 2 - Viewport.cellStep / 2,
+            y: this.height / 2 - Viewport.cellStep / 2
+        };
     }
 
     /**
@@ -56,10 +57,8 @@ export class Viewport {
      * @returns {Cell}
      */
     cellAtPosition(x, y) {
-        const [originX, originY] = this.origin;
-
-        const cellX = Math.floor((x - originX) / Viewport.cellStep);
-        const cellY = -Math.floor((y - originY) / Viewport.cellStep);
+        const cellX = Math.floor((x - this.origin.x) / Viewport.cellStep);
+        const cellY = -Math.floor((y - this.origin.y) / Viewport.cellStep);
 
         return new Cell(cellX, cellY);
     }
@@ -79,9 +78,8 @@ export class Viewport {
      * @returns {number[]}
      */
     cellPosition(cell) {
-        const [originX, originY] = this.origin;
-        const posX = originX + cell.x * Viewport.cellStep;
-        const posY = originY - cell.y * Viewport.cellStep;
+        const posX = this.origin.x + cell.x * Viewport.cellStep;
+        const posY = this.origin.y - cell.y * Viewport.cellStep;
 
         return [posX, posY];
     }
@@ -131,14 +129,13 @@ export class Viewport {
      * @returns {Cell[]}
      */
     visibleCells() {
-        const [originX, originY] = this.origin;
-
-        const minX = Math.floor(-originX / Viewport.cellStep);
-        const maxX = Math.ceil((this.width - originX) / Viewport.cellStep) - 1;
+        const minX = Math.floor(-this.origin.x / Viewport.cellStep);
+        const maxX =
+            Math.ceil((this.width - this.origin.x) / Viewport.cellStep) - 1;
 
         const minY =
-            Math.floor(-(this.height - originY) / Viewport.cellStep) + 1;
-        const maxY = Math.ceil(originY / Viewport.cellStep);
+            Math.floor(-(this.height - this.origin.y) / Viewport.cellStep) + 1;
+        const maxY = Math.ceil(this.origin.y / Viewport.cellStep);
 
         const result = [];
         for (let x = minX; x <= maxX; x++) {
