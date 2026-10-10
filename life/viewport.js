@@ -129,13 +129,11 @@ export class Viewport {
      * @returns {Cell[]}
      */
     visibleCells() {
-        const minX = Math.floor(-this.origin.x / Viewport.cellStep);
-        const maxX =
-            Math.ceil((this.width - this.origin.x) / Viewport.cellStep) - 1;
-
-        const minY =
-            Math.floor(-(this.height - this.origin.y) / Viewport.cellStep) + 1;
-        const maxY = Math.ceil(this.origin.y / Viewport.cellStep);
+        const { x: minX, y: maxY } = this.cellAtPosition(0, 0);
+        const { x: maxX, y: minY } = this.cellAtPosition(
+            this.width - 1,
+            this.height - 1
+        );
 
         const result = [];
         for (let x = minX; x <= maxX; x++) {
