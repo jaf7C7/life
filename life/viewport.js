@@ -26,8 +26,8 @@ export class Viewport {
     get origin() {
         // This sets the centre of cell 0,0 at the centre of the canvas.
         return {
-            x: this.width / 2 - Viewport.cellStep / 2,
-            y: this.height / 2 - Viewport.cellStep / 2
+            x: Math.floor(this.width / 2 - Viewport.cellStep / 2),
+            y: Math.ceil(this.height / 2 - Viewport.cellStep / 2)
         };
     }
 
